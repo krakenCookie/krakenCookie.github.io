@@ -40,7 +40,6 @@ a:hover {
 	font-weight: bold;
 	font-size: 1.2em;
 	margin: 0.8em 0;
-	text-align: left;
 }
 
 /* override the left margin added by font awesome for the main content list,
@@ -121,17 +120,6 @@ footer {
 	}
 }
 
-/* For smaller devices ONLY */
-@media (max-width: 768px) {
-	/* wrapper stays 480px wide past 480px wide and is kept centered */
-	/*** main content list ***/
-	.main-list-item {
-		text-align: center;
-	}
-}
-
-
-
 /* All other devices (768px and up) */
 @media (min-width: 768px) {
 	/* past 768px the layout is changed and the wrapper has a fixed width of 680px
@@ -147,11 +135,8 @@ footer {
 		width: 46%;
 		text-align: right;
 	}
-	/*** author ***/
-	.author-container h1 {
-		/* margin-top: 10%; */
-		text-align: right;
-	}
+
+	.author-container h1,
 	.logo-container,
 	.tagline-container p {
 		text-align: right;
