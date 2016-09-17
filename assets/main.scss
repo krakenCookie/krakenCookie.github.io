@@ -118,6 +118,14 @@ footer {
 		width: 480px;
 		margin: 10% auto 0 auto;
 	}
+	
+	/* ZACH-EDIT: the header column stays left and has a dynamic width with all contents
+	aligned right */
+	header {
+		float: left;
+		width: 46%;
+		text-align: center;
+	}
 }
 
 /* All other devices (768px and up) */
