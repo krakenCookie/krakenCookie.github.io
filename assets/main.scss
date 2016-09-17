@@ -131,11 +131,9 @@ footer {
 	/* the header column stays left and has a dynamic width with all contents
 	aligned right */
 	header {
-		float: center;
-		/*** float: left; ***/
+		float: left;
 		width: 46%;
-		text-align: center;
-		/*** text-align: right; ***/
+		text-align: right;
 	}
 
 	.author-container h1,
