@@ -131,7 +131,8 @@ footer {
 	/* the header column stays left and has a dynamic width with all contents
 	aligned right */
 	header {
-		float: left;
+		float: center;
+		/*** float: left; ***/
 		width: 46%;
 		text-align: center;
 		/*** text-align: right; ***/
