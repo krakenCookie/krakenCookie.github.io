@@ -117,12 +117,13 @@ footer {
 	.wrapper {
 		width: 480px;
 		margin: 10% auto 0 auto;
+		text-align: right;
 	}
 	
 	/* ZACH-EDIT: the header column stays left and has a dynamic width with all contents
 	aligned right */
 	header {
-		float: right;
+		float: left;
 		width: 70%;
 		text-align: right;
 	}
