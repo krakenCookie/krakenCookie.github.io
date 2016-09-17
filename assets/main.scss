@@ -120,20 +120,6 @@ footer {
 	}
 }
 
-@media (max-width: 480px) {
-	/* wrapper stays 480px wide past 480px wide and is kept centered */
-	.wrapper {
-		width: 480px;
-		margin: 10% auto 0 auto;
-	}
-	
-	/* ZACH-EDIT: the header column stays left and has a dynamic width with all contents
-	aligned right */
-	main {
-		text-align: center;
-	}
-}
-
 /* All other devices (768px and up) */
 @media (min-width: 768px) {
 	/* past 768px the layout is changed and the wrapper has a fixed width of 680px
@@ -147,7 +133,7 @@ footer {
 	header {
 		float: left;
 		width: 46%;
-		text-align: left;
+		text-align: right;
 	}
 
 	.author-container h1,
