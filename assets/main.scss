@@ -147,8 +147,11 @@ footer {
 		width: 46%;
 		text-align: right;
 	}
-
-	.author-container h1,
+	/*** author ***/
+	.author-container h1 {
+		margin-top: 20%;
+		text-align: right;
+	}
 	.logo-container,
 	.tagline-container p {
 		text-align: right;
