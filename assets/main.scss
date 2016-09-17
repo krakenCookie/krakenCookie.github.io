@@ -120,6 +120,17 @@ footer {
 	}
 }
 
+/* For smaller devices ONLY */
+@media (min-width: 480px) {
+	/* wrapper stays 480px wide past 480px wide and is kept centered */
+	/*** main content list ***/
+	.main-list-item {
+		text-align: center;
+	}
+}
+
+
+
 /* All other devices (768px and up) */
 @media (min-width: 768px) {
 	/* past 768px the layout is changed and the wrapper has a fixed width of 680px
