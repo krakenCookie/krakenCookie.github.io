@@ -5,10 +5,6 @@ layout: post
 <html>
   {% include head.html %}
   <body>
-    <h2 class="spacing">{{ page.title }}</h2>
-    <p>{{ page.date | date: '%B %d, %Y' }}</p>
-    <p>AAAAAAAAAA</p>
-
     <div class="wrapper">
       <header>
           {% if site.compass.author %}
@@ -26,6 +22,9 @@ layout: post
           {% endif %}
       </header>
       <main>
+        <h2 class="spacing">{{ page.title }}</h2>
+        <p>{{ page.date | date: '%B %d, %Y' }}</p>
+        <p>AAAAAAAAAA</p>
         <div class="content">
            {{ content }}
         </div>
