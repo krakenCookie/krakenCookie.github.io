@@ -2,7 +2,13 @@
 layout: post
 ---
 
-<h2 class="spacing">{{ page.title }}</h2>
-<p>{{ page.date | date: '%B %d, %Y' }}</p>
+<html>
+  {% include head.html %}
+  <body>
+  <h2 class="spacing">{{ page.title }}</h2>
+  <p>{{ page.date | date: '%B %d, %Y' }}</p>
+    
+  {{ content }}
 
-{{ content }}
+  </body>
+</html>
