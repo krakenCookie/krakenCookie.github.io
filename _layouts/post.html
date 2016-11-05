@@ -3,6 +3,6 @@ layout: post
 ---
 
 <h2 class="spacing">{{ page.title }}</h2>
-<p>{{ page.date }}</p>
+<p>{{ page.date | date: '%B %d, %Y' }}</p>
 
 {{ content }}
