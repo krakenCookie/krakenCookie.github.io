@@ -4,7 +4,7 @@ baseurl: ''
 
 # compass configuration
 compass:
-  # an avatar or logo (optional)
+  # an avatar or logo (optional)d
   logo: "/images/pawpaw.png"
   # author will appear under the avatar (optional)
   author: "Zachary Burchill"
