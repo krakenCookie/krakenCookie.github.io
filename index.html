@@ -20,6 +20,7 @@ layout: base
     <main>
       {% if site.compass.include_content %}
       <div class="content">
+          <p>{{ page.url }}</p>
         {% include content.html %}
       </div>
       {% endif %}
