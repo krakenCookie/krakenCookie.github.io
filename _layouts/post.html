@@ -5,32 +5,33 @@ layout: post
 <html>
   {% include head.html %}
   <body>
-  <h2 class="spacing">{{ page.title }}</h2>
-  <p>{{ page.date | date: '%B %d, %Y' }}</p>
-    
-  <div class="wrapper">
-    <header>
-        {% if site.compass.author %}
-        <div class="author-container"><h1>{{ site.compass.author }}</h1></div>
-        {% endif %}
-        
-        {% if site.compass.logo %}
-        <div class="logo-container">
-          <a class="logo" href="{{ page.baseurl }}" style="background-image: url('{{ site.baseurl }}{{ site.compass.logo }}')"></a>
+    <h2 class="spacing">{{ page.title }}</h2>
+    <p>{{ page.date | date: '%B %d, %Y' }}</p>
+    <p>AAAAAAAAAA</p>
+
+    <div class="wrapper">
+      <header>
+          {% if site.compass.author %}
+          <div class="author-container"><h1>{{ site.compass.author }}</h1></div>
+          {% endif %}
+
+          {% if site.compass.logo %}
+          <div class="logo-container">
+            <a class="logo" href="{{ page.baseurl }}" style="background-image: url('{{ site.baseurl }}{{ site.compass.logo }}')"></a>
+          </div>
+          {% endif %}
+
+          {% if site.compass.tagline %}
+          <div class="tagline-container"><p>{{ site.compass.tagline }}</p></div>
+          {% endif %}
+      </header>
+      <main>
+        <div class="content">
+           {{ content }}
         </div>
         {% endif %}
-
-        {% if site.compass.tagline %}
-        <div class="tagline-container"><p>{{ site.compass.tagline }}</p></div>
-        {% endif %}
-    </header>
-    <main>
-      <div class="content">
-         {{ content }}
-      </div>
-      {% endif %}
-    </main>
-   </div>
+      </main>
+     </div>
 
 
   </body>
