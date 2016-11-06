@@ -2,7 +2,8 @@
 url: http://www.zachburchill.tk
 baseurl: ''
 
-sass: sass_dir: ./assets/
+sass:
+    sass_dir: ./assets
 
 # compass configuration
 compass:
