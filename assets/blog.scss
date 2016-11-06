@@ -1,0 +1,149 @@
+---
+---
+
+$text-color: #46433A;
+$anchor-text-color: #CE534D;
+$background-color: #F1EED9;
+
+body {
+	font-family: 'Vollkorn', serif;
+	color: $text-color;
+	background-color: $background-color;
+}
+
+header,
+main {
+	padding: 0 20px;
+}
+
+/*** wrapper div for both header and main ***/
+.wrapper {
+	margin-top: 10%;
+}
+
+/*** anchor tags ***/
+a:link,
+a:visited,
+a:hover,
+a:active {
+	color: $anchor-text-color;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+
+/*** main content list ***/
+.main-list-item {
+	font-weight: bold;
+	font-size: 1.2em;
+	margin: 0.8em 0;
+}
+
+/* override the left margin added by font awesome for the main content list,
+since it must be aligned with the content */
+.fa-ul.main-list {
+	margin-left: 0;
+}
+
+/* list icons */
+.main-list-item-icon {
+	width: 36px;
+	color: $text-color;
+}
+
+/*** logo ***/
+.logo-container {
+	text-align: center;
+}
+
+.logo {
+	width: 150px;
+	height: 150px;
+	display: inline-block;
+	background-size: cover;
+	/*** border-radius: 50%;
+	-moz-border-radius: 50%; 
+	border: 2px solid $background-color;
+	box-shadow: 0 0 0 3px $text-color; ***/
+}
+
+/*** author ***/
+.author-container h1 {
+	font-size: 2.8em;
+	margin-top: 0;
+	margin-bottom: 0;
+	text-align: center;
+}
+
+/*** tagline ***/
+.tagline-container p {
+	font-size: 1.3em;
+	text-align: center;
+	margin-bottom: 2em;
+}
+
+/******/
+hr {
+	border: 0;
+	height: 1px;
+	background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), $text-color, rgba(0,0,0,0));
+	background-image: -moz-linear-gradient(left, rgba(0,0,0,0), $text-color, rgba(0,0,0,0));
+	background-image: -ms-linear-gradient(left, rgba(0,0,0,0), $text-color, rgba(0,0,0,0));
+	background-image: -o-linear-gradient(left, rgba(0,0,0,0), $text-color, rgba(0,0,0,0));
+}
+
+/*** footer ***/
+footer {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	height: 20px;
+}
+
+.poweredby {
+	font-family: "Arial Narrow", Arial;
+	font-size: 0.6em;
+	line-height: 0.6em;
+	padding: 0 5px;
+}
+
+/*** ********************************************************** ***/
+header.nav {
+	padding: 50px 0;
+}
+
+.nav-container {
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+nav {
+    display: block;
+}
+
+nav.main-nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    float: right;
+    display: block;
+}
+
+nav.main-nav li, nav.main-nav a {
+    display: inline-block;
+}
+
+nav.main-nav li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+
+nav.main-nav li a {
+    padding: 10px;
+}
+
+
+
