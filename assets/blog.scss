@@ -1,7 +1,5 @@
 ---
 ---
-// Import the general css to get variable names, etc.
-@import url('general.css');
 
 
 /*** ********************************************************** ***/
@@ -55,7 +53,6 @@ nav.main-nav li a {
 }
 .nav-container h1 a {
     text-decoration: none;
-    color: $text-color;
 }
 
 
