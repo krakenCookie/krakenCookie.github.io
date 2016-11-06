@@ -23,7 +23,36 @@ compass:
 
 # Dependencies
 markdown: kramdown
+kramdown:
+  syntax-highlighter:  rouge
 highlighter: rouge
 
 # Permalinks
 permalink: pretty
+
+# Hyde stuff
+baseurl: "/" # If you are making a gh-pages project blog, this is
+                        # the name of your project repo, preceded by a /'
+                        # Set it to just "/" if you are making a user page.
+                        
+baseurlknitr:  "/" # This will always be your baseurl plus an extra '/'
+                                # at the end.  It's used only when knitr renders
+                                # your R Markdown files.
+
+# set limit on number of post to appear on Home page
+homepostlimit: 4
+
+# Disqus comments:
+disqus:           false
+shortname:        homerhanumatknitrhyde # TO-DO: get a disqus account and change this
+
+# Social Media
+twitter:          true # add a twitter button to each post
+facebook:         true # add a facebook share button to each post
+
+author:
+  name:           'Zachary Burchill'
+  url:            https://zachburchill.tk
+
+github:
+  repo:           https://github.com/burchill
