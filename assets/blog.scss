@@ -70,11 +70,12 @@ since it must be aligned with the content */
 	box-shadow: 0 0 0 3px $text-color; ***/
 }
 
-.logo-small {
+.logo-nav {
 	width: 50px;
 	height: 50px;
 	display: inline-block;
 	background-size: cover;
+	margin-right: 20;
 	/*** border-radius: 50%;
 	-moz-border-radius: 50%; 
 	border: 2px solid $background-color;
@@ -131,6 +132,10 @@ header.nav {
 	padding: 0 20px;
 }
 
+.nav-container > * {
+	vertical-align: middle;
+}
+
 nav {
     display: block;
 }
@@ -153,6 +158,15 @@ nav.main-nav li {
 
 nav.main-nav li a {
     padding: 10px;
+}
+
+.nav h1, h2 {
+    padding: 0;
+    margin: 0;
+}
+.nav h1 a {
+    text-decoration: none;
+    color: #ffffff;
 }
 
 
