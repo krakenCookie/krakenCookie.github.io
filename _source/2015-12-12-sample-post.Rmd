@@ -15,6 +15,7 @@ output:
 
 ```{r include = FALSE}
 library(knitr)
+library(dplyr)
 ```
 
 
@@ -24,8 +25,8 @@ When you click the **Knit** button a document will be generated that includes bo
 
 
 ```{r}
-summary(cars)
-print("AAA")
+summary(cars) %>% names()
+
 ```
 
 You can also embed plots, for example: 
