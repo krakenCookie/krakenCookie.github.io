@@ -31,7 +31,7 @@ highlighter: rouge
 permalink: pretty
 
 # Hyde stuff
-baseurl: "/" # If you are making a gh-pages project blog, this is
+#baseurl: "/" # If you are making a gh-pages project blog, this is
                         # the name of your project repo, preceded by a /'
                         # Set it to just "/" if you are making a user page.
                         
