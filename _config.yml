@@ -35,7 +35,7 @@ permalink: pretty
                         # the name of your project repo, preceded by a /'
                         # Set it to just "/" if you are making a user page.
                         
-#baseurlknitr:  "/" # This will always be your baseurl plus an extra '/'
+baseurlknitr:  "/" # This will always be your baseurl plus an extra '/'
                                 # at the end.  It's used only when knitr renders
                                 # your R Markdown files.
 
