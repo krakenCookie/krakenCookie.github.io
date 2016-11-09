@@ -27,8 +27,9 @@ def load_obj(name ):
     
     
 # lock to serialize output
-#csv_string="Date,Width,Height" # this is the header for your csv file-to-be. Make sure it's right!
-csv_string="Date,SorryCount" # this is the one I used for prague race
+#csv_string="Date,IsCadavre" # this is the header for the Broodhollow .csv file
+#csv_string="Date,Width,Height" # this is the header for the SMBC .csv file
+csv_string="Date,SorryCount" # this is the one I used for the prague race .csv file
 csv_string_lock = threading.Lock()
 
 
@@ -42,9 +43,20 @@ def check_csv(csv_string1,csv_string2):
     except:
         raise AssertionError("Number of columns differs")
 
+# So, you can also pass a FUNCTION as an argument to `soup.find()` to search the tree
+# This function just makes it so that it puts the arguments in `soup.find()` in the right way
+# Don't fret about this too much if you aren't familiar with bs4
+def clean_find(soup_t,args):
+    # for Python 3.x but before 3.2, use: `if hasattr(args, '__call__'):`
+    if callable(args):
+        return(soup_t.find(args))
+    else:
+        return(soup_t.find(*args))
+        
+
 # This is the default function that gets the time. If getting the timestamp is more complicated, write your own
 def default_get_time(soup_t,time_args,date_format):
-    return(datetime.strptime(list(soup_t.find(*time_args).strings)[0], date_format))
+    return(datetime.strptime(list(clean_find(soup_t,time_args).strings)[0], date_format))
 
 # ----------------------- Threading functions ---------------------------- #
 
@@ -112,7 +124,7 @@ def write_csv_data(date_string,other_thing=None):
 # Remember you can pass in other functions that will analyze the soup besides just getting time in `get_soup_stuff()`
 # Gets the image url from the page and tries to load it
 def get_image_from_soup(soup_t,image_args):
-    image_url = soup_t.find(*image_args)['src']
+    image_url = clean_find(soup_t,image_args)['src']
     try: 
         width, height = get_image_dim(image_url)
     except Exception as errorm:
@@ -131,8 +143,6 @@ def get_image_dim(image_url_t):
     width, height = im.size
     return(width, height)
     
-
-
 
 # ----------------------------  SMBC example instantiations or whatever ---------------------------------- #
 
@@ -168,7 +178,7 @@ def prague_race_worker():
 def get_prague_race_comments_and_sorry_count(soup_t):
     #comments_string=list(soup_t.find('div',{'class': 'cc-commentlink'}).strings)[0]
     #comment_num=int(comments_string.split()[0])
-    news_text="\n".join(list(soup_t.find('div',{'class': 'cc-newsbody'}).strings))
+    news_text="\n".join(list(clean_find(soup_t,['div',{'class': 'cc-newsbody'}]).strings))
     sorry_count=news_text.lower().count("sorry")
     return(sorry_count)
     
@@ -177,6 +187,42 @@ prague_race_prev_comic_args=['a',{'rel': 'prev'}]
 # The filename we want to save to
 prague_race_filename="/Users/zburchill/Desktop/praguerace_dates_threaded.csv"
 
+
+
+# ---------------------------- Broodhollow example code --------------------------------------#
+
+# The argument to `soup.find()` that will return the element with Broodhollow's previous button
+# Yes, the argument can be a function
+def brood_is_prev_comic(x):
+    try: 
+        answer = x.name == "a" and "navi-prev" in x["class"]
+        return(answer)
+    except: return(False)
+
+
+# Gets whether element is a title or not
+def brood_is_title(x):
+    try: 
+        answer = x["class"]==["post-title"]
+        return(answer)
+    except: return(False)
+
+# If 'cadavre' is in the title, it's a cadavre comic
+def get_cadavre_bool(soup_t):
+    title_text = list(soup_t.find(brood_is_title).strings)[0]
+    is_cadavre="cadavre" in title_text or "Cadavre" in title_text
+    return(str(is_cadavre))
+    
+# This is a wrapper function for `worker()` that is specific to Broodhollow
+def broodhollow_worker():
+    date_format="%B %d, %Y" # the format of smbc's time_stamp
+    time_args=['span', {'class': 'post-date'}] # the html element with the time_stamp
+    worker(time_args, get_cadavre_bool, date_format)
+
+# The prev comic argument for broodhollow
+broodhollow_prev_comic_args=brood_is_prev_comic
+# The filename we want to save to
+broodhollow_filename="/Users/zburchill/Desktop/broodhollow_dates_threaded.csv"
 
 
 
@@ -212,7 +258,7 @@ def web_scrape(url,prev_comic_args):
         q_item=soup
         q.put(q_item)
         try:
-            prev_comic_soup = soup.find(*prev_comic_args)
+            prev_comic_soup = clean_find(soup,prev_comic_args)
             # if it starts a loop, kill it
             if prev_comic_soup["href"]==prev_url:
                 break
@@ -227,7 +273,8 @@ def web_scrape(url,prev_comic_args):
             break
     
 start = time.perf_counter() 
-#web_scrape('http://www.smbc-comics.com/', smbc_prev_comic_args)()
+#web_scrape('http://www.smbc-comics.com/', smbc_prev_comic_args)
+#web_scrape('http://www.broodhollow.chainsawsuit.com/', broodhollow_prev_comic_args)
 web_scrape('http://www.praguerace.com', prague_race_prev_comic_args)
 
 q.join()       # block until all tasks are done
