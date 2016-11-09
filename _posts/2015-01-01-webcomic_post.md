@@ -70,19 +70,22 @@ Now, for a little bit of humor only Zach Weinersmith could find funny:
 
 ![plot of chunk smbc_votey_graph](/figure/source/2015-01-01-webcomic_post/smbc_votey_graph-1.png)
 
-<p class = "figcaption">Just kidding Zach, I know how much you appreciate graph jokes. Typical height of 1 panel $\approx$ 500 px. If you want to make graphs that look like this in `ggplot`, you can with the... `xkcd` package in R.</p>
+<p class = "figcaption">Just kidding Zach, I know how much you appreciate graph jokes. Typical height of 1 panel $$ \approx $$ 500 px. If you want to make graphs that look like this in `ggplot`, you can with the... `xkcd` package in R.</p>
 
 ## Prague Race:
 
-## Source code:
+## Source Code:
 
-> My multi-thread web-scraper
+> `web_scraper_threaded_general.py`
 
-Written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python. Probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment... Once I get around to adding a comment section.
+ My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python. Probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment... Once I get around to adding a comment section.
 
-> My crappier, non-threaded, web-scraper with poor documentation
+> `web_scraper.py`
 
-Also written for Python 3.4+, requires Beautiful Soup and Pillow. This is the earlier, crappier version of my code for a few of the examples, more or less.
+My crappier, non-threaded, web-scraper with poor documentation. Also written for Python 3.4+, requires Beautiful Soup and Pillow. This is the earlier, crappier version of my code for a few of the examples, more or less.
 
+> `2015-01-01-webcomic_post.Rmd`
+
+The R Markdown file this blog post is generated from.
 
 
