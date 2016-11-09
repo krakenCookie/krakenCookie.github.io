@@ -70,11 +70,18 @@ Now, for a little bit of humor only Zach Weinersmith could find funny:
 
 ![plot of chunk smbc_votey_graph](/figure/source/2015-01-01-webcomic_post/smbc_votey_graph-1.png)
 
-<p class = "figcaption">Just kidding Zach, I know how much you appreciate graph jokes. Typical height of 1 panel $$ \approx $$ 500 px. If you want to make graphs that look like this in `ggplot`, you can with the... `xkcd` package in R.</p>
+<p class = "figcaption">Just kidding Zach! I know how much you appreciate graph jokes.<br /> Typical height of 1 panel ~= 500 px. If you want to make graphs that look like this in `ggplot`, you can with the... `xkcd` package in R.</p>
 
-## Prague Race:
+## Prague Race: testing a hypothesis
 
-1 panel $$ \approx $$ 500 px.
+The last webcomic I'll be discussing here is [_Prague Race_](http://www.praguerace.com/) by [Petra Nordlund](https://twitter.com/petra_nordlund).  _Prague Race_ is another pretty comic with great writing and plot.  Recently, I've gotten the feeling that the author is itching to start on newer projects, and that updates might be coming less frequently. Additionally, I occasionally read the little blurbs she writes with her updates, and formed the impression that after longer delays she would tend to apologize a lot for being late. When I was web scraping _Prague Race_ I decided to empirically test these hypotheses: are updates _actually_ coming out less frequently, and does Petra tend to apologize after longer delays?
+
+## The data
+
+As a first-order approximation of how much she was apologizing, I collected the number of times the word "sorry" appeared in the update text.  Let's first see 
+
+
+<hr />
 
 ## Source Code:
 
