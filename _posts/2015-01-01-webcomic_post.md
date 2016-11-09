@@ -50,7 +50,7 @@ I like this graph because it visually tells the story of the evolving involvemen
 
 To me, webcomics that fall into this pattern are the reason why I want a model to tell me if I should give up on them.  They keep toying with my hope that they will start updating like they were before.  But on the other hand, we can see that even though Book III updates less frequently, Kris hasn't forgotten about it. We'll need more data.
 
-## SMBC: Uh?
+## SMBC: longer and more uncut
 
 Unlike _Broodhollow_, _Saturday Morning Breakfast Cereal_ has no problems with regular updates. In a downright _freakish_ display of perseverance, _Saturday Morning Breakfast Cereal_ (or SMBC as its often known by) updates every. _Damn_. _**DAY**_.  [Zach Weinersmith](https://twitter.com/ZachWeiner) is a gangly, red-headed _beast_, and just by virtue of his update schedule, SMBC would remain one of my favorites.  
 
@@ -66,14 +66,23 @@ Combining the `Pillow` module for Python 3 with my web scraping code, I recorded
 
 I was surprised by how quickly SMBC started coming out with longer comics after late 2008. Clearly, once Zach tasted the sweet, sweet taste of multi-panel comics, he couldn't let it go.
 
-Now, if our 
+Now, for a little bit of humor only Zach Weinersmith could find funny:
 
 ![plot of chunk smbc_votey_graph](/figure/source/2015-01-01-webcomic_post/smbc_votey_graph-1.png)
 
-<p class = "figcaption">Typical height of one panel $$\approx$$ 500 px. If you want to make graphs like this in `ggplot`</p>
+<p class = "figcaption">Just kidding Zach, I know how much you appreciate graph jokes. Typical height of 1 panel $\approx$ 500 px. If you want to make graphs that look like this in `ggplot`, you can with the... `xkcd` package in R.</p>
 
+## Prague Race:
 
+## Source code:
 
-## Notes on my code:
+> My multi-thread web-scraper
+
+Written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python. Probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment... Once I get around to adding a comment section.
+
+> My crappier, non-threaded, web-scraper with poor documentation
+
+Also written for Python 3.4+, requires Beautiful Soup and Pillow. This is the earlier, crappier version of my code for a few of the examples, more or less.
+
 
 
