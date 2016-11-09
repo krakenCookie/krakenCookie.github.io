@@ -74,6 +74,8 @@ Now, for a little bit of humor only Zach Weinersmith could find funny:
 
 ## Prague Race:
 
+1 panel $$ \approx $$ 500 px.
+
 ## Source Code:
 
 > `web_scraper_threaded_general.py`
