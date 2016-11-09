@@ -181,6 +181,8 @@ grid.draw(gt)
 
 ## Prague Race:
 
+1 panel $$ \approx $$ 500 px.
+
 ## Source Code:
 
 > `web_scraper_threaded_general.py`
