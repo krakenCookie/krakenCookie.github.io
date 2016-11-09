@@ -177,7 +177,7 @@ gt$layout$clip[gt$layout$name == "panel"] <- "off"
 grid.draw(gt)
 ```
 
-<p class = "figcaption">Typical height of one panel = 500 px. If you want to make graphs like this in `ggplot`</p>
+<p class = "figcaption">Typical height of one panel $$\approx$$ 500 px. If you want to make graphs like this in `ggplot`</p>
 
 
 
