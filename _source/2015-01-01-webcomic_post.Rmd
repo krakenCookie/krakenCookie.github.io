@@ -1,62 +1,22 @@
 ---
 layout:  post
-title: "Sample Post"
+title: "Web scraping and webcomics"
 comments:  true
 published:  true
-author: "Homer White"
+author: "Zach Burchill"
 date: 2015-12-12 20:00:00
-categories: [R]
+categories: ['web scraping',webcomics,python,threading,R]
 output:
   html_document:
     mathjax:  default
     fig_caption:  true
 ---
 
-
-```{r include = FALSE}
+```{r setup, include=FALSE}
 library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 ```
-
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-
-```{r}
-summary(cars) %>% names()
-
-```
-
-You can also embed plots, for example: 
-
-
-```{r, echo=FALSE}
-plot(cars)
-```
-
-<p class = "figcaption">Here is a plot for you.</p>
-
-The border around the graph above is due to custom CSS for this site (see `public/css/custom.css`).  The caption was produced with some HTML:
-
-> `<p class = "figcaption">Here is a plot for you.</p>`
-
-You can write mathematics, of course, but the syntax will be a bit different from R Mardown.  Here's some inline math:  $$ \pi/2 \approx 1.57 $$.  There is displayed math as well:
-
-$$ \sum_{i=1}^{n} i = \frac{n(n+1)}{2}.$$
-
-Here's the source so you can see how the above worked:
-
-```{r eval = FALSE}
-You can write mathematics, of course, but the syntax will be a bit different from R Markdown.  Here's some inline math:  $$ \pi/2 \approx 1.57 $$.  There is displayed math as well:
-
-$$ \sum_{i=1}^{n} i = \frac{n(n+1)}{2}.$$
-
-Here's the source ...
-```
-
-Happy blogging.
 
 I like learning statistical modeling. I like webcomics.  I 
 
@@ -79,8 +39,8 @@ If you use Python and want an incredibly easy-to-get-into web scraping tool, che
 ```{r, echo=FALSE, fig.width=6}
 library(png)
 library(grid)
-img <- readPNG("/Users/zburchill/Desktop/broodhollow_snippet.png")
-grid.raster(img)
+#img <- readPNG("/Users/zburchill/Desktop/broodhollow_snippet.png")
+#grid.raster(img)
 ```
 
 <p class = "figcaption">A sample of Kris Staub's genius.</p>
@@ -88,3 +48,5 @@ grid.raster(img)
 That is, _if_ he can finish it.  Kris is 
 
 ## Notes on my code:
+
+
