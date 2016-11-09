@@ -78,7 +78,12 @@ If you use Python and want an incredibly easy-to-get-into web scraping tool, che
 
 "Broodhollow."  The name sounds like a title that a moody fifteen-year-old would come up with, but it is **absolutely** my favorite webcomic. _**Ever.**_ The art is beautiful and the story writing is some of the best I've ever read. One part comedy and two parts creeping horror, if author [Kris Straub](http://studios.chainsawsuit.com/) can finish the comic with a _tenth_ of the talent he's exhibited so far, I'm confident this will go down as one of the great graphic novels of our generation.
 
-![plot of chunk unnamed-chunk-5](/figure/source/2015-12-12-sample-post/unnamed-chunk-5-1.png)
+![test text](/Users/zburchill/Desktop/broodhollow_snippet.png "markdown alt test")
+
+
+{% highlight text %}
+## Error in rasterGrob(image, x = x, y = y, width = width, height = height, : object 'img' not found
+{% endhighlight %}
 
 <p class = "figcaption">A sample of Kris Staub's genius.</p>
  
