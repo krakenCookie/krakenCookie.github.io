@@ -1,6 +1,6 @@
 ---
 layout:  post
-title: "Web scraping and webcomics"
+title: "Web Scraping and Webcomics"
 comments:  true
 published:  true
 author: "Zach Burchill"
@@ -22,19 +22,17 @@ library(ggplot2)
 library(xkcd)
 ```
 
-I like learning statistical modeling. I like webcomics.  I 
+I like statistical models. I like webcomics. I like not having to suffer through deciding whether a webcomic is ever going to update regularly again. I began to ask myself, "Can I use statistical modelling to tell me when I should stop hoping a webcomic will keep updating?"
 
-It started with the thought: "Can I use statistical modelling to tell me when I should stop hoping a webcomic will keep updating?"  There are few feelings worse than returning to a comic week after week in the vain hope its creator will start releasing new strips again.
+Nothing is more haunting than that oft-repeated phrase, "updates when?" It's not even about the wait, it's about the _uncertainty_--either end or start updating, don't keep me in limbo!  I would love it if I could make a model that could just _tell_ me, "Hey, this comic is entering its death spiral, abandon ship."  Also, I just like learning new statistical methods.
 
-And while that model is still in the works, I've gotten my hands on a bunch of cool data in the meantime.
+And while that model is still in the works, I've gotten my hands on a bunch of cool data in the meantime.  This post isn't quite a tutorial; it's more like a demonstration of how you can fun with simple web scraping and niche interests--but I've attached all the code I used, complete with documentation and a flexible design for newbies who want to start collecting their own data.
 
-## Web scraping
+## Web scraping 101
 
 In order to make a model, you generally need data to train it on.  Most webcomics don't have a downloadable R database of all their updates, so you'll have to get the data yourself.  You can click through potentially thousands of pages, recording the dates manually, or you can use **web scraping** to do it automatically.
 
-If you use Python and want an incredibly easy-to-get-into web scraping tool, check out the Python module, [Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/) (I used `bs4`). In a nutshell, it loads HTML pages and parses the elements into a tree automatically. Extracting, say, all the `img` tags on a page can be as simple as: `soup.find_all('img')`. Beautiful Soup is pretty simple to learn and the [documentation](http://www.crummy.com/software/BeautifulSoup/bs4/doc/) makes it a breeze. 
-
-## Data
+If you use Python and want an incredibly easy-to-get-into web scraping tool, check out the Python module, [Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/) (I used `bs4`). In a nutshell, it loads HTML pages and parses the elements into a tree automatically. Extracting, say, all the `img` tags on a page can be as simple as: `soup.find_all('img')`. Beautiful Soup is pretty simple to learn and the [documentation](http://www.crummy.com/software/BeautifulSoup/bs4/doc/) makes it a breeze. Check my source code at the end for the code I used.
 
 ## Broodhollow updates: a story of an author's life
 
@@ -181,11 +179,13 @@ grid.draw(gt)
 
 ## Prague Race: testing a hypothesis
 
-The last webcomic I'll be discussing here is [_Prague Race_](http://www.praguerace.com/) by [Petra Nordlund](https://twitter.com/petra_nordlund).  _Prague Race_ is another pretty comic with great writing and plot.  Recently, I've gotten the feeling that the author is itching to start on newer projects, and that updates might be coming less frequently. Additionally, I occasionally read the little blurbs she writes with her updates, and formed the impression that after longer delays she would tend to apologize a lot for being late. When I was web scraping _Prague Race_ I decided to empirically test these hypotheses: are updates _actually_ coming out less frequently, and does Petra tend to apologize after longer delays?
+The last webcomic I'll be discussing here is [_Prague Race_](http://www.praguerace.com/) by [Petra Nordlund](https://twitter.com/petra_nordlund).  _Prague Race_ is another pretty comic with great writing and plot.  Recently, I've gotten the feeling that the author is itching to start on newer projects, and that updates might be coming less frequently. Additionally, I occasionally read the little blurbs she writes with her updates, and formed the impression that after longer delays she would tend to apologize a lot for being late. 
+
+When I was web scraping _Prague Race_ I decided to empirically test these hypotheses: are updates _actually_ coming out less frequently, and does Petra tend to apologize after longer delays?
 
 ## The data
 
-As a first-order approximation of how much she was apologizing, I collected the number of times the word "sorry" appeared in the update text.  Let's first see 
+As a first-order approximation of how much she was apologizing, I collected the number of times the word "sorry" appeared in the update text.  Let's first see whether she's updating less.
 
 
 <hr />
