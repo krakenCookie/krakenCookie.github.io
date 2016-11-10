@@ -1,5 +1,11 @@
 ---
 ---
+
+/*** wrapper div for both header and main ***/
+.wrapper {
+	margin-top: 10%;
+}
+
 /*** media queries ***/
 /* X-Small devices (phones, 480px and up) */
 @media (min-width: 480px) {
