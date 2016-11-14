@@ -85,7 +85,7 @@ As a first-order approximation of how much she was apologizing, I collected the 
 
 ## Source Code:
 
-> [`web_scraper_threaded_general.py`]({{ site.baseurl }})
+> [`web_scraper_threaded_general.py`]("{{ site.baseurl }}/code/web-scraping/web_scraper_threaded_general.py")
 
  My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python. Probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment... Once I get around to adding a comment section.
 
