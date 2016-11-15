@@ -4,6 +4,7 @@ title: Das Blog
 author: Zach
 permalink: /blog.html
 ---
+<div class="blog_head_container">
 <h2>Recent posts:</h2>
 <ul>
   {% for post in site.posts limit:3 %}
@@ -19,6 +20,8 @@ permalink: /blog.html
 </ul>
 
 <h2><a href="{{site.baseurl}}/archive.html">Archive</a></h2>
+  
+</div>
 
 <hr />
 
