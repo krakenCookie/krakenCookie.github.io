@@ -37,6 +37,12 @@
   <meta property="og:description" content="{{ site.compass.description }}"/>
   <meta property="og:site_name" content="{{ site.compass.tagline }}">
 
+  {% if site.disqus %}
+    <!--Disqus comment counts-->
+    <script id="dsq-count-scr" src="//{{ site.shortname }}.disqus.com/count.js" async></script>
+  {% endif %}
+  
+  
   {% if site.compass.include_analytics %}
   {% include analytics.html %}
   {% endif %}
