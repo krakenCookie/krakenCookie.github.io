@@ -8,7 +8,7 @@
 	margin-left: 2em
 }
 
-(.posts > .post-date) ~ (.posts > .commentcount) {
+.post-date ~  > .posts .commentcount {
 	display: inline-block;
 	margin: 0;
 	font-size: 20;
