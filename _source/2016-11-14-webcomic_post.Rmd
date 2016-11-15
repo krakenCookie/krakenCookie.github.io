@@ -26,9 +26,11 @@ set.seed(123)
 
 I like statistical models. I like webcomics. I like not having to suffer through deciding whether a webcomic is ever going to update regularly again. I began to ask myself, "Can I use statistical modelling to tell me when I should stop hoping a webcomic will keep updating?"
 
-Nothing is more haunting than that oft-repeated phrase, "updates when?" It's not even about the wait, it's about the _uncertainty_--either end or start updating, don't keep me in limbo!  I would love it if I could make a model that could just _tell_ me, "Hey, this comic is entering its death spiral, abandon ship."  Also, I just like learning new statistical methods.
+Nothing is more haunting than that oft-repeated phrase: "updates when?" It's not even about the wait, it's about the _uncertainty_--either end or start updating, don't keep me in limbo!  I would love it if I could make a model that could just _tell_ me, "Hey, this comic is entering its death spiral, abandon ship!"  Also, I just like learning new statistical methods.
 
-And while that model is still in the works, I've gotten my hands on a bunch of cool data in the meantime.  This post isn't quite a tutorial; it's more like a demonstration of how you can fun with simple web scraping and niche interests--but I've attached all the code I used, complete with documentation and a flexible design for newbies who want to start collecting their own data.
+Although that model is still in the works, I've gotten my hands on a bunch of cool data in the meantime.  This post isn't quite a tutorial; it's more like a demonstration of how you can fun with simple web scraping and niche interests--but I've attached all the code I used, complete with documentation and a flexible design for newbies who want to start collecting their own data.
+
+<!--more-->
 
 ## Web scraping 101
 
