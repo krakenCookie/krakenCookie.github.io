@@ -190,7 +190,7 @@ When I was web scraping _Prague Race_ I decided to empirically test these hypoth
 
 Let's first see whether she's updating less. I'll be fitting your basic, barebones linear regression model to the data, which I'll add to the graph.
 
-```{r}
+```{r warning=FALSE,echo=FALSE,fig.width=7,fig.height=5}
 prague_race<-read.csv("/Users/zburchill/Desktop/praguerace_dates_threaded.csv")
 prague_race$Date <- as.Date(prague_race$Date,format="%m/%d/%y")
 prague_race$Diff <- c(as.numeric(diff(prague_race$Date,units=c("days"))),0)
@@ -234,6 +234,8 @@ p2 <- prague_race %>%
 g1 <- ggplotGrob(p2) 
 #g1$widths[[8]] <- unit(6, "null") 
 legend <- g1$grobs[[which(sapply(g1$grobs, function(x) x$name) == "guide-box")]]
+library(grid)
+library(gridExtra)
 grid.newpage()
 grid.arrange(p1, p2, ncol=2, as.table =TRUE)
 

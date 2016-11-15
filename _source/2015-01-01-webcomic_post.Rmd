@@ -4,7 +4,7 @@ title: "Web Scraping and Webcomics"
 comments:  true
 published:  true
 author: "Zach Burchill"
-date: 2015-12-12 20:00:00
+date: 2016-11-14 10:00:00
 categories: ['web scraping',webcomics,python,threading,R]
 output:
   html_document:
@@ -196,11 +196,11 @@ As a first-order approximation of how much she was apologizing, I collected the 
 
  My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python. Probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment... Once I get around to adding a comment section.
 
-> `web_scraper.py`
+> [`web_scraper_nonthreaded.py`]({{ site.url }}/code/web-scraping/web_scraper_nonthreaded.py)
 
 My crappier, non-threaded, web-scraper with poor documentation. Also written for Python 3.4+, requires Beautiful Soup and Pillow. This is the earlier, crappier version of my code for a few of the examples, more or less.
 
-> `2015-01-01-webcomic_post.Rmd`
+> [`2015-01-01-webcomic_post.Rmd`]({{ site.url }}/_source/web-scraping/web_scraper_threaded_general.py)
 
 The R Markdown file this blog post is generated from.
 

@@ -81,59 +81,20 @@ When I was web scraping _Prague Race_ I decided to empirically test these hypoth
 Let's first see whether she's updating less. I'll be fitting your basic, barebones linear regression model to the data, which I'll add to the graph.
 
 
-{% highlight r %}
-prague_race<-read.csv("/Users/zburchill/Desktop/praguerace_dates_threaded.csv")
-prague_race$Date <- as.Date(prague_race$Date,format="%m/%d/%y")
-prague_race$Diff <- c(as.numeric(diff(prague_race$Date,units=c("days"))),0)
-prague_race$Diff <- -prague_race$Diff
-prague_race$Apology <- ifelse(prague_race$SorryCount>0,"Yes","No")
-
-
-p1 <- prague_race %>% 
-  # Filtering out periods that don't make sense to include
-  filter(Date > as.Date("01/01/15",format="%m/%d/%y")) %>%
-  ggplot(aes(x=Date,y=Diff,color=Apology,group=1)) +
-  theme_bw() +
-  scale_color_brewer(name="Apologized?",palette="Set1",guide=FALSE) +
-  theme(text=element_text(size=20),
-        legend.title=element_text(size=15),
-        legend.text=element_text(size=10)) +
-  ylab("# of days since last update") +
-  geom_point() + geom_smooth(method="lm",formula=y~x) +
-  scale_x_date(labels = scales::date_format("%Y"))
-
-
-p2 <- prague_race %>% 
-  # Filtering out periods that don't make sense to include
-  filter(Date > as.Date("01/01/15",format="%m/%d/%y")) %>%
-  group_by(Apology) %>%
-  ungroup() %>%
-  ggplot(aes(x=Apology,y=Diff,color=Apology,fill=Apology)) +
-  stat_summary(fun.data = mean_cl_boot,geom="errorbar") +
-  geom_point(alpha=0)+
-  stat_summary(fun.y = mean,geom="point") + 
-  geom_violin(alpha=0.2,color=NA) +
-  theme_bw() +
-  scale_fill_discrete(name="Apologized?") +
-  scale_color_brewer(name="Apologized?",palette="Set1") +
-  theme(text=element_text(size=20),
-        legend.title=element_text(size=15),
-        legend.text=element_text(size=10),
-        axis.ticks.y=element_blank(),
-        axis.text.y=element_blank()) + ylab("") +xlab("Distribution")
-
-g1 <- ggplotGrob(p2) 
-#g1$widths[[8]] <- unit(6, "null") 
-legend <- g1$grobs[[which(sapply(g1$grobs, function(x) x$name) == "guide-box")]]
-grid.newpage()
-grid.arrange(p1, p2, ncol=2, as.table =TRUE)
+{% highlight text %}
+## 
+## Attaching package: 'gridExtra'
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): could not find function "grid.arrange"
+## The following object is masked from 'package:dplyr':
+## 
+##     combine
 {% endhighlight %}
+
+![plot of chunk unnamed-chunk-1](/figure/source/2016-11-14-webcomic_post/unnamed-chunk-1-1.png)
 
 
 As a first-order approximation of how much she was apologizing, I collected the number of times the word "sorry" appeared in the update text.  
