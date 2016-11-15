@@ -35,10 +35,11 @@ permalink: /blog.html
     </h1>
     <span class="post-date">{{ post.date | date_to_string }}</span> 
     {% if site.disqus %}
-      &mdash;  <a href="{{ site.baseurl }}{{ post.url }}#disqus_thread"
+      &mdash;  <a href="{{ post.url }}#disqus_thread"
                               class = "commentcount" style="margin:0;display:inline"></a>
     {% endif %}
     {{ post.excerpt }}
+    <p style="text-align: right;display: block">[... &#8618; <a href="{{ post.url }}">Read more</a></p>
   </div>
   {% endfor %}
 </div>
