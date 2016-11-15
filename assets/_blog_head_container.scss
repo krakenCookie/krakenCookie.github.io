@@ -1,5 +1,8 @@
 .blog_head_container {
     text-align: center;
-    h2, h3 { margin: 2em; }
+    h2, h3 { 
+        margin-top: 0.8em;
+        margin-bottom: 0.8em;
+    }
     li { list-style-type: none;}
 }
