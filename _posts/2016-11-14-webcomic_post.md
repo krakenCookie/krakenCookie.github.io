@@ -5,6 +5,7 @@ comments:  true
 published:  true
 author: "Zach Burchill"
 date: 2016-11-14 10:00:00
+permalink: /webscraping.html
 categories: ['web scraping',webcomics,python,threading,R]
 output:
   html_document:
@@ -90,7 +91,7 @@ As a first-order approximation of how much she was apologizing, I collected the 
 
 ![plot of chunk prague_graph](/figure/source/2016-11-14-webcomic_post/prague_graph-1.png)
 
-<p class = "figcaption">It does seem that updates are slowing down slightly, and although updates with the word "sorry" seemingly tend to come after longer delays, there were too few data points. Errorbars represent bootstrapped 95% confidence intervals.</p>
+<p class = "figcaption">It does seem that updates are slowing down slightly, and although updates with the word "sorry" seemingly tend to come after longer delays, there were too few data points to say something definitive. Errorbars represent bootstrapped 95% confidence intervals.</p>
 
 **So how did my hypotheses bear out?**
 
