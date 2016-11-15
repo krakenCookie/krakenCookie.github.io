@@ -76,7 +76,9 @@ The last webcomic I'll be discussing here is [_Prague Race_](http://www.praguera
 
 ![plot of chunk prague_race_snippet](/figure/source/2016-11-14-webcomic_post/prague_race_snippet-1.png)
 
-Recently, I've gotten the feeling that the author is itching to start on newer projects, and that updates might be coming less frequently. Additionally, I occasionally read the little blurbs she writes with her updates, and formed the impression that after longer delays she would tend to apologize a lot for being late. 
+<p class = "figcaption"><em>Prague Race</em> by Petra Nordlund: mostly funny, sometimes dark, and with enough mystery in the background to keep readers guessing</p>
+
+Recently, I've gotten the feeling that the author is itching to start on newer projects, and that updates might be coming less frequently. Additionally, I occasionally read the little blurbs she posts with her updates, and formed the impression that after longer delays she would tend to apologize a lot for being late. 
 
 When I was web scraping _Prague Race_ I decided to empirically test these hypotheses: are updates _actually_ coming out less frequently, and does Petra tend to apologize after longer delays?
 
@@ -88,7 +90,7 @@ As a first-order approximation of how much she was apologizing, I collected the 
 
 <p class = "figcaption">It does seem that updates are slowing down slightly, and although updates with the word "sorry" seemingly tend to come after longer delays, there were too few data points. Errorbars represent bootstrapped 95% confidence intervals.</p>
 
-So how did my hypotheses bear out?
+**So how did my hypotheses bear out?**
 
 It does seem that updates are slowing down--the date was a significant predictor of delays between updates, with later updates tending to have longer delays.  And although the graph _might_ suggest that updates with apologies tend to come after longer delays, the data revealed that she had only said the words "sorry" ten whole times in the entire run of the comic, pretty much invalidating my original feeling that she apologized a lot.  Of course, my measure of apologizing was pretty rough, but I **_am_** in grad school and I **_do_** have more important things to do.
 
@@ -97,12 +99,13 @@ Hopefully you get the sense that web scraping can get you some potentially inter
 
 
 <hr />
+<br />
 
 ## Source Code:
 
 > [`web_scraper_threaded_general.py`]({{ site.url }}/code/web-scraping/web_scraper_threaded_general.py)
 
-My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python--probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment... once I get around to adding a comment section. _Womp womp!_
+My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python--probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment below.
 
 > [`web_scraper_nonthreaded.py`]({{ site.url }}/code/web-scraping/web_scraper_nonthreaded.py)
 
