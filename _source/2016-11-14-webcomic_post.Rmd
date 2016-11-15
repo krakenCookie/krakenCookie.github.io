@@ -188,9 +188,10 @@ When I was web scraping _Prague Race_ I decided to empirically test these hypoth
 
 ## The data
 
+As a first-order approximation of how much she was apologizing, I collected the number of times the word "sorry" appeared in the update text.  
 Let's first see whether she's updating less. I'll be fitting your basic, barebones linear regression model to the data, which I'll add to the graph.
 
-```{r warning=FALSE,echo=FALSE,fig.width=7,fig.height=5}
+```{r warning=FALSE,message=FALSE,echo=FALSE,fig.width=9,fig.height=5}
 prague_race<-read.csv("/Users/zburchill/Desktop/praguerace_dates_threaded.csv")
 prague_race$Date <- as.Date(prague_race$Date,format="%m/%d/%y")
 prague_race$Diff <- c(as.numeric(diff(prague_race$Date,units=c("days"))),0)
@@ -207,7 +208,7 @@ p1 <- prague_race %>%
   theme(text=element_text(size=20),
         legend.title=element_text(size=15),
         legend.text=element_text(size=10)) +
-  ylab("# of days since last update") +
+  ylab("Delay (in days)") +
   geom_point() + geom_smooth(method="lm",formula=y~x) +
   scale_x_date(labels = scales::date_format("%Y"))
 
@@ -229,7 +230,7 @@ p2 <- prague_race %>%
         legend.title=element_text(size=15),
         legend.text=element_text(size=10),
         axis.ticks.y=element_blank(),
-        axis.text.y=element_blank()) + ylab("") +xlab("Distribution")
+        axis.text.y=element_blank()) + ylab("") +xlab("Apologized?")
 
 g1 <- ggplotGrob(p2) 
 #g1$widths[[8]] <- unit(6, "null") 
@@ -242,7 +243,7 @@ grid.arrange(p1, p2, ncol=2, as.table =TRUE)
 ```
 
 
-As a first-order approximation of how much she was apologizing, I collected the number of times the word "sorry" appeared in the update text.  
+
 
 <hr />
 
