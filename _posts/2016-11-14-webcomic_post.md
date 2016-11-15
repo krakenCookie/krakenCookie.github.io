@@ -68,7 +68,7 @@ Now, for a little bit of humor only Zach Weinersmith could find funny:
 
 ![plot of chunk smbc_votey_graph](/figure/source/2016-11-14-webcomic_post/smbc_votey_graph-1.png)
 
-<p class = "figcaption">Just kidding Zach! I know how much you appreciate graph jokes.<br /> Typical height of 1 panel ~= 500 px. If you want to make graphs that look like this in `ggplot`, you can with the... `xkcd` package in R.</p>
+<p class = "figcaption">Just kidding Zach! I know how much you appreciate graph jokes. <br />Typical height of 1 panel ~= 500 px. Ironically, this plot was created with the `xkcd` package in R.</p>
 
 ## Prague Race: testing a hypothesis
 
@@ -82,6 +82,16 @@ As a first-order approximation of how much she was apologizing, I collected the 
 
 ![plot of chunk prague_graph](/figure/source/2016-11-14-webcomic_post/prague_graph-1.png)
 
+<p class = "figcaption">It does seem that updates are slowing down slightly, and although updates with the word "sorry" seemingly tend to come after longer delays, there were too few data points. Errorbars represent bootstrapped 95% confidence intervals.</p>
+
+So how did my hypotheses bear out?
+
+It does seem that updates are slowing down--the date was a significant predictor of delays between updates, with later updates tending to have longer delays.  And although the graph _might_ suggest that updates with apologies tend to come after longer delays, the data revealed that she had only said the words "sorry" ten whole times in the entire run of the comic, pretty much invalidating my original feeling that she apologized a lot.  Of course, my measure of apologizing was pretty rough, but I **_am_** in grad school and I **_do_** have more important things to do.
+
+Hopefully you get the sense that web scraping can get you some potentially interesting data without a lot of hassle. If you're a data-geek or a webcomic enthusiast, check out my source code below and give it a whirl yourself.  There's a lot of untapped data out there, so go out and scrape it![^1]
+
+
+[^1]: Oh no you didn't!
 
 
 
@@ -91,7 +101,7 @@ As a first-order approximation of how much she was apologizing, I collected the 
 
 > [`web_scraper_threaded_general.py`]({{ site.url }}/code/web-scraping/web_scraper_threaded_general.py)
 
- My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python. Probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment... Once I get around to adding a comment section.
+My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python--probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment... once I get around to adding a comment section. _Womp womp!_
 
 > [`web_scraper_nonthreaded.py`]({{ site.url }}/code/web-scraping/web_scraper_nonthreaded.py)
 
