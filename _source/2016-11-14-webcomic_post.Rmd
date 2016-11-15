@@ -32,7 +32,7 @@ And while that model is still in the works, I've gotten my hands on a bunch of c
 
 ## Web scraping 101
 
-In order to make a model, you generally need data to train it on.  Most webcomics don't have a downloadable R database of all their updates, so you'll have to get the data yourself.  You can click through potentially thousands of pages, recording the dates manually, or you can use **web scraping** to do it automatically.
+In order to make a model, you generally need data to train it on.  Most webcomics don't have a downloadable R database of all their updates, so you'll have to get the data yourself.  You can click through potentially thousands of pages, recording the dates manually, or you can use **web scraping** to do it automatically[^1].
 
 If you use Python and want an incredibly easy-to-get-into web scraping tool, check out the Python module, [Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/) (I used `bs4`). In a nutshell, it loads HTML pages and parses the elements into a tree automatically. Extracting, say, all the `img` tags on a page can be as simple as: `soup.find_all('img')`. Beautiful Soup is pretty simple to learn and the [documentation](http://www.crummy.com/software/BeautifulSoup/bs4/doc/) makes it a breeze. Check my source code at the end for the code I used.
 
@@ -250,10 +250,7 @@ So how did my hypotheses bear out?
 
 It does seem that updates are slowing down--the date was a significant predictor of delays between updates, with later updates tending to have longer delays.  And although the graph _might_ suggest that updates with apologies tend to come after longer delays, the data revealed that she had only said the words "sorry" ten whole times in the entire run of the comic, pretty much invalidating my original feeling that she apologized a lot.  Of course, my measure of apologizing was pretty rough, but I **_am_** in grad school and I **_do_** have more important things to do.
 
-Hopefully you get the sense that web scraping can get you some potentially interesting data without a lot of hassle. If you're a data-geek or a webcomic enthusiast, check out my source code below and give it a whirl yourself.  There's a lot of untapped data out there, so go out and scrape it![^1]
-
-
-[^1]: Oh no you didn't!
+Hopefully you get the sense that web scraping can get you some potentially interesting data without a lot of hassle. If you're a data-geek or a webcomic enthusiast, check out my source code below and give it a whirl yourself.  There's a lot of untapped data out there, so go out and scrape it!
 
 
 
@@ -272,5 +269,9 @@ My crappier, non-threaded, web-scraper with poor documentation. Also written for
 > [`2016-11-14-webcomic_post.Rmd`]({{ site.url }}/_source/2016-11-14-webcomic_post.Rmd)
 
 The R Markdown file this blog post is generated from, if you want to know what R code I used for the analysis and plotting.
+
+### Footnotes
+
+[^1]: I should point out, for pedantry's sake, that webcomics make _especially_ easy targets to web scrape, given their fairly consistent structure and general lack of JavaScript. Web scraping is a bit harder when you want to collect JavaScript-generated content--check out `PhantomJS` and `Selenium` Python libraries for good places to start.
 
 
