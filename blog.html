@@ -5,8 +5,6 @@ author: Zach
 permalink: /blog.html
 ---
 
-<h2><a href="{{site.baseurl}}/archive.html">Archive</a></h2>
-
 <ul>
   {% for post in site.posts limit:3 %}
   <li>
@@ -20,6 +18,8 @@ permalink: /blog.html
   {% endfor %}
 </ul>
 
+<h2><a href="{{site.baseurl}}/archive.html">Archive</a></h2>
+
 <hr />
 
 <div class="posts">
@@ -30,12 +30,11 @@ permalink: /blog.html
         {{ post.title }}
       </a>
     </h1>
+    <span class="post-date">{{ post.date | date_to_string }}</span>
     {% if site.disqus %}
 <a href="{{ site.baseurl }}{{ post.url }}#disqus_thread"
     class = "commentcount"></a>
     {% endif %}
-    <span class="post-date">{{ post.date | date_to_string }}</span>
-
     {{ post.content }}
   </div>
   {% endfor %}
