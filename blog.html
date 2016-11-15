@@ -1,17 +1,18 @@
 ---
 layout: page
-title: Das Blog
+title: Blog
 author: Zach
 permalink: /blog.html
 ---
+<div class="blog_head_container">
 <h2>Recent posts:</h2>
 <ul>
   {% for post in site.posts limit:3 %}
   <li>
     <h3>
       <a href="{{ post.url }}">
-        {{ post.title }}
-        <small>{{ post.date | date_to_string }}</small>
+        &bull; {{ post.title }}
+        <small> &ndash; {{ post.date | date_to_string }}</small>
       </a>
     </h3>
   </li>
@@ -19,6 +20,8 @@ permalink: /blog.html
 </ul>
 
 <h2><a href="{{site.baseurl}}/archive.html">Archive</a></h2>
+  
+</div>
 
 <hr />
 
