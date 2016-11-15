@@ -78,9 +78,7 @@ When I was web scraping _Prague Race_ I decided to empirically test these hypoth
 
 ## The data
 
-As a first-order approximation of how much she was apologizing, I collected the number of times the word "sorry" appeared in the update text.  
-Let's first see whether she's updating less. I'll be fitting your basic, barebones linear regression model to the data, which I'll add to the graph.
-
+As a first-order approximation of how much she was apologizing, I collected the number of times the word "sorry" appeared in the update text for each comic. As a first-order approximation of whether the update cycle was slowing down, I'll be fitting your basic, barebones linear regression model to the data, which I'll add to the graph below.
 
 ![plot of chunk prague_graph](/figure/source/2016-11-14-webcomic_post/prague_graph-1.png)
 
