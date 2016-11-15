@@ -43,8 +43,8 @@ baseurlknitr:  "/" # This will always be your baseurl plus an extra '/'
 homepostlimit: 4
 
 # Disqus comments:
-disqus:           false
-shortname:        homerhanumatknitrhyde # TO-DO: get a disqus account and change this
+disqus:           true
+shortname:        zachburchill # TO-DO: get a disqus account and change this
 
 # Social Media
 twitter:          false # add a twitter button to each post
