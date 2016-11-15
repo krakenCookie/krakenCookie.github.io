@@ -41,6 +41,8 @@ baseurlknitr:  "/" # This will always be your baseurl plus an extra '/'
 
 # set limit on number of post to appear on Home page
 homepostlimit: 4
+# The thing that gets excerpts
+excerpt_separator: <!--more-->  # you can specify your own separator, of course.
 
 # Disqus comments:
 disqus:           true
