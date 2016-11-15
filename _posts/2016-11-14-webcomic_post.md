@@ -32,7 +32,7 @@ If you use Python and want an incredibly easy-to-get-into web scraping tool, che
 
 ![plot of chunk broodhollow_snippet](/figure/source/2016-11-14-webcomic_post/broodhollow_snippet-1.png)
 
-<p class = "figcaption">A sample of Kris Staub's genius.</p>
+<p class = "figcaption">A sample of Kris Staub's genius: <em>Broodhollow</em>.</p>
  
 That is, _if_ he can finish it. Kris is a [pretty prolific artist](http://studios.chainsawsuit.com/) and just had a child a couple of years ago.  While he's continued regular updates to his non-serial comedic strip, [Chainsawsuit](http://chainsawsuit.com/) (another one of my favorites, actually), Broodhollow has gone through a few hiatuses.
 
@@ -50,7 +50,7 @@ To me, webcomics that fall into this pattern are the reason why I want a model t
 
 ## SMBC: longer and more uncut
 
-Unlike _Broodhollow_, _Saturday Morning Breakfast Cereal_ has no problems with regular updates. In a downright _freakish_ display of perseverance, _Saturday Morning Breakfast Cereal_ (or SMBC as its often known by) updates every. _Damn_. _**DAY**_.  [Zach Weinersmith](https://twitter.com/ZachWeiner) is a gangly, red-headed _beast_, and just by virtue of his update schedule, SMBC would remain one of my favorites.  
+Unlike _Broodhollow_, _Saturday Morning Breakfast Cereal_ has no problems with regular updates. In a downright _freakish_ display of perseverance, _Saturday Morning Breakfast Cereal_ (or SMBC as its often known by) updates every. _Damn_. _**DAY**_.  [Zach Weinersmith](https://twitter.com/ZachWeiner) is a gangly, red-headed _beast_, and if just by virtue of his update schedule, SMBC would remain one of my favorites.  
 
 Early SMBC comics usually consisted of a single panel, and relied on a specific brand of humor to get laughs. To long-time readers of the comic, [my brother](https://twitter.com/andrewburchill) and I, it felt that a while ago Zach started doing longer and longer strips, which we joked got less and less funny.  So when I started collected data, my brother suggested that I collect data on how long his strips were at the same time. Were his strips _really_ getting longer, or was it just our imagination?
 
@@ -72,7 +72,11 @@ Now, for a little bit of humor only Zach Weinersmith could find funny:
 
 ## Prague Race: testing a hypothesis
 
-The last webcomic I'll be discussing here is [_Prague Race_](http://www.praguerace.com/) by [Petra Nordlund](https://twitter.com/petra_nordlund).  _Prague Race_ is another pretty comic with great writing and plot.  Recently, I've gotten the feeling that the author is itching to start on newer projects, and that updates might be coming less frequently. Additionally, I occasionally read the little blurbs she writes with her updates, and formed the impression that after longer delays she would tend to apologize a lot for being late. 
+The last webcomic I'll be discussing here is [_Prague Race_](http://www.praguerace.com/) by [Petra Nordlund](https://twitter.com/petra_nordlund).  _Prague Race_ is another pretty comic with great writing and plot. 
+
+![plot of chunk prague_race_snippet](/figure/source/2016-11-14-webcomic_post/prague_race_snippet-1.png)
+
+Recently, I've gotten the feeling that the author is itching to start on newer projects, and that updates might be coming less frequently. Additionally, I occasionally read the little blurbs she writes with her updates, and formed the impression that after longer delays she would tend to apologize a lot for being late. 
 
 When I was web scraping _Prague Race_ I decided to empirically test these hypotheses: are updates _actually_ coming out less frequently, and does Petra tend to apologize after longer delays?
 
