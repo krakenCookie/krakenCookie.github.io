@@ -8,6 +8,16 @@
 	margin-left: 2em
 }
 
+.posts > .post-date ~ .posts > .commentcount {
+	display: inline-block;
+	margin: 0;
+	font-size: 20;
+}
+
+
+
+
+
 /*** I think blog posts look better justified ***/
 body {
 	text-align: justify;	
