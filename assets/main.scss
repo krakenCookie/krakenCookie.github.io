@@ -3,11 +3,10 @@
 .post-title {
 	margin-bottom: 0;
 }
-.post-date, .post-comments {
+.post-date, .post-date ~ .commentcount {
 	margin-top: 0;
 	margin-left: 2em
 }
-
 
 /*** I think blog posts look better justified ***/
 body {
