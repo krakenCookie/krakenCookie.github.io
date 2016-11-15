@@ -32,8 +32,8 @@ permalink: /blog.html
     </h1>
     <span class="post-date">{{ post.date | date_to_string }}</span>
     {% if site.disqus %}
-    <span class="post-comments"><a href="{{ site.baseurl }}{{ post.url }}#disqus_thread"
-                              class = "commentcount"></a></span>
+    <a href="{{ site.baseurl }}{{ post.url }}#disqus_thread"
+                              class = "commentcount"></a>
     {% endif %}
     {{ post.content }}
   </div>
