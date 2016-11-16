@@ -2,6 +2,7 @@
 ---
 .post-title {
 	margin-bottom: 0;
+	text-align: left;
 }
 .post-date {
 	margin-top: 0;
@@ -14,6 +15,11 @@
 	font-size: 20;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+    width: auto\9; /* ie8 */
+}
 
 
 
