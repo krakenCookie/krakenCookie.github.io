@@ -41,7 +41,7 @@ body {
 	/* wrapper stays 480px wide past 480px wide and is kept centered */
 	.wrapper {
 		width: 480px;
-		margin: 5% auto 0 auto;
+		margin: 10% auto 0 auto;
 	}
 }
 
@@ -51,6 +51,7 @@ body {
 	to accomodate both the header column and the content column */
 	.wrapper {
 		width: 700px;
+		margin: 5% auto 0 auto;
 	}
 
 	/* the header column stays left and has a dynamic width with all contents
