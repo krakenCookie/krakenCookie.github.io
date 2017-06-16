@@ -24,7 +24,9 @@ But if it can't, and the *z*-axis *has* to be parellel with the pull of gravity,
 
 # Possible solutions:
 
-Most of the following potential solutions are built on the idea that one can *print* the model in the bounding box with an orientation so that it fits, and then fire the ceramic in the desired orientation above.  If there's some sort of reason why that couldn't be done, I think I'm basically out of luck.
+If the printer can't be rotated (or something like that) and we need to print my model at a different orientation, I came up with a few possible ways that could be accomplished. I don't know your system, so I just threw out a few possible ideas and my concerns about what they might necessitate.
+
+Most of the following potential solutions are built on the idea that we can *print* the model in the bounding box with an orientation so that it fits (e.g., rotated 90 degrees), and then fire the ceramic in the desired orientation pictured above.  If there's some sort of reason why that couldn't be done, I think I'm basically out of luck, but hopefully not.
 
 ## Rotating the model 90 degrees
 
