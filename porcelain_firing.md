@@ -1,5 +1,5 @@
 
-# My Shapeways problem
+# My Shapeways challenge
 
 # What I want to do
 
