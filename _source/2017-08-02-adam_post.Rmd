@@ -41,7 +41,7 @@ The sides of the keyboard are decorated with simplified [festoons](http://en.wik
 
 The rear has two holes for the MicroUSB cable and TRRS jack, and sports the classic Greek urn--an object prevalent in the Adam brothers' work. The renders on this page are designed to accommodate /u/wootpatoot's [Let's Split v2 PCB](https://github.com/climbalima/let-s-Split-v2). Somewhat frustratingly, the USB and TRRS connections are not symmetrically aligned on the PCB, meaning that the holes in the back cannot be equally spaced. Hand-wired versions of this case will feature nicely symmetric holes for those interested in wiring it themselves.  I'm currently debating whether the festoons on the back are too distracting--feedback would be appreciated.
 
-## But why porcelain?
+# But why porcelain?
 
 fdafas
 
