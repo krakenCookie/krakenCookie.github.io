@@ -114,7 +114,7 @@ My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup an
 
 My crappier, non-threaded, web-scraper with poor documentation. Also written for Python 3.4+, requires Beautiful Soup and Pillow. This is the earlier, crappier version of my code for a few of the examples, more or less.
 
-> [`2016-11-14-webcomic_post.Rmd`]({{ site.url }}/code/2016-11-14-webcomic_post.Rmd)
+> [`2016-11-14-webcomic_post.Rmd`]({{ site.url }}/code/web-scraping/2016-11-14-webcomic_post.Rmd)
 
 The R Markdown file this blog post is generated from, if you want to know what R code I used for the analysis and plotting.
 
