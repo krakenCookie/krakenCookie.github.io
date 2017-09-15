@@ -1,5 +1,5 @@
 # general configuration
-url: http://www.zachburchill.tk
+url: http://www.zachburchill.ml
 baseurl: ''
 
 sass:
@@ -54,7 +54,7 @@ facebook:         false # add a facebook share button to each post
 
 author:
   name:           'Zachary Burchill'
-  url:            https://zachburchill.tk
+  url:            https://zachburchill.ml
 
 github:
   repo:           https://github.com/burchill
