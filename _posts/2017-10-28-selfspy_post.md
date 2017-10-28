@@ -125,7 +125,7 @@ getPresses(key_db) %>%
 
 
 {% highlight text %}
-## # A tibble: 109,352 × 1
+## # A tibble: 110,389 × 1
 ##    cleanStrings
 ##           <chr>
 ## 1  <[Cmd: Tab]>
@@ -138,12 +138,12 @@ getPresses(key_db) %>%
 ## 8             s
 ## 9             s
 ## 10            a
-## # ... with 109,342 more rows
+## # ... with 110,379 more rows
 {% endhighlight %}
 
 For those of you not used to `R` and those `R` users not used to the `tidyverse`, the `%>%` operator pipes the output of everything on the left of it (`getPresses(key_db)`) into the function on the right of it as the first argument (or, wherever you put a `.`). Thus, what is above is equivalent to `select(getPresses(key_db), cleanStrings)`. My irrational commitment to never declare new variables might make some of the code seem a little weird to some of you--each function is basically a single "flow".
 
-## Understanding the output: Part I
+## Understanding the output: basic
 
 The output from `getPresses()` is essentially a table where every row is a single key press (kind of). The keypresses are saved as strings with the "cleaned up" version of each press in the `cleanStrings` column. A row with "a" in this column means you typed that character--unfortunately, `selfspy` includes the presence of the Shift key in this value, so "A" actually means `Shift + 'a'`. For modifier combos and certain other key presses, such as `Command + Tab` or `Backspace`, the key press is saved in brackets like `<[Cmd: Tab]>`. Technically speaking, these probably aren't "key presses"--`selfspy` doesn't record pressing the Command, Alt, or Ctrl keys unless they are pressed along with some other key.
 
@@ -169,16 +169,16 @@ key_db %>%
 ## 
 ##     cleanStrings areModsPressed     n
 ##            <chr>          <dbl> <dbl>
-## 1       <[Down]>              1 27480
-## 2  <[Backspace]>              1 13843
-## 3                             0 13300
-## 4              e              0  7867
-## 5              t              0  6231
-## 6              a              0  5230
-## 7              o              0  4796
-## 8              i              0  4564
-## 9              s              0  4509
-## 10             n              0  4299
+## 1       <[Down]>              1 27490
+## 2  <[Backspace]>              1 13940
+## 3                             0 13431
+## 4              e              0  7953
+## 5              t              0  6296
+## 6              a              0  5281
+## 7              o              0  4844
+## 8              i              0  4626
+## 9              s              0  4584
+## 10             n              0  4332
 ## # ... with 191 more rows
 {% endhighlight %}
 
@@ -188,7 +188,7 @@ It seems that so far, I press "Down" and "Backspace" the most, followed by "Spac
 
 Well, `selfspy` automatically records repeated "bracketed" key presses with a single entry. So 15 `Command + Tab`s in a row will be recorded as `<[Command + Tab]x15>`. By default, `getStats()` treats this as a single key press. This is useful if you want to consider making macros for, say, something that presses Backspace three times in a row. Note that only "bracketed" key presses are recorded this way. By setting `break_multitaps=TRUE`, we treat these repeated presses individually.
 
-## Understanding the output: Part II
+## Understanding the output: intermediate
 
 But what if you're not satisfied with something that you could basically do with the `selfstats` command? For example, what if you wanted to look at how you typed differently in different applications (perhaps for creating a `Python` layer or an `R` layer), or if you wanted to look at multi-press patterns?
 
@@ -209,9 +209,9 @@ key_db %>%
 ## # A tibble: 22 × 2
 ##             process_id                  data
 ##                  <chr>                <list>
-## 1             Terminal  <tibble [5,021 × 8]>
-## 2              RStudio <tibble [33,812 × 8]>
-## 3        Google Chrome <tibble [39,395 × 8]>
+## 1             Terminal  <tibble [5,103 × 8]>
+## 2              RStudio <tibble [34,689 × 8]>
+## 3        Google Chrome <tibble [39,471 × 8]>
 ## 4         TextWrangler  <tibble [3,097 × 8]>
 ## 5               Finder    <tibble [580 × 8]>
 ## 6             TextEdit  <tibble [5,213 × 8]>
@@ -242,27 +242,40 @@ key_db %>%
 
 
 {% highlight text %}
-## # A tibble: 2,227 × 4
+## # A tibble: 2,230 × 4
 ##        process_id cleanStrings     n areModsPressed
 ##             <chr>        <chr> <int>          <dbl>
-## 1   Google Chrome               4950              0
-## 2         RStudio               4008              0
+## 1   Google Chrome               4952              0
+## 2         RStudio               4129              0
 ## 3   Google Chrome            e  3014              0
-## 4         RStudio            e  2409              0
-## 5   Google Chrome            t  2358              0
+## 4         RStudio            e  2493              0
+## 5   Google Chrome            t  2360              0
 ## 6  Microsoft Word               2151              0
 ## 7   Google Chrome            o  2023              0
-## 8   Google Chrome            a  1948              0
-## 9         RStudio            t  1917              0
-## 10  Google Chrome            i  1793              0
-## # ... with 2,217 more rows
+## 8         RStudio            t  1971              0
+## 9   Google Chrome            a  1949              0
+## 10  Google Chrome            i  1797              0
+## # ... with 2,220 more rows
 {% endhighlight %}
 
-Hmmmfdsafds afds AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Yeah, most of my typing is typing English words, separated by spaces, so you can see similar statistics for the top key presses across applications.
+
+There are differences, however. I threw together this quick-and-dirty little visualization that compares the highest key presses across applications.
 
 ![plot of chunk unnamed-chunk-7](/figure/source/2017-10-28-selfspy_post/unnamed-chunk-7-1.png)
 
-<p class = "figcaption">A little demonstration</p>
+<p class = "figcaption">Visualizing the most-pressed keys across a few applications. Presses with modifier keys are highlighted--the rest are boring and left blank. The order of the keys is identical across applications. Note the dearth of returns in Word--it's probably because I'm writing in paragraphs as opposed to coding/browsing.</p>
+
+It's a pretty boring plot for the most part (sue me!), but you can see some differences emerging across applications. I press the `Enter` key a lot less in Microsoft Word, than I do when I'm coding in `R`, or browsing the web. Presumably, that's because I type in paragraphs in Word. If I want to optimize my key layout, I might be ok with making a layer for Word where the `Enter` key is less accessible.
+
+I urge you to really play around with your data at this point. Really get in there and see what's up. You can do a lot of comparisons between applications, visualize it, etc.--I've really only shown the most boring possibilities above. The differences get much more interesting once you get past the alpha keys.
+
+## Understanding the output: advanced
+
+What would a _rational_ keyboard layout look like? I'm tempted to start prattling on about what that could be, bringing in concepts from information theory or psycholinguistics, but to spare you my philosophizing, I'll just settle on a super basic definition: a rational keyboard layout is one that minimizes the number of necessary key strokes for the statistics of the output and the constraints of the board[^4]. 
+
+Ugh, it's too hard to stop myself from going into lecture mode, so I'll just say this--if you type the same multi-key patterns again and again, why not reduce them to fewer key presses? For example, I type the `%>%` operator a lot in `R`--maybe I want to make this a macro that I can press with a single button?  Well, if you want to start looking at key press n-grams, I wrote some rudimentary code for that as well!
+
 
 
 
@@ -295,4 +308,6 @@ The R Markdown file this blog post is generated from, if you want to know what R
 [^2]: You can leave your data unencrypted with: `selfspy -p ""`. I also learned that you can completely screw up your database by trying to change the password, so my advice is to pick if you want it encrypted or not and stay with that decision.
 
 [^3]: Technically it "had" the ability. The latest release of `dplyr` has separated this functionality into the `dbplyr` package. I haven't yet made the leap to the newest `dplyr` though (even though it's _way_ better), and my code reflects that. The code I wrote should be basically identical to what you'd use if you use the new package though.
+
+[^4]: Hhhnnnngggh, that's totally wrong by the way, and _way_ too simple to be interesting, but if I start thinking about it anymore I won't be able to ~~quell my raging science boner~~ get work done. I actually think an optimal keyboard layout would probably end up looking something like a stenography board for most users, but the specificity needed for activities like coding would make the trade-off with speed interesting.
 
