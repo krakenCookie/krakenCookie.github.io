@@ -125,7 +125,7 @@ getPresses(key_db) %>%
 
 
 {% highlight text %}
-## # A tibble: 108,520 × 1
+## # A tibble: 108,594 × 1
 ##    cleanStrings
 ##           <chr>
 ## 1  <[Cmd: Tab]>
@@ -138,7 +138,7 @@ getPresses(key_db) %>%
 ## 8             s
 ## 9             s
 ## 10            a
-## # ... with 108,510 more rows
+## # ... with 108,584 more rows
 {% endhighlight %}
 
 For those of you not used to `R` and those `R` users not used to the `tidyverse`, the `%>%` operator pipes the output of everything on the left of it (`getPresses(key_db)`) into the function on the right of it as the first argument (or, wherever you put a `.`). Thus, what is above is equivalent to `select(getPresses(key_db), cleanStrings)`. My irrational commitment to never declare new variables might make some of the code seem a little weird to some of you--each function is basically a single "flow".
@@ -169,16 +169,16 @@ key_db %>%
 ## 
 ##     cleanStrings areModsPressed     n
 ##            <chr>          <dbl> <dbl>
-## 1       <[Down]>              1 27465
-## 2  <[Backspace]>              1 13729
-## 3                             0 13228
+## 1       <[Down]>              1 27475
+## 2  <[Backspace]>              1 13746
+## 3                             0 13231
 ## 4              e              0  7849
-## 5              t              0  6169
-## 6              a              0  5197
-## 7              o              0  4771
-## 8              i              0  4513
-## 9              s              0  4462
-## 10             n              0  4287
+## 5              t              0  6176
+## 6              a              0  5199
+## 7              o              0  4772
+## 8              i              0  4516
+## 9              s              0  4468
+## 10             n              0  4288
 ## # ... with 191 more rows
 {% endhighlight %}
 
@@ -209,9 +209,9 @@ key_db %>%
 ## # A tibble: 22 × 2
 ##             process_id                  data
 ##                  <chr>                <list>
-## 1             Terminal  <tibble [4,561 × 8]>
-## 2              RStudio <tibble [33,478 × 8]>
-## 3        Google Chrome <tibble [39,359 × 8]>
+## 1             Terminal  <tibble [4,598 × 8]>
+## 2              RStudio <tibble [33,510 × 8]>
+## 3        Google Chrome <tibble [39,362 × 8]>
 ## 4         TextWrangler  <tibble [3,097 × 8]>
 ## 5               Finder    <tibble [580 × 8]>
 ## 6             TextEdit  <tibble [5,213 × 8]>
@@ -242,20 +242,20 @@ key_db %>%
 
 
 {% highlight text %}
-## # A tibble: 2,224 × 4
+## # A tibble: 2,225 × 4
 ##        process_id cleanStrings     n areModsPressed
 ##             <chr>        <chr> <int>          <dbl>
 ## 1   Google Chrome               4950              0
-## 2         RStudio               3992              0
+## 2         RStudio               3993              0
 ## 3   Google Chrome            e  3014              0
 ## 4         RStudio            e  2395              0
 ## 5   Google Chrome            t  2358              0
 ## 6  Microsoft Word               2151              0
 ## 7   Google Chrome            o  2023              0
 ## 8   Google Chrome            a  1948              0
-## 9         RStudio            t  1907              0
+## 9         RStudio            t  1911              0
 ## 10  Google Chrome            i  1793              0
-## # ... with 2,214 more rows
+## # ... with 2,215 more rows
 {% endhighlight %}
 
 
