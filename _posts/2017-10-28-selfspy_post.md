@@ -61,7 +61,11 @@ library(stringr)
 library(purrr)
 
 # Loading in the data from the default location for the database
-selfspy_db <- src_sqlite("/Users/zburchill/.selfspy/selfspy.sqlite", create = T) 
+selfspy_db <- dplyr::src_sqlite("/Users/zburchill/.selfspy/selfspy.sqlite", create = T) 
+{% endhighlight %}
+
+
+{% highlight r %}
 selfspy_db
 {% endhighlight %}
 
@@ -70,6 +74,7 @@ selfspy_db
 {% highlight text %}
 ## Error in UseMethod("db_list_tables"): no applicable method for 'db_list_tables' applied to an object of class "SQLiteConnection"
 {% endhighlight %}
+
 
 You can see that there are five tables in the database: `click` (mouse data?), `geometry` (window size data?), `keys` (key press data), `process` (the names of the programs), `window` (data on what windows have been active).  For this excursion, we'll only care about `keys` and `process`.
 
