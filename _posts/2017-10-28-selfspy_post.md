@@ -29,11 +29,11 @@ This tutorial/demonstration is for those who know something about mechanical key
 
 After suffering through the hell that was the Massdrop group buy for [Jack Humbert's](http://jackhumbert.com/) [Planck mechanical keyboard](https://www.youtube.com/watch?v=bEPg8kk84gw)[^1], I've finally got a fully programmable keyboard of my own.  This guide will be for that rev4 Planck. I use an old Macbook Pro with OSX 10.9.5 (I _really_ need to get around to updating!) and `R` version 3.3.1 (more shame!).
 
-I can tell you right now, following this tutorial on a PC is going to be challenging. Making and flashing custom QMK layouts to your keyboard is way easier on Unix-based systems, and most of the cool open-source stuff is for Unix as well. Now is the perfect time to get in on that Linux action if you haven't already. Installing a virtual machine on your PC is a committment-free way of playing around with Linux, and I'd recommend that.
+I can tell you right now, following this tutorial on a PC is going to be challenging. Making and flashing custom QMK layouts to your keyboard is way easier on Unix-based systems, and most of the cool open-source stuff is for Unix as well. Now is the perfect time to get in on that Linux action if you haven't already. Installing a virtual machine on your PC is a commitment-free way of playing around with Linux, and I'd recommend that.
 
 ## Getting your typing data
 
-Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  Selfspy is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it justs saves all of it in an Sqlite database on your computer.
+Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  Selfspy is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it just saves all of it in an Sqlite database on your computer.
 
 ### Installing selfspy
 
@@ -43,11 +43,11 @@ Looking back, you might be able to just update the pyobjc requirements in `osx_r
 
 ## Analyzing your data
 
-Open up a terminal, and run `selfspy` to have it start collecting your data.  **A word to the wise: unless you sometimes pause it, it will record _EVERYTHING_**. All your passwords, the names of all those dirty, _dirty_ site you visit (you filthy animal!)--everything.
+Open up a terminal, and run `selfspy` to have it start collecting your data.  **A word to the wise: unless you sometimes pause it, it will record _EVERYTHING_**. All your passwords, the names of all those dirty, _dirty_ sites you visit (you filthy animal!)--everything.
 
 This isn't a such a big deal, however, because you can have it encrypt the data it stores in the database on your computer. If you're fine with somewhat surface-level analyses of your data, this is fine--`selfspy` comes with a program called `selfstats` that lets you print out some basic analyses of your data, including key frequencies. If you want to see how often you've pressed each key while `selfspy` has been running, you can do it with `selfstats` easy-peasy.
 
-But if you want to manipulate all that juicy, _succulent_ data yourself (you little pervert!), the fact that it's all encrypted _is_ a bit of problem. At least it was for me, who doesn't know how to decrypt it with the tools I had on hand.  Instead, I opted to just leave everything unecrypted and pray to God that the Russians don't get a hold of my computer[^2]. The `R` code that I've written to analyze the data at a more fine-grain level only works when it's unecrypted, so either figure out how to decrypt [Blowfish](https://en.wikipedia.org/wiki/Blowfish_(cipher)) in `R` or `Python`, or let your freak flag fly.
+But if you want to manipulate all that juicy, _succulent_ data yourself (you little pervert!), the fact that it's all encrypted _is_ a bit of problem. At least it was for me, who doesn't know how to decrypt it with the tools I had on hand.  Instead, I opted to just leave everything unencrypted and pray to God that the Russians don't get a hold of my computer[^2]. The `R` code that I've written to analyze the data at a more fine-grain level only works when it's unecrypted, so either figure out how to decrypt [Blowfish](https://en.wikipedia.org/wiki/Blowfish_(cipher)) in `R` or `Python`, or let your freak flag fly.
 
 ## Walking through my code
 
@@ -112,11 +112,11 @@ key_db
 
 See the `Source:   query [?? x 10]` at the top? As it currently stands, `key_db` isn't a data frame or a `tbl_df`--it's just a query to the database--it doesn't know how many rows there are yet. When dealing with SQL, `dplyr` evaluates things _lazily_, meaning it won't actually fetch all the data from the database unless you demand it.  
 
-You can see that there's a lot of info in `key_db`: in addition to timining information for the key presses, it has the IDs of all the applications and windows that were active while you were typing. Today, I'll only be focusing on the key presses and the names of the applications.
+You can see that there's a lot of info in `key_db`: in addition to timing information for the key presses, it has the IDs of all the applications and windows that were active while you were typing. Today, I'll only be focusing on the key presses and the names of the applications.
 
 Let's look at some of the functions I've written to help you analyze your data.
 
-### Getting the keypresses in human-readable formats
+### Getting the key presses in human-readable formats
 
 In order analyze the key presses, we have to get them to a point where we can work with them. For this, I've written the function `getPresses()`. There are a lot of optional arguments, but they're detailed in the code. The basic functionality is like this:
 
