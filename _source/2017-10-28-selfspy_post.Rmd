@@ -4,7 +4,7 @@ title: "Optimizing Your Keyboard Layout"
 comments:  true
 published:  true
 author: "Zach Burchill"
-date: 2016-11-14 10:00:00
+date: 2017-10-28 10:00:00
 permalink: /selfspy.html
 categories: ['mechanical keyboards',selfspy,analysis,'keyboard layout',R]
 output:
@@ -179,7 +179,7 @@ I can tell you right now, following this tutorial on a PC is going to be challen
 
 ## Getting your typing data
 
-Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  Selfspy is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it justs saves all of it in an Sqlite database on your computer.
+Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  `selfspy` is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it justs saves all of it in an Sqlite database on your computer.
 
 ### Installing selfspy
 
@@ -205,12 +205,16 @@ library(tidyr)
 library(stringr)
 library(purrr)
 
-# Loading in the data from the default location for the database
-selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T) 
+# Loading in the data from a personalized (smaller) database
+selfspy_db <- src_sqlite("~/.selfspy/selfspy_post.sqlite ", create = T) 
+# Below is the default location for the database, and what you would presumably use
+# selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T) 
 selfspy_db
 ```
 
 You can see that there are five tables in the database: `click` (mouse data?), `geometry` (window size data?), `keys` (key press data), `process` (the names of the programs), `window` (data on what windows have been active).  For this excursion, we'll only care about `keys` and `process`.
+
+**Note:** For this demonstration, I'm using a smaller copy of one of my databases. This is because: 1) I accidentally locked myself out of my month-long database and 2) I don't want any weird stuff being coming up in this tutorial!
 
 ```{r}
 # Opening connections to the key and process databases
@@ -356,38 +360,52 @@ What would a _rational_ keyboard layout look like? I'm tempted to start prattlin
 
 Ugh, it's too hard to stop myself from going into lecture mode, so I'll just say this--if you type the same multi-key patterns again and again, why not reduce them to fewer key presses? For example, I type the `%>%` operator a lot in `R`--maybe I want to make this a macro that I can press with a single button?  Well, if you want to start looking at key press n-grams, I wrote some rudimentary code for that as well!
 
+The function `nGramPresses()` basically does the same thing as `getPresses()`, but it clusters subsequent key-presses into groups of _n_. Let's look at what happens when we analyze the frequency of 4-gram key presses that use modifier keys, grouping them by application.
 
+```{r}
+key_db %>% 
+  nGramPresses(process_id_df    = process_db %>% select(-created_at) %>% collect(), 
+               group_by_process = TRUE,
+               n=4) %>% # n is an integer greater than 0
+  mutate(data = purrr::map(data, ~getStats(., 
+                                           s_col="cleanStrings", 
+                                           break_multitaps=FALSE))) %>% # `break_multitaps` needs to be set to false if you're using n-grams. If you have the know-how, you could pretty easily change the code so that it works
+  tidyr::unnest() %>% 
+  arrange(-n) %>% 
+  filter(areModsPressed!=0) %>% 
+  head(10) %>% as.data.frame()
+```
 
+Look at that! Now we're getting somewhere! You can get a sense of what I've been doing the most from these n-grams!  I've been using `git` a lot (e.g., `<[Enter]>-g-i-t`), navigating with the terminal (with `ls` and `cd`), and yes, it looks like I _do_ use the `%>%` operator (followed by a return) a lot! Hilariously, you can also see my reddit obsession: I just type `r-e-d` to get the autocomplete suggestions, and then press `Enter`!
 
+## Other layouts
 
+Hopefully, I'll be getting around to writing a newbie's introduction to QMK, but for those of you with no C++ experience, check out [kbfirmware.com](https://kbfirmware.com/) for an easy way to make basic layers and layouts.  For those who are just starting out on their QMK journey, my advice is to copy the hell out of other people's code and layouts--there are loads of examples for most keyboards in the firmware!  
 
+There are also great ideas to draw inspiration from.  For example, my current layout (which you can follow along with [here](https://github.com/burchill/qmk_firmware/tree/master/keyboards/planck/keymaps/betua)) draws a lot of inspiration from [Noah Frederick's set up](https://noahfrederick.com/log/the-planck-keyboard).  [This person](http://thedarnedestthing.com/planck%20constant) also has a bunch of crazy layouts and code that beginners might find helpful.
+
+If this helps at all, or if you have any questions (_please don't be about installing selfspy please don't be about installing selfspy_), feel free to drop a comment here or on reddit!
 
 <hr />
 <br />
 
 ## Source Code:
 
-> [`web_scraper_threaded_general.py`]({{ site.url }}/code/web-scraping/web_scraper_threaded_general.py)
+> [`keyboard_analysis.py`]({{ site.url }}/code/keyboard-analysis/keyboard_analysis.R)
 
-My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python--probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment below.
+The code that I banged out for this project. Although it's using some outdated package versions, I added a lot of comments and usage examples. 
 
-> [`web_scraper_nonthreaded.py`]({{ site.url }}/code/web-scraping/web_scraper_nonthreaded.py)
+> [`2017-10-28-selfspy_post.Rmd`]({{ site.url }}/_source/2017-10-28-selfspy_post.Rmd)
 
-My crappier, non-threaded, web-scraper with poor documentation. Also written for Python 3.4+, requires Beautiful Soup and Pillow. This is the earlier, crappier version of my code for a few of the examples, more or less.
-
-> [`2016-11-14-webcomic_post.Rmd`]({{ site.url }}/_source/2016-11-14-webcomic_post.Rmd)
-
-The R Markdown file this blog post is generated from, if you want to know what R code I used for the analysis and plotting.
+The R Markdown file this blog post is generated from, if you want to know what R code I used for the plot, etc.
 
 ### Footnotes
-
-
 
 [^1]: None of the trainwreck was Jack's fault--Massdrop is just a horrible company.
 
 [^2]: You can leave your data unencrypted with: `selfspy -p ""`. I also learned that you can completely screw up your database by trying to change the password, so my advice is to pick if you want it encrypted or not and stay with that decision.
 
-[^3]: Technically it "had" the ability. The latest release of `dplyr` has separated this functionality into the `dbplyr` package. I haven't yet made the leap to the newest `dplyr` though (even though it's _way_ better), and my code reflects that. The code I wrote should be basically identical to what you'd use if you use the new package though.
+[^3]: Technically it "had" the ability. The latest release of `dplyr` has separated this functionality into the `dbplyr` package. I haven't yet made the leap to the newest `dplyr` though (even though it's _way_ better), and my code reflects that. The code I wrote should be similar to what you'd use if you use the new package though.
 
-[^4]: Hhhnnnngggh, that's totally wrong by the way, and _way_ too simple to be interesting, but if I start thinking about it anymore I won't be able to ~~quell my raging science boner~~ get work done. I actually think an optimal keyboard layout would probably end up looking something like a stenography board for most users, but the specificity needed for activities like coding would make the trade-off with speed interesting.
+[^4]: Hhhnnnngggh, that's totally wrong by the way, and _way_ too simple to be interesting, but if I start thinking about it anymore I won't be able to ~~quell my raging science boner~~ get any work done. I actually think an optimal keyboard layout would probably end up looking something like a stenography board for most users, but the specificity needed for activities like coding would make the trade-off with speed interesting.
 

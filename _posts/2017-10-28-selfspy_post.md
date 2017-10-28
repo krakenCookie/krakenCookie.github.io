@@ -4,7 +4,7 @@ title: "Optimizing Your Keyboard Layout"
 comments:  true
 published:  true
 author: "Zach Burchill"
-date: 2016-11-14 10:00:00
+date: 2017-10-28 10:00:00
 permalink: /selfspy.html
 categories: ['mechanical keyboards',selfspy,analysis,'keyboard layout',R]
 output:
@@ -33,7 +33,7 @@ I can tell you right now, following this tutorial on a PC is going to be challen
 
 ## Getting your typing data
 
-Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  Selfspy is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it justs saves all of it in an Sqlite database on your computer.
+Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  `selfspy` is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it justs saves all of it in an Sqlite database on your computer.
 
 ### Installing selfspy
 
@@ -60,50 +60,58 @@ library(tidyr)
 library(stringr)
 library(purrr)
 
-# Loading in the data from the default location for the database
-selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T) 
+# Loading in the data from a personalized (smaller) database
+selfspy_db <- src_sqlite("~/.selfspy/selfspy_post.sqlite ", create = T) 
+# Below is the default location for the database, and what you would presumably use
+# selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T) 
 selfspy_db
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## src:  sqlite 3.11.1 [~/.selfspy/selfspy.sqlite]
-## tbls: click, geometry, keys, process, window
+## src:  sqlite 3.11.1 [~/.selfspy/selfspy_post.sqlite ]
+## tbls:
 {% endhighlight %}
 
 You can see that there are five tables in the database: `click` (mouse data?), `geometry` (window size data?), `keys` (key press data), `process` (the names of the programs), `window` (data on what windows have been active).  For this excursion, we'll only care about `keys` and `process`.
+
+**Note:** For this demonstration, I'm using a smaller copy of one of my databases. This is because: 1) I accidentally locked myself out of my month-long database and 2) I don't want any weird stuff being coming up in this tutorial!
 
 
 {% highlight r %}
 # Opening connections to the key and process databases
 key_db <- tbl(selfspy_db, "keys")
-process_db <- tbl(selfspy_db, "process")
+{% endhighlight %}
 
+
+
+{% highlight text %}
+## Error in rsqlite_send_query(conn@ptr, statement): no such table: keys
+{% endhighlight %}
+
+
+
+{% highlight r %}
+process_db <- tbl(selfspy_db, "process")
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Error in rsqlite_send_query(conn@ptr, statement): no such table: process
+{% endhighlight %}
+
+
+
+{% highlight r %}
 key_db
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## Source:   query [?? x 10]
-## Database: sqlite 3.11.1 [~/.selfspy/selfspy.sqlite]
-## 
-##       id                 created_at        text
-##    <int>                      <chr>      <list>
-## 1      1 2017-10-18 14:24:13.692624  <raw [12]>
-## 2      2 2017-10-18 14:24:28.915149  <raw [24]>
-## 3      3 2017-10-18 14:24:30.259072  <raw [12]>
-## 4      4 2017-10-18 14:25:05.551297  <raw [42]>
-## 5      5 2017-10-18 14:27:39.875412 <raw [397]>
-## 6      6 2017-10-18 14:27:50.265004  <raw [27]>
-## 7      7 2017-10-18 14:27:57.575051  <raw [48]>
-## 8      8 2017-10-18 14:27:59.317140  <raw [12]>
-## 9      9 2017-10-18 14:28:00.678074  <raw [13]>
-## 10    10 2017-10-18 14:28:02.835207  <raw [19]>
-## # ... with more rows, and 7 more variables: started <chr>,
-## #   process_id <int>, window_id <int>, geometry_id <int>,
-## #   nrkeys <int>, keys <list>, timings <list>
+## Error in eval(expr, envir, enclos): object 'key_db' not found
 {% endhighlight %}
 
 See the `Source:   query [?? x 10]` at the top? As it currently stands, `key_db` isn't a data frame or a `tbl_df`--it's just a query to the database--it doesn't know how many rows there are yet. When dealing with SQL, `dplyr` evaluates things _lazily_, meaning it won't actually fetch all the data from the database unless you demand it.  
@@ -125,20 +133,7 @@ getPresses(key_db) %>%
 
 
 {% highlight text %}
-## # A tibble: 110,389 × 1
-##    cleanStrings
-##           <chr>
-## 1  <[Cmd: Tab]>
-## 2             a
-## 3             a
-## 4             a
-## 5             a
-## 6             s
-## 7             s
-## 8             s
-## 9             s
-## 10            a
-## # ... with 110,379 more rows
+## Error in eval(expr, envir, enclos): object 'key_db' not found
 {% endhighlight %}
 
 For those of you not used to `R` and those `R` users not used to the `tidyverse`, the `%>%` operator pipes the output of everything on the left of it (`getPresses(key_db)`) into the function on the right of it as the first argument (or, wherever you put a `.`). Thus, what is above is equivalent to `select(getPresses(key_db), cleanStrings)`. My irrational commitment to never declare new variables might make some of the code seem a little weird to some of you--each function is basically a single "flow".
@@ -164,22 +159,7 @@ key_db %>%
 
 
 {% highlight text %}
-## Source: local data frame [201 x 3]
-## Groups: cleanStrings [201]
-## 
-##     cleanStrings areModsPressed     n
-##            <chr>          <dbl> <dbl>
-## 1       <[Down]>              1 27490
-## 2  <[Backspace]>              1 13940
-## 3                             0 13431
-## 4              e              0  7953
-## 5              t              0  6296
-## 6              a              0  5281
-## 7              o              0  4844
-## 8              i              0  4626
-## 9              s              0  4584
-## 10             n              0  4332
-## # ... with 191 more rows
+## Error in eval(expr, envir, enclos): object 'key_db' not found
 {% endhighlight %}
 
 You can see from the output that there are three columns: the names of the key presses, `areModsPressed` (a column indicating whether functional/modifier keys were pressed down, excluding Shift), and `n` (the number of presses).
@@ -206,20 +186,7 @@ key_db %>%
 
 
 {% highlight text %}
-## # A tibble: 22 × 2
-##             process_id                  data
-##                  <chr>                <list>
-## 1             Terminal  <tibble [5,103 × 8]>
-## 2              RStudio <tibble [34,689 × 8]>
-## 3        Google Chrome <tibble [39,471 × 8]>
-## 4         TextWrangler  <tibble [3,097 × 8]>
-## 5               Finder    <tibble [580 × 8]>
-## 6             TextEdit  <tibble [5,213 × 8]>
-## 7                Notes  <tibble [1,851 × 8]>
-## 8          QMK Flasher      <tibble [3 × 8]>
-## 9  CoreServicesUIAgent      <tibble [1 × 8]>
-## 10     Microsoft Excel    <tibble [151 × 8]>
-## # ... with 12 more rows
+## Error in eval(expr, envir, enclos): object 'key_db' not found
 {% endhighlight %}
 
 A marvel of the `tidyverse` is that it can store entire data frames as single cells in bigger data frames. Each cell in the `data` column above is a data frame of all the key presses for the application in the `process_id` column.
@@ -242,27 +209,29 @@ key_db %>%
 
 
 {% highlight text %}
-## # A tibble: 2,230 × 4
-##        process_id cleanStrings     n areModsPressed
-##             <chr>        <chr> <int>          <dbl>
-## 1   Google Chrome               4952              0
-## 2         RStudio               4129              0
-## 3   Google Chrome            e  3014              0
-## 4         RStudio            e  2493              0
-## 5   Google Chrome            t  2360              0
-## 6  Microsoft Word               2151              0
-## 7   Google Chrome            o  2023              0
-## 8         RStudio            t  1971              0
-## 9   Google Chrome            a  1949              0
-## 10  Google Chrome            i  1797              0
-## # ... with 2,220 more rows
+## Error in eval(expr, envir, enclos): object 'key_db' not found
 {% endhighlight %}
 
 Yeah, most of my typing is typing English words, separated by spaces, so you can see similar statistics for the top key presses across applications.
 
 There are differences, however. I threw together this quick-and-dirty little visualization that compares the highest key presses across applications.
 
-![plot of chunk unnamed-chunk-7](/figure/source/2017-10-28-selfspy_post/unnamed-chunk-7-1.png)
+
+{% highlight text %}
+## Error in eval(expr, envir, enclos): object 'key_db' not found
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Error in eval(expr, envir, enclos): object 'test_plot_data' not found
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Error in eval(expr, envir, enclos): object 'test_plot_data' not found
+{% endhighlight %}
 
 <p class = "figcaption">Visualizing the most-pressed keys across a few applications. Presses with modifier keys are highlighted--the rest are boring and left blank. The order of the keys is identical across applications. Note the dearth of returns in Word--it's probably because I'm writing in paragraphs as opposed to coding/browsing.</p>
 
@@ -276,38 +245,59 @@ What would a _rational_ keyboard layout look like? I'm tempted to start prattlin
 
 Ugh, it's too hard to stop myself from going into lecture mode, so I'll just say this--if you type the same multi-key patterns again and again, why not reduce them to fewer key presses? For example, I type the `%>%` operator a lot in `R`--maybe I want to make this a macro that I can press with a single button?  Well, if you want to start looking at key press n-grams, I wrote some rudimentary code for that as well!
 
+The function `nGramPresses()` basically does the same thing as `getPresses()`, but it clusters subsequent key-presses into groups of _n_. Let's look at what happens when we analyze the frequency of 4-gram key presses that use modifier keys, grouping them by application.
+
+
+{% highlight r %}
+key_db %>% 
+  nGramPresses(process_id_df    = process_db %>% select(-created_at) %>% collect(), 
+               group_by_process = TRUE,
+               n=4) %>% # n is an integer greater than 0
+  mutate(data = purrr::map(data, ~getStats(., 
+                                           s_col="cleanStrings", 
+                                           break_multitaps=FALSE))) %>% # `break_multitaps` needs to be set to false if you're using n-grams. If you have the know-how, you could pretty easily change the code so that it works
+  tidyr::unnest() %>% 
+  arrange(-n) %>% 
+  filter(areModsPressed!=0) %>% 
+  head(10) %>% as.data.frame()
+{% endhighlight %}
 
 
 
+{% highlight text %}
+## Error in eval(expr, envir, enclos): object 'key_db' not found
+{% endhighlight %}
 
+Look at that! Now we're getting somewhere! You can get a sense of what I've been doing the most from these n-grams!  I've been using `git` a lot (e.g., `<[Enter]>-g-i-t`), navigating with the terminal (with `ls` and `cd`), and yes, it looks like I _do_ use the `%>%` operator (followed by a return) a lot! Hilariously, you can also see my reddit obsession: I just type `r-e-d` to get the autocomplete suggestions, and then press `Enter`!
 
+## Other layouts
+
+Hopefully, I'll be getting around to writing a newbie's introduction to QMK, but for those of you with no C++ experience, check out [kbfirmware.com](https://kbfirmware.com/) for an easy way to make basic layers and layouts.  For those who are just starting out on their QMK journey, my advice is to copy the hell out of other people's code and layouts--there are loads of examples for most keyboards in the firmware!  
+
+There are also great ideas to draw inspiration from.  For example, my current layout (which you can follow along with [here](https://github.com/burchill/qmk_firmware/tree/master/keyboards/planck/keymaps/betua)) draws a lot of inspiration from [Noah Frederick's set up](https://noahfrederick.com/log/the-planck-keyboard).  [This person](http://thedarnedestthing.com/planck%20constant) also has a bunch of crazy layouts and code that beginners might find helpful.
+
+If this helps at all, or if you have any questions (_please don't be about installing selfspy please don't be about installing selfspy_), feel free to drop a comment here or on reddit!
 
 <hr />
 <br />
 
 ## Source Code:
 
-> [`web_scraper_threaded_general.py`]({{ site.url }}/code/web-scraping/web_scraper_threaded_general.py)
+> [`keyboard_analysis.py`]({{ site.url }}/code/keyboard-analysis/keyboard_analysis.R)
 
-My multi-thread web-scraper, written for Python 3.4+, requires Beautiful Soup and Pillow. If you have `pip` you can try: `python3 pip install beautifulsoup4` and `python3 pip install pillow`.  This is my first time ever working with threads in Python--probably overkill, but it was fun to learn about. If you have any comments about what I could do better--any rookie mistakes I made--feel free to leave a comment below.
+The code that I banged out for this project. Although it's using some outdated package versions, I added a lot of comments and usage examples. 
 
-> [`web_scraper_nonthreaded.py`]({{ site.url }}/code/web-scraping/web_scraper_nonthreaded.py)
+> [`2017-10-28-selfspy_post.Rmd`]({{ site.url }}/_source/2017-10-28-selfspy_post.Rmd)
 
-My crappier, non-threaded, web-scraper with poor documentation. Also written for Python 3.4+, requires Beautiful Soup and Pillow. This is the earlier, crappier version of my code for a few of the examples, more or less.
-
-> [`2016-11-14-webcomic_post.Rmd`]({{ site.url }}/_source/2016-11-14-webcomic_post.Rmd)
-
-The R Markdown file this blog post is generated from, if you want to know what R code I used for the analysis and plotting.
+The R Markdown file this blog post is generated from, if you want to know what R code I used for the plot, etc.
 
 ### Footnotes
-
-
 
 [^1]: None of the trainwreck was Jack's fault--Massdrop is just a horrible company.
 
 [^2]: You can leave your data unencrypted with: `selfspy -p ""`. I also learned that you can completely screw up your database by trying to change the password, so my advice is to pick if you want it encrypted or not and stay with that decision.
 
-[^3]: Technically it "had" the ability. The latest release of `dplyr` has separated this functionality into the `dbplyr` package. I haven't yet made the leap to the newest `dplyr` though (even though it's _way_ better), and my code reflects that. The code I wrote should be basically identical to what you'd use if you use the new package though.
+[^3]: Technically it "had" the ability. The latest release of `dplyr` has separated this functionality into the `dbplyr` package. I haven't yet made the leap to the newest `dplyr` though (even though it's _way_ better), and my code reflects that. The code I wrote should be similar to what you'd use if you use the new package though.
 
-[^4]: Hhhnnnngggh, that's totally wrong by the way, and _way_ too simple to be interesting, but if I start thinking about it anymore I won't be able to ~~quell my raging science boner~~ get work done. I actually think an optimal keyboard layout would probably end up looking something like a stenography board for most users, but the specificity needed for activities like coding would make the trade-off with speed interesting.
+[^4]: Hhhnnnngggh, that's totally wrong by the way, and _way_ too simple to be interesting, but if I start thinking about it anymore I won't be able to ~~quell my raging science boner~~ get any work done. I actually think an optimal keyboard layout would probably end up looking something like a stenography board for most users, but the specificity needed for activities like coding would make the trade-off with speed interesting.
 
