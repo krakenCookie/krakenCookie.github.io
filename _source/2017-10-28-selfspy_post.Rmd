@@ -179,7 +179,7 @@ I can tell you right now, following this tutorial on a PC is going to be challen
 
 ## Getting your typing data
 
-Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  `selfspy` is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it justs saves all of it in an Sqlite database on your computer.
+Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  Selfspy is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it justs saves all of it in an Sqlite database on your computer.
 
 ### Installing selfspy
 
