@@ -125,7 +125,7 @@ getPresses(key_db) %>%
 
 
 {% highlight text %}
-## # A tibble: 108,479 × 1
+## # A tibble: 108,520 × 1
 ##    cleanStrings
 ##           <chr>
 ## 1  <[Cmd: Tab]>
@@ -138,7 +138,7 @@ getPresses(key_db) %>%
 ## 8             s
 ## 9             s
 ## 10            a
-## # ... with 108,469 more rows
+## # ... with 108,510 more rows
 {% endhighlight %}
 
 For those of you not used to `R` and those `R` users not used to the `tidyverse`, the `%>%` operator pipes the output of everything on the left of it (`getPresses(key_db)`) into the function on the right of it as the first argument (or, wherever you put a `.`). Thus, what is above is equivalent to `select(getPresses(key_db), cleanStrings)`. My irrational commitment to never declare new variables might make some of the code seem a little weird to some of you--each function is basically a single "flow".
@@ -170,14 +170,14 @@ key_db %>%
 ##     cleanStrings areModsPressed     n
 ##            <chr>          <dbl> <dbl>
 ## 1       <[Down]>              1 27465
-## 2  <[Backspace]>              1 13691
-## 3                             0 13226
-## 4              e              0  7847
-## 5              t              0  6168
+## 2  <[Backspace]>              1 13729
+## 3                             0 13228
+## 4              e              0  7849
+## 5              t              0  6169
 ## 6              a              0  5197
 ## 7              o              0  4771
-## 8              i              0  4510
-## 9              s              0  4459
+## 8              i              0  4513
+## 9              s              0  4462
 ## 10             n              0  4287
 ## # ... with 191 more rows
 {% endhighlight %}
@@ -209,9 +209,9 @@ key_db %>%
 ## # A tibble: 22 × 2
 ##             process_id                  data
 ##                  <chr>                <list>
-## 1             Terminal  <tibble [4,529 × 8]>
-## 2              RStudio <tibble [33,470 × 8]>
-## 3        Google Chrome <tibble [39,356 × 8]>
+## 1             Terminal  <tibble [4,561 × 8]>
+## 2              RStudio <tibble [33,478 × 8]>
+## 3        Google Chrome <tibble [39,359 × 8]>
 ## 4         TextWrangler  <tibble [3,097 × 8]>
 ## 5               Finder    <tibble [580 × 8]>
 ## 6             TextEdit  <tibble [5,213 × 8]>
@@ -258,6 +258,54 @@ key_db %>%
 ## # ... with 2,214 more rows
 {% endhighlight %}
 
+
+
+{% highlight r %}
+test_plot_data <- key_db %>% 
+  getPresses(process_id_df = process_db %>% select(-created_at) %>% collect(), 
+             group_by_process = TRUE) %>%
+  mutate(data = purrr::map(data, ~getStats(., # Don't forget the tilde in front of the function, and you have to use the '.' to indicate where the first argument of `purrr::map` should appear
+                                           s_col="cleanStrings",
+                                           break_multitaps=FALSE))) %>%
+  tidyr::unnest() %>% # Expands the data frames in the `data` column
+                      # If you want to keep them separate, keep manipulating them with `map`!
+  arrange(-n) %>%
+  group_by(process_id) %>%
+  mutate(id_size=sum(n)) %>%
+  ungroup() %>%
+  filter(id_size > mean(id_size)/2) %>%
+  group_by(cleanStrings) %>%
+  mutate(string_num=sum(n)) %>%
+  ungroup() %>%
+  filter(string_num > 500) %>%
+  arrange(-string_num) %>%
+  mutate(cleanStrings=factor(cleanStrings,
+                             levels=unique(cleanStrings))) %>%
+  group_by(process_id) %>%
+  mutate(normalized_log_n=scale(log(n))) %>%
+  ungroup()
+
+
+
+label_data <- test_plot_data %>%
+  filter(areModsPressed==1)
+
+test_plot_data %>%
+  ggplot(aes(x=cleanStrings,y=normalized_log_n,color=as.factor(areModsPressed))) + geom_point() +
+  facet_wrap(~process_id) + 
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) + 
+  scale_color_discrete(guide=FALSE) + 
+  geom_label_repel(aes(label=cleanStrings), 
+                   #color="black",
+                   size=5,
+                   alpha=0.7,
+                   data=label_data, 
+                   force=10,
+                 box.padding = unit(0.5, "lines"),
+                 min.segment.length = unit(0.0, "lines"),
+                 show.legend = FALSE)
+{% endhighlight %}
 
 ![BABABA this is a test, this is a test, waaaaaaaa waaaaaaaaaaa, waaaaaaaaa](/figure/source/2017-10-28-selfspy_post/unnamed-chunk-7-1.png)
 

@@ -291,7 +291,7 @@ key_db %>%
 ```
 
 
-```{r,echo=FALSE,fig.cap="BABABA this is a test, this is a test, waaaaaaaa waaaaaaaaaaa, waaaaaaaaa"}
+```{r,fig.cap="BABABA this is a test, this is a test, waaaaaaaa waaaaaaaaaaa, waaaaaaaaa"}
 test_plot_data <- key_db %>% 
   getPresses(process_id_df = process_db %>% select(-created_at) %>% collect(), 
              group_by_process = TRUE) %>%
