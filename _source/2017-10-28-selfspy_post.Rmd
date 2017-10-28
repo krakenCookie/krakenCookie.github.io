@@ -205,7 +205,7 @@ library(stringr)
 library(purrr)
 
 # Loading in the data from the default location for the database
-selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T) 
+selfspy_db <- src_sqlite("/Users/zburchill/.selfspy/selfspy.sqlite", create = T) 
 selfspy_db
 ```
 
