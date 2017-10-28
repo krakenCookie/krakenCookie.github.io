@@ -13,7 +13,7 @@ output:
     fig_caption:  true
 ---
 
-```{r setup, include=FALSE}
+```{r setup}
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -30,7 +30,7 @@ library(stringr)
 library(purrr)
 ```
 
-```{r functions,warning=FALSE,message=FALSE,echo=FALSE}
+```{r functions}
 
 # Cleans up the weird escaped characters
 cleanUpStrings <- function(string_vec) {
@@ -198,7 +198,7 @@ But if you want to manipulate all that juicy, _succulent_ data yourself (you lit
 
 I do a lot of `R` coding and use [Hadley Wickham's beautiful `R` babies](https://github.com/tidyverse/tidyverse) all the time. One of his packages, `dplyr`, has[^3] the capability of manipulating SQL data, so that's what I use to access the data stored in `~/.selfspy/selfspy.sqlite`.  I'll run you through some of it so you can get a sense of how it works. You can download it for yourself in the link at the end of the post--it comes with (hopefully) helpful comments and multiple examples for you to acquaint yourself with different possibilities.
 
-```{r,warning=FALSE,message=FALSE}
+```{r}
 library(dplyr) # you should add `library(dbplyr)` if you're using the newest version of dplyr
 library(tidyr)
 library(stringr)

@@ -14,8 +14,241 @@ output:
 ---
 
 
+{% highlight r %}
+library(knitr)
+{% endhighlight %}
 
 
+
+{% highlight text %}
+## Warning: package 'knitr' was built under R version 3.3.2
+{% endhighlight %}
+
+
+
+{% highlight r %}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(png)
+library(grid)
+library(ggplot2)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Warning: package 'ggplot2' was built under R version 3.3.2
+{% endhighlight %}
+
+
+
+{% highlight r %}
+library(ggrepel)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Warning: package 'ggrepel' was built under R version 3.3.2
+{% endhighlight %}
+
+
+
+{% highlight r %}
+# Set random seed so it doesn't keep redrawing the plots whenever I change anything
+set.seed(123)
+
+library(dplyr) 
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## 
+## Attaching package: 'dplyr'
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+{% endhighlight %}
+
+
+
+{% highlight r %}
+library(tidyr)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Warning: package 'tidyr' was built under R version 3.3.2
+{% endhighlight %}
+
+
+
+{% highlight r %}
+library(stringr)
+library(purrr)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## 
+## Attaching package: 'purrr'
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## The following objects are masked from 'package:dplyr':
+## 
+##     contains, order_by
+{% endhighlight %}
+
+
+{% highlight r %}
+# Cleans up the weird escaped characters
+cleanUpStrings <- function(string_vec) {
+  ifelse(string_vec=="\"\\\"\"", "\"", # Cleaning up escaped chars
+  ifelse(string_vec=="\"\\\\\"", "\\", # Clean up escaped backslash
+         stringr::str_sub(string_vec,2,-2)))
+}
+
+# Add extra clean-up criteria in this function
+extraCleanUpStrings <- function(string_vec) {
+  # For me, Shift + Tab produces the string \uu0019, 
+  # so I change it to what it should be below
+  ifelse(!grepl("\\\\u0019",string_vec),string_vec,
+  ifelse(string_vec=="\\u0019","<[Shift: Tab]>",
+         str_replace(string_vec,"\\\\u0019","Tab")))
+}
+
+# Decompresses, cleans, and organizes the keystrokes into a tbl_df()
+getPresses <- function(.data, # the db
+                       process_id_df=NA, # generally, `tbl(selfspy_db, "process") %>% collect()` or the like
+                       group_by_process=FALSE, # Whether or not you want to analyze keystrokes for processes individually
+                       extra_clean_f=extraCleanUpStrings # A function that operates on a vector that cleans up extra weird stuff. Set to NA to skip
+                       ) {
+  .data %>% 
+    collect() %>% # Forces dplyr to actually get all the data from the Sqlite database
+    mutate(Strings=purrr::map(keys,
+                              ~memDecompress(.,type=c("gzip"), # decompresses the key-press data
+                                             asChar=TRUE)) %>% #  as a single string
+             purrr::simplify() %>% 
+             stringr::str_sub(2,-2)) %>% # gets rid of the initial and final brackets in the string
+    tidyr::separate_rows(Strings,sep=", ") %>% # breaks the string apart into presses
+    mutate(cleanStrings = cleanUpStrings(Strings)) %>% # cleans up the individual key-press strings
+    # If you give it a data frame of names for the process ids:
+   {if (is.data.frame(process_id_df)) {
+    left_join(.,rename(process_id_df,"process_id"=id),by="process_id") %>%
+       mutate(process_id=name) %>%
+       select(-name)
+   } else {.}}  %>%
+    # If there are extra clean-up functions you've passed in
+   {if (is.function(extra_clean_f)) {
+     (.) %>%
+       mutate(cleanStrings = extra_clean_f(cleanStrings))
+   } else {.}} %>%
+   # If you want to group it by process id
+   {if (group_by_process == TRUE) {
+     (.) %>%
+       group_by(process_id) %>%
+       tidyr::nest()
+   } else {.}}
+}
+
+# Gets the number of presses for each key combination
+getStats <- function(.data, 
+                     s_col, # string, the name of the column with the keypresses
+                     break_multitaps=FALSE # Breaks up something like <[Cmd: Tab]x3> into 3 separate <[Cmd: Tab]>'s
+                                           #    If you're using n>1-grams, make sure it's "FALSE"
+                     ) {
+  .data %>%
+    mutate_(TempCol = lazyeval::interp(quote(vvv), vvv=as.name(s_col))) %>%
+    group_by(TempCol) %>%
+    summarise(n=n()) %>%
+    mutate(areModsPressed = ifelse(grepl("<\\[.*\\].*>",TempCol),1,0),
+           Multiplier = ifelse(areModsPressed & grepl("x[0-9]+", TempCol),
+                               stringr::str_extract(TempCol, "x[0-9]+") %>%
+                                 stringr::str_sub(2) %>%
+                                 as.numeric(),
+                               1)) %>%
+    {if (break_multitaps == TRUE) {
+      (.) %>%
+        mutate(TempCol = ifelse(areModsPressed==1,
+                                stringr::str_replace(TempCol, "x[0-9]+>",">"),
+                                TempCol)) %>%
+        group_by(TempCol,areModsPressed) %>%
+        summarise(n=sum(Multiplier*n))
+    } else { (.) %>% select(-Multiplier) } } %>%
+    rename_(.dots=setNames(list(quote(TempCol)),s_col)) %>%
+    arrange(-n)
+}
+
+
+# A more generalized way of getting the key presses: this has the option of getting n-grams of subsequent key presses
+nGramPresses <- function(.data, # e.g., `key_db`
+                         process_id_df=NA, # generally, `tbl(selfspy_db, "process") %>% collect()` or the like
+                         group_by_process=FALSE, # Whether or not you want to analyze keystrokes for processes individually
+                         extra_clean_f=extraCleanUpStrings, # A function that operates on a vector that cleans up extra weird stuff. Set to NA to skip
+                         n=1, # the n in the n-gram collection
+                         key_delimter="-", # If n > 1, the string that joins key presses in the n-gram
+                         joiner_string="XXXXXX" # A string that will not appear in any keypresses--used for joining and separating rows
+) {
+  .data %>% 
+    collect() %>% 
+    mutate(StringLists = purrr::map(keys, ~memDecompress(.,type=c("gzip"), asChar=TRUE)) %>% 
+             purrr::simplify() %>% 
+             stringr::str_sub(2,-2) %>%
+             str_split(", ") %>%
+             purrr::map(~cleanUpStrings(.))) %>%
+             {if (n>1) {
+               mutate(., cleanStrings = purrr::map(StringLists,
+                                                   ~purrr::reduce(1:(n-1),
+                                                                  function(x,i) { paste0(x, key_delimter, lead(.,i))},.init=.) %>%
+                                                     head(-(n-1)) %>%
+                                                     paste0(collapse=joiner_string)) %>%
+                        purrr::simplify()) %>%
+                 tidyr::separate_rows(cleanStrings,sep=joiner_string) 
+             } else if (n==1) {
+               mutate(., cleanStrings = purrr::map(StringLists,
+                                                   ~paste0(.,collapse=joiner_string)) %>%
+                        purrr::simplify()) %>%
+                 tidyr::separate_rows(cleanStrings,sep=joiner_string)
+             }
+             } %>%
+    # If you give it a df of names for the process ids:
+             {if (is.data.frame(process_id_df)) {
+               left_join(.,rename(process_id_df,"process_id"=id),by="process_id") %>%
+                 mutate(process_id=name) %>%
+                 select(-name)
+             } else {.}}  %>%
+    # If there are extra clean-up functions you've passed in
+             {if (is.function(extra_clean_f)) {
+               (.) %>%
+                 mutate(cleanStrings = extra_clean_f(cleanStrings))
+             } else {.}} %>%
+    # If you want to group it by process id
+             {if (group_by_process == TRUE) {
+               (.) %>%
+                 group_by(process_id) %>%
+                 tidyr::nest()
+             } else {.}}
+}
+{% endhighlight %}
 
 I've recently gotten into the fabulous world of [mechanical keyboards](https://www.reddit.com/r/MechanicalKeyboards/).  Other than the Ａｅｓｔｈｅｔｉｃｓ and the fact that building working electronics is cool, the main draw for me was the ability to _completely_ customize how your board works. Just imagine all the chances for increased ｐｒｏｄｕｃｔｉｖｉｔｙ!
 
