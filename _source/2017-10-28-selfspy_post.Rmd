@@ -16,6 +16,7 @@ output:
 ```{r setup, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
+library(methods)
 
 library(png)
 library(grid)

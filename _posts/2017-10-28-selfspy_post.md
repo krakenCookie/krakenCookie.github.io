@@ -72,7 +72,8 @@ selfspy_db
 
 
 {% highlight text %}
-## Error in UseMethod("db_list_tables"): no applicable method for 'db_list_tables' applied to an object of class "SQLiteConnection"
+## src:  sqlite 3.11.1 [/Users/zburchill/.selfspy/selfspy.sqlite]
+## tbls: click, geometry, keys, process, window
 {% endhighlight %}
 
 
@@ -82,36 +83,32 @@ You can see that there are five tables in the database: `click` (mouse data?), `
 {% highlight r %}
 # Opening connections to the key and process databases
 key_db <- tbl(selfspy_db, "keys")
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error in UseMethod("db_query_fields"): no applicable method for 'db_query_fields' applied to an object of class "SQLiteConnection"
-{% endhighlight %}
-
-
-
-{% highlight r %}
 process_db <- tbl(selfspy_db, "process")
-{% endhighlight %}
 
-
-
-{% highlight text %}
-## Error in UseMethod("db_query_fields"): no applicable method for 'db_query_fields' applied to an object of class "SQLiteConnection"
-{% endhighlight %}
-
-
-
-{% highlight r %}
 key_db
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## Source:   query [?? x 10]
+## Database: sqlite 3.11.1 [/Users/zburchill/.selfspy/selfspy.sqlite]
+## 
+##       id                 created_at        text
+##    <int>                      <chr>      <list>
+## 1      1 2017-10-18 14:24:13.692624  <raw [12]>
+## 2      2 2017-10-18 14:24:28.915149  <raw [24]>
+## 3      3 2017-10-18 14:24:30.259072  <raw [12]>
+## 4      4 2017-10-18 14:25:05.551297  <raw [42]>
+## 5      5 2017-10-18 14:27:39.875412 <raw [397]>
+## 6      6 2017-10-18 14:27:50.265004  <raw [27]>
+## 7      7 2017-10-18 14:27:57.575051  <raw [48]>
+## 8      8 2017-10-18 14:27:59.317140  <raw [12]>
+## 9      9 2017-10-18 14:28:00.678074  <raw [13]>
+## 10    10 2017-10-18 14:28:02.835207  <raw [19]>
+## # ... with more rows, and 7 more variables: started <chr>,
+## #   process_id <int>, window_id <int>, geometry_id <int>,
+## #   nrkeys <int>, keys <list>, timings <list>
 {% endhighlight %}
 
 See the `Source:   query [?? x 10]` at the top? As it currently stands, `key_db` isn't a data frame or a `tbl_df`--it's just a query to the database--it doesn't know how many rows there are yet. When dealing with SQL, `dplyr` evaluates things _lazily_, meaning it won't actually fetch all the data from the database unless you demand it.  
@@ -133,7 +130,20 @@ getPresses(key_db) %>%
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## # A tibble: 108,405 × 1
+##    cleanStrings
+##           <chr>
+## 1  <[Cmd: Tab]>
+## 2             a
+## 3             a
+## 4             a
+## 5             a
+## 6             s
+## 7             s
+## 8             s
+## 9             s
+## 10            a
+## # ... with 108,395 more rows
 {% endhighlight %}
 
 For those of you not used to `R` and those `R` users not used to the `tidyverse`, the `%>%` operator pipes the output of everything on the left of it (`getPresses(key_db)`) into the function on the right of it as the first argument (or, wherever you put a `.`). Thus, what is above is equivalent to `select(getPresses(key_db), cleanStrings)`. My irrational commitment to never declare new variables might make some of the code seem a little weird to some of you--each function is basically a single "flow".
@@ -159,7 +169,22 @@ key_db %>%
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## Source: local data frame [201 x 3]
+## Groups: cleanStrings [201]
+## 
+##     cleanStrings areModsPressed     n
+##            <chr>          <dbl> <dbl>
+## 1       <[Down]>              1 27465
+## 2  <[Backspace]>              1 13690
+## 3                             0 13222
+## 4              e              0  7846
+## 5              t              0  6166
+## 6              a              0  5195
+## 7              o              0  4770
+## 8              i              0  4507
+## 9              s              0  4457
+## 10             n              0  4286
+## # ... with 191 more rows
 {% endhighlight %}
 
 You can see from the output that there are three columns: the names of the key presses, `areModsPressed` (a column indicating whether functional/modifier keys were pressed down, excluding Shift), and `n` (the number of presses).
@@ -186,7 +211,20 @@ key_db %>%
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## # A tibble: 22 × 2
+##             process_id                  data
+##                  <chr>                <list>
+## 1             Terminal  <tibble [4,483 × 8]>
+## 2              RStudio <tibble [33,447 × 8]>
+## 3        Google Chrome <tibble [39,352 × 8]>
+## 4         TextWrangler  <tibble [3,097 × 8]>
+## 5               Finder    <tibble [580 × 8]>
+## 6             TextEdit  <tibble [5,213 × 8]>
+## 7                Notes  <tibble [1,851 × 8]>
+## 8          QMK Flasher      <tibble [3 × 8]>
+## 9  CoreServicesUIAgent      <tibble [1 × 8]>
+## 10     Microsoft Excel    <tibble [151 × 8]>
+## # ... with 12 more rows
 {% endhighlight %}
 
 A marvel of the `tidyverse` is that it can store entire data frames as single cells in bigger data frames. Each cell in the `data` column above is a data frame of all the key presses for the application in the `process_id` column.
@@ -209,26 +247,24 @@ key_db %>%
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## # A tibble: 2,222 × 4
+##        process_id cleanStrings     n areModsPressed
+##             <chr>        <chr> <int>          <dbl>
+## 1   Google Chrome               4950              0
+## 2         RStudio               3992              0
+## 3   Google Chrome            e  3014              0
+## 4         RStudio            e  2395              0
+## 5   Google Chrome            t  2358              0
+## 6  Microsoft Word               2151              0
+## 7   Google Chrome            o  2023              0
+## 8   Google Chrome            a  1948              0
+## 9         RStudio            t  1907              0
+## 10  Google Chrome            i  1793              0
+## # ... with 2,212 more rows
 {% endhighlight %}
 
 
-
-{% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error in eval(expr, envir, enclos): object 'test_plot_data' not found
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error in eval(expr, envir, enclos): object 'test_plot_data' not found
-{% endhighlight %}
+![BABABA this is a test, this is a test, waaaaaaaa waaaaaaaaaaa, waaaaaaaaa](/figure/source/2017-10-28-selfspy_post/unnamed-chunk-8-1.png)
 
 
 
