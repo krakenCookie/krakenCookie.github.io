@@ -61,21 +61,16 @@ library(stringr)
 library(purrr)
 
 # Loading in the data from the default location for the database
-selfspy_db <- dplyr::src_sqlite("/Users/zburchill/.selfspy/selfspy.sqlite", create = T) 
-{% endhighlight %}
-
-
-{% highlight r %}
+selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T) 
 selfspy_db
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## src:  sqlite 3.11.1 [/Users/zburchill/.selfspy/selfspy.sqlite]
+## src:  sqlite 3.11.1 [~/.selfspy/selfspy.sqlite]
 ## tbls: click, geometry, keys, process, window
 {% endhighlight %}
-
 
 You can see that there are five tables in the database: `click` (mouse data?), `geometry` (window size data?), `keys` (key press data), `process` (the names of the programs), `window` (data on what windows have been active).  For this excursion, we'll only care about `keys` and `process`.
 
@@ -92,7 +87,7 @@ key_db
 
 {% highlight text %}
 ## Source:   query [?? x 10]
-## Database: sqlite 3.11.1 [/Users/zburchill/.selfspy/selfspy.sqlite]
+## Database: sqlite 3.11.1 [~/.selfspy/selfspy.sqlite]
 ## 
 ##       id                 created_at        text
 ##    <int>                      <chr>      <list>
@@ -130,7 +125,7 @@ getPresses(key_db) %>%
 
 
 {% highlight text %}
-## # A tibble: 108,405 × 1
+## # A tibble: 108,479 × 1
 ##    cleanStrings
 ##           <chr>
 ## 1  <[Cmd: Tab]>
@@ -143,7 +138,7 @@ getPresses(key_db) %>%
 ## 8             s
 ## 9             s
 ## 10            a
-## # ... with 108,395 more rows
+## # ... with 108,469 more rows
 {% endhighlight %}
 
 For those of you not used to `R` and those `R` users not used to the `tidyverse`, the `%>%` operator pipes the output of everything on the left of it (`getPresses(key_db)`) into the function on the right of it as the first argument (or, wherever you put a `.`). Thus, what is above is equivalent to `select(getPresses(key_db), cleanStrings)`. My irrational commitment to never declare new variables might make some of the code seem a little weird to some of you--each function is basically a single "flow".
@@ -175,15 +170,15 @@ key_db %>%
 ##     cleanStrings areModsPressed     n
 ##            <chr>          <dbl> <dbl>
 ## 1       <[Down]>              1 27465
-## 2  <[Backspace]>              1 13690
-## 3                             0 13222
-## 4              e              0  7846
-## 5              t              0  6166
-## 6              a              0  5195
-## 7              o              0  4770
-## 8              i              0  4507
-## 9              s              0  4457
-## 10             n              0  4286
+## 2  <[Backspace]>              1 13691
+## 3                             0 13226
+## 4              e              0  7847
+## 5              t              0  6168
+## 6              a              0  5197
+## 7              o              0  4771
+## 8              i              0  4510
+## 9              s              0  4459
+## 10             n              0  4287
 ## # ... with 191 more rows
 {% endhighlight %}
 
@@ -214,9 +209,9 @@ key_db %>%
 ## # A tibble: 22 × 2
 ##             process_id                  data
 ##                  <chr>                <list>
-## 1             Terminal  <tibble [4,483 × 8]>
-## 2              RStudio <tibble [33,447 × 8]>
-## 3        Google Chrome <tibble [39,352 × 8]>
+## 1             Terminal  <tibble [4,529 × 8]>
+## 2              RStudio <tibble [33,470 × 8]>
+## 3        Google Chrome <tibble [39,356 × 8]>
 ## 4         TextWrangler  <tibble [3,097 × 8]>
 ## 5               Finder    <tibble [580 × 8]>
 ## 6             TextEdit  <tibble [5,213 × 8]>
@@ -247,7 +242,7 @@ key_db %>%
 
 
 {% highlight text %}
-## # A tibble: 2,222 × 4
+## # A tibble: 2,224 × 4
 ##        process_id cleanStrings     n areModsPressed
 ##             <chr>        <chr> <int>          <dbl>
 ## 1   Google Chrome               4950              0
@@ -260,11 +255,11 @@ key_db %>%
 ## 8   Google Chrome            a  1948              0
 ## 9         RStudio            t  1907              0
 ## 10  Google Chrome            i  1793              0
-## # ... with 2,212 more rows
+## # ... with 2,214 more rows
 {% endhighlight %}
 
 
-![BABABA this is a test, this is a test, waaaaaaaa waaaaaaaaaaa, waaaaaaaaa](/figure/source/2017-10-28-selfspy_post/unnamed-chunk-8-1.png)
+![BABABA this is a test, this is a test, waaaaaaaa waaaaaaaaaaa, waaaaaaaaa](/figure/source/2017-10-28-selfspy_post/unnamed-chunk-7-1.png)
 
 
 
