@@ -125,7 +125,7 @@ getPresses(key_db) %>%
 
 
 {% highlight text %}
-## # A tibble: 108,733 × 1
+## # A tibble: 108,947 × 1
 ##    cleanStrings
 ##           <chr>
 ## 1  <[Cmd: Tab]>
@@ -138,7 +138,7 @@ getPresses(key_db) %>%
 ## 8             s
 ## 9             s
 ## 10            a
-## # ... with 108,723 more rows
+## # ... with 108,937 more rows
 {% endhighlight %}
 
 For those of you not used to `R` and those `R` users not used to the `tidyverse`, the `%>%` operator pipes the output of everything on the left of it (`getPresses(key_db)`) into the function on the right of it as the first argument (or, wherever you put a `.`). Thus, what is above is equivalent to `select(getPresses(key_db), cleanStrings)`. My irrational commitment to never declare new variables might make some of the code seem a little weird to some of you--each function is basically a single "flow".
@@ -170,15 +170,15 @@ key_db %>%
 ##     cleanStrings areModsPressed     n
 ##            <chr>          <dbl> <dbl>
 ## 1       <[Down]>              1 27476
-## 2  <[Backspace]>              1 13767
-## 3                             0 13244
-## 4              e              0  7850
-## 5              t              0  6191
-## 6              a              0  5204
-## 7              o              0  4778
-## 8              i              0  4527
-## 9              s              0  4476
-## 10             n              0  4288
+## 2  <[Backspace]>              1 13791
+## 3                             0 13264
+## 4              e              0  7853
+## 5              t              0  6211
+## 6              a              0  5211
+## 7              o              0  4786
+## 8              i              0  4544
+## 9              s              0  4488
+## 10             n              0  4291
 ## # ... with 191 more rows
 {% endhighlight %}
 
@@ -209,9 +209,9 @@ key_db %>%
 ## # A tibble: 22 × 2
 ##             process_id                  data
 ##                  <chr>                <list>
-## 1             Terminal  <tibble [4,708 × 8]>
-## 2              RStudio <tibble [33,532 × 8]>
-## 3        Google Chrome <tibble [39,369 × 8]>
+## 1             Terminal  <tibble [4,869 × 8]>
+## 2              RStudio <tibble [33,576 × 8]>
+## 3        Google Chrome <tibble [39,378 × 8]>
 ## 4         TextWrangler  <tibble [3,097 × 8]>
 ## 5               Finder    <tibble [580 × 8]>
 ## 6             TextEdit  <tibble [5,213 × 8]>
@@ -242,26 +242,13 @@ key_db %>%
 
 
 {% highlight text %}
-## # A tibble: 2,225 × 4
-##        process_id cleanStrings     n areModsPressed
-##             <chr>        <chr> <int>          <dbl>
-## 1   Google Chrome               4950              0
-## 2         RStudio               3993              0
-## 3   Google Chrome            e  3014              0
-## 4         RStudio            e  2395              0
-## 5   Google Chrome            t  2358              0
-## 6  Microsoft Word               2151              0
-## 7   Google Chrome            o  2023              0
-## 8   Google Chrome            a  1948              0
-## 9         RStudio            t  1911              0
-## 10  Google Chrome            i  1793              0
-## # ... with 2,215 more rows
+## Error in rsqlite_send_query(conn@ptr, statement): database is locked
 {% endhighlight %}
 
 
 ![ZZZZZZZZZZZBABABA this is a test, this is a test, waaaaaaaa waaaaaaaaaaa, waaaaaaaaa](/figure/source/2017-10-28-selfspy_post/unnamed-chunk-7-1.png)
 
-
+<p class = "figcaption">A little demonstration</p>
 
 
 
