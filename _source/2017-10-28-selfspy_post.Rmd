@@ -195,7 +195,7 @@ This isn't a such a big deal, however, because you can have it encrypt the data 
 
 But if you want to manipulate all that juicy, _succulent_ data yourself (you little pervert!), the fact that it's all encrypted _is_ a bit of problem. At least it was for me, who doesn't know how to decrypt it with the tools I had on hand.  Instead, I opted to just leave everything unecrypted and pray to God that the Russians don't get a hold of my computer[^2]. The `R` code that I've written to analyze the data at a more fine-grain level only works when it's unecrypted, so either figure out how to decrypt [Blowfish](https://en.wikipedia.org/wiki/Blowfish_(cipher)) in `R` or `Python`, or let your freak flag fly.
 
-## Walking through the code I've written
+## Walking through my code
 
 I do a lot of `R` coding and use [Hadley Wickham's beautiful `R` babies](https://github.com/tidyverse/tidyverse) all the time. One of his packages, `dplyr`, has[^3] the capability of manipulating SQL data, so that's what I use to access the data stored in `~/.selfspy/selfspy.sqlite`.  I'll run you through some of it so you can get a sense of how it works. You can download it for yourself in the link at the end of the post--it comes with (hopefully) helpful comments and multiple examples for you to acquaint yourself with different possibilities.
 
@@ -206,9 +206,9 @@ library(stringr)
 library(purrr)
 
 # Loading in the data from a personalized (smaller) database
-selfspy_db <- src_sqlite("~/.selfspy/selfspy_post.sqlite ", create = T) 
+selfspy_db <- src_sqlite("~/.selfspy/selfspy_post.sqlite", create = T)
 # Below is the default location for the database, and what you would presumably use
-# selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T) 
+# selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T)
 selfspy_db
 ```
 

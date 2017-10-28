@@ -33,7 +33,7 @@ I can tell you right now, following this tutorial on a PC is going to be challen
 
 ## Getting your typing data
 
-Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  `selfspy` is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it justs saves all of it in an Sqlite database on your computer.
+Alright folks, this here's the secret I learned: download [selfspy](https://github.com/gurgeh/selfspy).  Selfspy is basically spyware you use on yourself--it collects _enormous_ amounts of information on your activity on your computer. It records every keystroke, every name of every window you open, and your mouse movements as well. Unlike spyware, it doesn't send this data to anybody else, it justs saves all of it in an Sqlite database on your computer.
 
 ### Installing selfspy
 
@@ -49,7 +49,7 @@ This isn't a such a big deal, however, because you can have it encrypt the data 
 
 But if you want to manipulate all that juicy, _succulent_ data yourself (you little pervert!), the fact that it's all encrypted _is_ a bit of problem. At least it was for me, who doesn't know how to decrypt it with the tools I had on hand.  Instead, I opted to just leave everything unecrypted and pray to God that the Russians don't get a hold of my computer[^2]. The `R` code that I've written to analyze the data at a more fine-grain level only works when it's unecrypted, so either figure out how to decrypt [Blowfish](https://en.wikipedia.org/wiki/Blowfish_(cipher)) in `R` or `Python`, or let your freak flag fly.
 
-## Walking through the code I've written
+## Walking through my code
 
 I do a lot of `R` coding and use [Hadley Wickham's beautiful `R` babies](https://github.com/tidyverse/tidyverse) all the time. One of his packages, `dplyr`, has[^3] the capability of manipulating SQL data, so that's what I use to access the data stored in `~/.selfspy/selfspy.sqlite`.  I'll run you through some of it so you can get a sense of how it works. You can download it for yourself in the link at the end of the post--it comes with (hopefully) helpful comments and multiple examples for you to acquaint yourself with different possibilities.
 
@@ -61,17 +61,17 @@ library(stringr)
 library(purrr)
 
 # Loading in the data from a personalized (smaller) database
-selfspy_db <- src_sqlite("~/.selfspy/selfspy_post.sqlite ", create = T) 
+selfspy_db <- src_sqlite("~/.selfspy/selfspy_post.sqlite", create = T)
 # Below is the default location for the database, and what you would presumably use
-# selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T) 
+# selfspy_db <- src_sqlite("~/.selfspy/selfspy.sqlite", create = T)
 selfspy_db
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## src:  sqlite 3.11.1 [~/.selfspy/selfspy_post.sqlite ]
-## tbls:
+## src:  sqlite 3.11.1 [~/.selfspy/selfspy_post.sqlite]
+## tbls: click, geometry, keys, process, window
 {% endhighlight %}
 
 You can see that there are five tables in the database: `click` (mouse data?), `geometry` (window size data?), `keys` (key press data), `process` (the names of the programs), `window` (data on what windows have been active).  For this excursion, we'll only care about `keys` and `process`.
@@ -82,36 +82,32 @@ You can see that there are five tables in the database: `click` (mouse data?), `
 {% highlight r %}
 # Opening connections to the key and process databases
 key_db <- tbl(selfspy_db, "keys")
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error in rsqlite_send_query(conn@ptr, statement): no such table: keys
-{% endhighlight %}
-
-
-
-{% highlight r %}
 process_db <- tbl(selfspy_db, "process")
-{% endhighlight %}
 
-
-
-{% highlight text %}
-## Error in rsqlite_send_query(conn@ptr, statement): no such table: process
-{% endhighlight %}
-
-
-
-{% highlight r %}
 key_db
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## Source:   query [?? x 10]
+## Database: sqlite 3.11.1 [~/.selfspy/selfspy_post.sqlite]
+## 
+##       id                 created_at        text
+##    <int>                      <chr>      <list>
+## 1      1 2017-10-18 14:24:13.692624  <raw [12]>
+## 2      2 2017-10-18 14:24:28.915149  <raw [24]>
+## 3      3 2017-10-18 14:24:30.259072  <raw [12]>
+## 4      4 2017-10-18 14:25:05.551297  <raw [42]>
+## 5      5 2017-10-18 14:27:39.875412 <raw [397]>
+## 6      6 2017-10-18 14:27:50.265004  <raw [27]>
+## 7      7 2017-10-18 14:27:57.575051  <raw [48]>
+## 8      8 2017-10-18 14:27:59.317140  <raw [12]>
+## 9      9 2017-10-18 14:28:00.678074  <raw [13]>
+## 10    10 2017-10-18 14:28:02.835207  <raw [19]>
+## # ... with more rows, and 7 more variables: started <chr>,
+## #   process_id <int>, window_id <int>, geometry_id <int>,
+## #   nrkeys <int>, keys <list>, timings <list>
 {% endhighlight %}
 
 See the `Source:   query [?? x 10]` at the top? As it currently stands, `key_db` isn't a data frame or a `tbl_df`--it's just a query to the database--it doesn't know how many rows there are yet. When dealing with SQL, `dplyr` evaluates things _lazily_, meaning it won't actually fetch all the data from the database unless you demand it.  
@@ -133,7 +129,20 @@ getPresses(key_db) %>%
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## # A tibble: 110,389 × 1
+##    cleanStrings
+##           <chr>
+## 1  <[Cmd: Tab]>
+## 2             a
+## 3             a
+## 4             a
+## 5             a
+## 6             s
+## 7             s
+## 8             s
+## 9             s
+## 10            a
+## # ... with 110,379 more rows
 {% endhighlight %}
 
 For those of you not used to `R` and those `R` users not used to the `tidyverse`, the `%>%` operator pipes the output of everything on the left of it (`getPresses(key_db)`) into the function on the right of it as the first argument (or, wherever you put a `.`). Thus, what is above is equivalent to `select(getPresses(key_db), cleanStrings)`. My irrational commitment to never declare new variables might make some of the code seem a little weird to some of you--each function is basically a single "flow".
@@ -159,7 +168,22 @@ key_db %>%
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## Source: local data frame [201 x 3]
+## Groups: cleanStrings [201]
+## 
+##     cleanStrings areModsPressed     n
+##            <chr>          <dbl> <dbl>
+## 1       <[Down]>              1 27490
+## 2  <[Backspace]>              1 13940
+## 3                             0 13431
+## 4              e              0  7953
+## 5              t              0  6296
+## 6              a              0  5281
+## 7              o              0  4844
+## 8              i              0  4626
+## 9              s              0  4584
+## 10             n              0  4332
+## # ... with 191 more rows
 {% endhighlight %}
 
 You can see from the output that there are three columns: the names of the key presses, `areModsPressed` (a column indicating whether functional/modifier keys were pressed down, excluding Shift), and `n` (the number of presses).
@@ -186,7 +210,20 @@ key_db %>%
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## # A tibble: 22 × 2
+##             process_id                  data
+##                  <chr>                <list>
+## 1             Terminal  <tibble [5,103 × 8]>
+## 2              RStudio <tibble [34,689 × 8]>
+## 3        Google Chrome <tibble [39,471 × 8]>
+## 4         TextWrangler  <tibble [3,097 × 8]>
+## 5               Finder    <tibble [580 × 8]>
+## 6             TextEdit  <tibble [5,213 × 8]>
+## 7                Notes  <tibble [1,851 × 8]>
+## 8          QMK Flasher      <tibble [3 × 8]>
+## 9  CoreServicesUIAgent      <tibble [1 × 8]>
+## 10     Microsoft Excel    <tibble [151 × 8]>
+## # ... with 12 more rows
 {% endhighlight %}
 
 A marvel of the `tidyverse` is that it can store entire data frames as single cells in bigger data frames. Each cell in the `data` column above is a data frame of all the key presses for the application in the `process_id` column.
@@ -209,29 +246,27 @@ key_db %>%
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+## # A tibble: 2,230 × 4
+##        process_id cleanStrings     n areModsPressed
+##             <chr>        <chr> <int>          <dbl>
+## 1   Google Chrome               4952              0
+## 2         RStudio               4129              0
+## 3   Google Chrome            e  3014              0
+## 4         RStudio            e  2493              0
+## 5   Google Chrome            t  2360              0
+## 6  Microsoft Word               2151              0
+## 7   Google Chrome            o  2023              0
+## 8         RStudio            t  1971              0
+## 9   Google Chrome            a  1949              0
+## 10  Google Chrome            i  1797              0
+## # ... with 2,220 more rows
 {% endhighlight %}
 
 Yeah, most of my typing is typing English words, separated by spaces, so you can see similar statistics for the top key presses across applications.
 
 There are differences, however. I threw together this quick-and-dirty little visualization that compares the highest key presses across applications.
 
-
-{% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error in eval(expr, envir, enclos): object 'test_plot_data' not found
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error in eval(expr, envir, enclos): object 'test_plot_data' not found
-{% endhighlight %}
+![plot of chunk unnamed-chunk-7](/figure/source/2017-10-28-selfspy_post/unnamed-chunk-7-1.png)
 
 <p class = "figcaption">Visualizing the most-pressed keys across a few applications. Presses with modifier keys are highlighted--the rest are boring and left blank. The order of the keys is identical across applications. Note the dearth of returns in Word--it's probably because I'm writing in paragraphs as opposed to coding/browsing.</p>
 
@@ -265,7 +300,17 @@ key_db %>%
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'key_db' not found
+##       process_id            cleanStrings  n areModsPressed
+## 1       Terminal         <[Enter]>-g-i-t 67              1
+## 2        RStudio         %->-%-<[Enter]> 55              1
+## 3       Terminal         <[Enter]>-c-d-  54              1
+## 4       Terminal <[Enter]>-l-s-<[Enter]> 48              1
+## 5       Terminal         l-s-<[Enter]>-c 46              1
+## 6       Terminal         s-<[Enter]>-c-d 40              1
+## 7        RStudio    <[Cmd: Enter]>- -%-> 27              1
+## 8       Terminal         t-u-s-<[Enter]> 25              1
+## 9       Terminal   <[Tab]>-<[Enter]>-l-s 24              1
+## 10 Google Chrome         r-e-d-<[Enter]> 24              1
 {% endhighlight %}
 
 Look at that! Now we're getting somewhere! You can get a sense of what I've been doing the most from these n-grams!  I've been using `git` a lot (e.g., `<[Enter]>-g-i-t`), navigating with the terminal (with `ls` and `cd`), and yes, it looks like I _do_ use the `%>%` operator (followed by a return) a lot! Hilariously, you can also see my reddit obsession: I just type `r-e-d` to get the autocomplete suggestions, and then press `Enter`!
