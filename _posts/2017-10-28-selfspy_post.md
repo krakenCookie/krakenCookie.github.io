@@ -330,8 +330,6 @@ If this helps at all, or if you have any questions (_please don't be about insta
 
 > [`keyboard_analysis.py`]({{ site.url }}/code/keyboard-analysis/keyboard_analysis.R)
 
-> Testy test test <br /> Testtjklsa ofds eid  pefds 
-
 The code that I banged out for this project. Although it's using some outdated package versions, I added a lot of comments and usage examples. 
 
 > [`2017-10-28-selfspy_post.Rmd`]({{ site.url }}/_source/2017-10-28-selfspy_post.Rmd)
