@@ -38,6 +38,15 @@ permalink: pretty
 baseurlknitr:  "/" # This will always be your baseurl plus an extra '/'
                                 # at the end.  It's used only when knitr renders
                                 # your R Markdown files.
+                                
+# Site-wide links
+links:
+  about_me:           https://www.hlp.rochester.edu/people/#Grads
+  blog:            blog.html
+  cv:            cv.pdf
+  publications:            https://scholar.google.com/citations?hl=en&user=u5G_A14AAAAJ
+
+                                
 
 # set limit on number of post to appear on Home page
 homepostlimit: 4
@@ -58,3 +67,5 @@ author:
 
 github:
   repo:           https://github.com/burchill
+  
+
