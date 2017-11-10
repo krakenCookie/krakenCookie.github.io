@@ -21,6 +21,9 @@ compass:
   # Tracking Code to that file.
   include_analytics: true
 
+# Exclude non-site files:
+exclude: ["CNAME", "Gemfile", "Gemfile.lock", "LICENSE", "README.md", "anne_pro_macros.xlsx", "notes.txt"]
+
 # Dependencies
 markdown: kramdown
 kramdown:
