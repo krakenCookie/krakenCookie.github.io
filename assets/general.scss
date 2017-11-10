@@ -78,6 +78,11 @@ since it must be aligned with the content */
 	box-shadow: 0 0 0 3px $text-color; ***/
 }
 
+/*** Title for stand-alone pages ***/
+.page-title-container h1 {
+	font-size: 2.8em;
+}
+
 /*** author ***/
 .author-container h1 {
 	font-size: 2.8em;
