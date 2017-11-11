@@ -101,6 +101,19 @@ since it must be aligned with the content */
 	margin-bottom: 2em;
 }
 
+/*** New test for equidistant objects ***/
+.eqi-container {
+  display: flex;
+  justify-content: space-between;
+}
+.eqi-container div {
+}
+
+
+
+
+
+
 /******/
 hr {
 	border: 0;
