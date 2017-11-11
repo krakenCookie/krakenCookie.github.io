@@ -44,8 +44,8 @@ baseurlknitr:  "/" # This will always be your baseurl plus an extra '/'
                                 
 # Site-wide links
 links:
-  about_me:           https://www.hlp.rochester.edu/people/#Grads
-  blog:            /blog.html
+  about_me:           /about/
+  blog:            /blog/
   cv:            /cv.pdf
   publications:            https://scholar.google.com/citations?hl=en&user=u5G_A14AAAAJ
   home: "/"
