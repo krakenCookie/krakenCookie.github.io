@@ -2,7 +2,7 @@
 layout:  post
 title: "Bob Seger and the 'Ah-ness' of Being: Why 'Night Moves' is the Most Poetic Rock Song Ever"
 comments:  true
-published:  false
+published:  true
 author: "Zach Burchill"
 date: 2017-11-16 10:00:00
 permalink: /nightmoves/
