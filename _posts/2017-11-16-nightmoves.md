@@ -15,9 +15,7 @@ output:
 
 
 
-What does a quintessential American heartland rock song have to do with a traditional Japanese aesthetic?
-
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+What does a quintessential heartland rock song have to do with a traditional Japanese aesthetic?
 
 American rock roll legend Bob Seger isn't Japanese.  I'm not sure he's ever even _been_ to Japan. It makes it weird, then, that his music so perfectly captures a uniquely Japanese aesthetic, one infamously difficult to translate. What's even weirder is that he can do this in a song about how he was constantly horny as a kid.
 
@@ -65,6 +63,8 @@ Horny teenagers out in the country? Check. Cornfields in the summer? Check. Maki
 
 Except for a few references to their awkwardness, inexperience, and their oddly desperate urgency, Seger paints a very one-dimensional scene. At this point, it is "obvious" that the titular "night moves" refer to sex.
 
+![Definitely not an inspiring image. (Taken from Wikipedia)](https://upload.wikimedia.org/wikipedia/en/0/00/Bob_Seger_-_Night_Moves.jpg)
+
 So when the song begins to pivot, a new listener could be excused for thinking that nothing is changing.
 
 > And oh the wonder <br />We felt the lightning <br />And we waited on the thunder <br />Waited on the thunder
@@ -103,15 +103,16 @@ Less explicit than a metaphor, the semi-colon and line break merely invite the r
 
 These two aspects of the _kiru_--the sudden change or twist, and the ambiguous, understated conveyance of ideas--are not to the best of my knowledge inherently a part of _mono no aware_. However, they fit very well with the aesthetic. The association of the changing aspect of the _kiru_ is obvious[^1]: _mono no aware_ is predicated on change.  I don't think _mono no aware_ _necessarily_ has to be understated and slightly ambiguious, but it almost always is conveyed in that manner (see Yasujirō Ozu).  And when you think about it, it makes sense. Acceptance, wistfulness, and bittersweet sadness are all rolled into one emotion--perhaps not even the one experiencing it knows exactly _what_ they're feeling.
 
+![A portrait of Issa, whose (pen) name literally means "one [cup of] tea". (Taken from Wikipedia)](https://upload.wikimedia.org/wikipedia/commons/b/bd/Kobayashi_Issa-Portrait.jpg)
+
+<p class = "figcaption">A portrait of Issa, whose (pen) name literally means "one [cup of] tea". (Taken from Wikipedia)</p>
+
 For example, in a _haiku_ by the famous poet [Issa](https://en.wikipedia.org/wiki/Kobayashi_Issa):
 
 > In my old home <br />which I forsook, the cherries <br />are in bloom.
 
 we see both elements at play[^2], heightening the gentle sadness of the ephemeral.  The first two lines alone might evoke some level of contempt--a reference to a place the author purposefully abandoned--but the transition to the last line completely undercuts that interpretation. Note how Issa never says he regrets his actions, or that he misses home; he merely states that the flowers are blooming there.  What _exactly_ he's feeling is left up to the reader, and this makes the poem much more powerful.
 
-![A portrait of Issa, whose (pen) name literally means "one [cup of] tea". (Taken from Wikipedia)](https://upload.wikimedia.org/wikipedia/commons/b/bd/Kobayashi_Issa-Portrait.jpg)
-
-<p class = "figcaption">A portrait of Issa, whose (pen) name literally means "one [cup of] tea". (Taken from Wikipedia)</p>
 
 Or how about this one by another _haiku_ giant, [Bashō](https://en.wikipedia.org/wiki/Matsuo_Bash%C5%8D)?
 
@@ -159,11 +160,11 @@ Compare the change between stanzas to the _kiru_ in Bashō and Issa's _haiku_. I
 
 But we don't _know_ exactly how he feels--like Issa's poem mentioning the cherries blooming, Seger merely juxtaposes the hormonal teenager in lightning passion with the older man who has finally heard the thunder. We are left to fill in the blanks ourselves. Nostalgia, ruefulness, wry irony--it's all there.
 
-Compare this to Yasujirō Ozu's famous film, _Late Spring_. In it, a widowed father makes the hard choice to convince his daughter to move out from his life to get married. In the film's [most famous scene](https://en.wikipedia.org/wiki/Late_Spring#The_vase_scene), the daughter and father, on one last trip together, are in separate futons side by side.  When the daughter realizes that her father has fallen asleep mid-conversation, she smiles, and the camera cuts to a vase in the corner of their room, without dialogue, for six seconds. 
-
 ![The shot of the vase in the famous scene from Ozu's <em>Late Spring</em>](https://upload.wikimedia.org/wikipedia/commons/b/b7/Vase1.png){:width="450px"}
 
-<p class = "figcaption">The shot of the vase in the famous scene from Ozu's <em>Late Spring</em>. (Taken from Wikipedia)</p>
+<p class = "figcaption">The shot of the vase in the famous scene from Ozu's <em>Late Spring</em>. Ozu hides the actress while she thinks about  her future away from her father, avoiding melodrama and prompting the audience to participate in the thought process. (Taken from Wikipedia)</p>
+
+Compare this to Yasujirō Ozu's famous film, _Late Spring_. In it, a widowed father makes the hard choice to convince his daughter to move out from his life to get married. In the film's [most famous scene](https://en.wikipedia.org/wiki/Late_Spring#The_vase_scene), the daughter and father, on one last trip together, are in separate futons side by side.  When the daughter realizes that her father has fallen asleep mid-conversation, she smiles, and the camera cuts to a vase in the corner of their room, without dialogue, for six seconds. 
 
 When it cuts back to her face, she now looks upset and sad. This is followed by another ten-second shot of the vase. Ozu leaves it to the audience to understand her feelings, heightening our contemplation by providing us with only short snapshots of her face. 
 
