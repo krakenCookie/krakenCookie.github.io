@@ -111,6 +111,10 @@ For example, in a _haiku_ by the famous poet [Issa](https://en.wikipedia.org/wik
 
 we see both elements at play[^2], heightening the gentle sadness of the ephemeral.  The first two lines alone might evoke some level of contempt--a reference to a place the author purposefully abandoned--but the transition to the last line completely undercuts that interpretation. Note how Issa never says he regrets his actions, or that he misses home; he merely states that the flowers are blooming there.  What _exactly_ he's feeling is left up to the reader, and this makes the poem much more powerful.
 
+![A portrait of Issa, whose (pen) name literally means "one [cup of] tea". (Taken from Wikipedia)](https://upload.wikimedia.org/wikipedia/commons/b/bd/Kobayashi_Issa-Portrait.jpg)
+
+<p class = "figcaption">A portrait of Issa, whose (pen) name literally means "one [cup of] tea". (Taken from Wikipedia)</p>
+
 Or how about this one by another _haiku_ giant, [Bashō](https://en.wikipedia.org/wiki/Matsuo_Bash%C5%8D)?
 
 > Nothing in the cry <br />Of cicadas suggests they <br />Are about to die.
@@ -161,7 +165,7 @@ Compare this to Yasujirō Ozu's famous film, _Late Spring_. In it, a widowed fat
 
 ![The shot of the vase in the famous scene from Ozu's <em>Late Spring</em>](https://upload.wikimedia.org/wikipedia/commons/b/b7/Vase1.png){:width="450px"}
 
-<p class = "figcaption">The shot of the vase in the famous scene from Ozu's <em>Late Spring</em>.</p>
+<p class = "figcaption">The shot of the vase in the famous scene from Ozu's <em>Late Spring</em>. (Taken from Wikipedia)</p>
 
 When it cuts back to her face, she now looks upset and sad. This is followed by another ten-second shot of the vase. Ozu leaves it to the audience to understand her feelings, heightening our contemplation by providing us with only short snapshots of her face. 
 
