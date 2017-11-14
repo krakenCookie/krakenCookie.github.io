@@ -1,6 +1,6 @@
 ---
 layout:  post
-title: "Bob Seger and the 'Ah-ness' of Being: Why 'Night Moves' is the Most Poetic Rock Song Ever"
+title: "Bob Seger and the 'Ah-ness' of Being: <br/>Why 'Night Moves' is the Most Poetic Rock Song Ever"
 comments:  true
 published:  true
 author: "Zach Burchill"
@@ -67,7 +67,7 @@ So when the song begins to pivot, a new listener could be excused for thinking t
 
 On the surface, this is nothing new--electric passion without any cares. But, Seger has now slid in a slightly "ominous" tone--now we have what could be an implication of _consequences_.
 
-But before Seger sings even the first words of this next stanza, you can tell there has been a change. The percussion and guitar riffs have fallen away, and his voice drops down from a throaty cry to almost a whisper. What comes next are some of the most poetically dense lines of rock ever recorded.
+But before Seger sings even the first words of this next stanza, the music signals a change. The percussion and guitar riffs have fallen away, and his voice drops down from a throaty cry to almost a whisper. What comes next are some of the most poetically dense lines of rock ever recorded.
 
 ### The Second Part
 
@@ -145,9 +145,11 @@ Ho. Lee. _Shit._ Are you getting this? Bob Seger just changed the _game_ here. "
 
 > Strange how the night moves<br/>With autumn closing in
 
-Although Bob Seger was probably not aware of traditional elements of Japanese poetry, he seems to have a natural talent for using them. His use of seasons parallels the emphasis on seasonality in _haiku_, and the connection of the changing of seasons to _mono no aware_. Additionally, the terms for "lightning" and "thunder" are actually _kigo_[^3]!
+Although Bob Seger was probably not aware of traditional elements of Japanese poetry, he seems to have a natural talent for using them. His use of seasons parallels the emphasis on seasonality in _haiku_, and the connection of the changing of seasons to _mono no aware_. Additionally, the terms for "lightning" and "thunder" are actually _kigo_![^3]
 
-Compare the change between stanzas to the _kiru_ in Bashō and Issa's _haiku_. In just a few lines, Seger changes the way we interpret the previous lyrics. The summer of his youth is over, and as he turns to face the autumn of his life, a season typically associated with things getting old and dying, he reflects on his past. He doesn't seem angry about this or particularly bitter. He has accepted the end of that chapter of his life, musing on how strange it is to go from one stage to the next. But we don't _know_ exactly how he feels--like Issa's poem mentioning the cherries blooming, Seger merely juxtaposes the hormonal teenager in lightning passion with the older man who has finally heard the thunder. We are left to fill in the blanks ourselves. Nostalgia, ruefulness, wry irony--it's all there.
+Compare the change between stanzas to the _kiru_ in Bashō and Issa's _haiku_. In just a few lines, Seger changes the way we interpret the previous lyrics. The summer of his youth is over, and as he turns to face the autumn of his life, a season typically associated with things getting old and dying, he reflects on his past. He doesn't seem angry about this or particularly bitter. He has accepted the end of that chapter of his life, musing on how strange it is to go from one stage to the next. 
+
+But we don't _know_ exactly how he feels--like Issa's poem mentioning the cherries blooming, Seger merely juxtaposes the hormonal teenager in lightning passion with the older man who has finally heard the thunder. We are left to fill in the blanks ourselves. Nostalgia, ruefulness, wry irony--it's all there.
 
 Compare this to Yasujirō Ozu's famous film, _Late Spring_. In it, a widowed father makes the hard choice to convince his daughter to move out from his life to get married. In the film's [most famous scene](https://en.wikipedia.org/wiki/Late_Spring#The_vase_scene), the daughter and father, on one last trip together, are in separate futons side by side.  When the daughter realizes that her father has fallen asleep mid-conversation, she smiles, and the camera cuts to a vase in the corner of their room, without dialogue, for six seconds. 
 
