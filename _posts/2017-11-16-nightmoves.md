@@ -149,11 +149,11 @@ Compare the change between stanzas to the _kiru_ in Bashō and Issa's _haiku_. I
 
 Compare this to Yasujirō Ozu's famous film, _Late Spring_. In it, a widowed father makes the hard choice to convince his daughter to move out from his life to get married. In the film's [most famous scene](https://en.wikipedia.org/wiki/Late_Spring#The_vase_scene), the daughter and father, on one last trip together, are in separate futons side by side.  When the daughter realizes that her father has fallen asleep mid-conversation, she smiles, and the camera cuts to a vase in the corner of their room, without dialogue, for six seconds. When it cuts back to her face, she now looks upset and sad. This is followed by another ten-second shot of the vase. Ozu leaves it to the audience to understand her feelings, heightening our contemplation by providing us with only short snapshots of her face. 
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Vase1.png" width="200px"></img>
+<img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Vase1.png" width="200px" />
 
 <p class = "figcaption">The shot of the vase in the famous scene from Ozu's <em>Late Spring</em>.</p>
 
-<img src="{{ site.url }}/images/nightmoves/autumn_afternoon.png", width = "250px"></img>
+<img src="{{ site.url }}/images/nightmoves/autumn_afternoon.png", width ="250px" />
 
 <p class = "figcaption">Chishū Ryū, as Shūhei Hirayama in Ozu's <em>An Autumn Afternoon</em>, alone after marrying off his only daughter.</p>
 
