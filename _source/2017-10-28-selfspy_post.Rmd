@@ -163,7 +163,7 @@ nGramPresses <- function(.data, # e.g., `key_db`
 }
 ```
 
-I've recently gotten into the fabulous world of [mechanical keyboards](https://www.reddit.com/r/MechanicalKeyboards/).  Other than the <span style="nowrap">Ａｅｓｔｈｅｔｉｃｓ</span> and the fact that building working electronics is cool, the main draw for me was the ability to _completely_ customize how your board works. Just imagine all the chances for increased <span style="nowrap">ｐｒｏｄｕｃｔｉｖｉｔｙ!</span>
+I've recently gotten into the fabulous world of [mechanical keyboards](https://www.reddit.com/r/MechanicalKeyboards/).  Other than the <span style="white-space: nowrap">Ａｅｓｔｈｅｔｉｃｓ</span> and the fact that building working electronics is cool, the main draw for me was the ability to _completely_ customize how your board works. Just imagine all the chances for increased <span style="white-space: nowrap">ｐｒｏｄｕｃｔｉｖｉｔｙ!</span>
 
 Of course, good cognitive scientist as I am, I know that optimal performance requires a good grip of the statistics of the environment you're working in. For us, that's going to be our typing patterns!  Here, I'll show you how I was able to capture a huge amount of data on how I type, how to play around with it, and how to do the same for your own keyboard.
 
