@@ -147,20 +147,19 @@ Although Bob Seger was probably not aware of traditional elements of Japanese po
 
 Compare the change between stanzas to the _kiru_ in Bashō and Issa's _haiku_. In just a few lines, Seger changes the way we interpret the previous lyrics. The summer of his youth is over, and as he turns to face the autumn of his life, a season typically associated with things getting old and dying, he reflects on his past. He doesn't seem angry about this or particularly bitter. He has accepted the end of that chapter of his life, musing on how strange it is to go from one stage to the next. But we don't _know_ exactly how he feels--like Issa's poem mentioning the cherries blooming, Seger merely juxtaposes the hormonal teenager in lightning passion with the older man who has finally heard the thunder. We are left to fill in the blanks ourselves. Nostalgia, ruefulness, wry irony--it's all there.
 
-Compare this to Yasujirō Ozu's famous film, _Late Spring_. In it, a widowed father makes the hard choice to convince his daughter to move out from his life to get married. In the film's [most famous scene](https://en.wikipedia.org/wiki/Late_Spring#The_vase_scene), the daughter and father, on one last trip together, are in separate futons side by side.  When the daughter realizes that her father has fallen asleep mid-conversation, she smiles, and the camera cuts to a vase in the corner of their room, without dialogue, for six seconds. When it cuts back to her face, she now looks upset and sad. This is followed by another ten-second shot of the vase. Ozu leaves it to the audience to understand her feelings, heightening our contemplation by providing us with only short snapshots of her face. 
+Compare this to Yasujirō Ozu's famous film, _Late Spring_. In it, a widowed father makes the hard choice to convince his daughter to move out from his life to get married. In the film's [most famous scene](https://en.wikipedia.org/wiki/Late_Spring#The_vase_scene), the daughter and father, on one last trip together, are in separate futons side by side.  When the daughter realizes that her father has fallen asleep mid-conversation, she smiles, and the camera cuts to a vase in the corner of their room, without dialogue, for six seconds. 
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Vase1.png" width="400px" />
+![The shot of the vase in the famous scene from Ozu's <em>Late Spring</em>](https://upload.wikimedia.org/wikipedia/commons/b/b7/Vase1.png){:width="450px"}
 
 <p class = "figcaption">The shot of the vase in the famous scene from Ozu's <em>Late Spring</em>.</p>
 
-![baadfas]({{ site.url }}/images/nightmoves/autumn_afternoon.png){:width="400px"}
-
-<img src="{{ site.url }}/images/nightmoves/autumn_afternoon.png", width ="250px" />
-
-<p class = "figcaption">Chishū Ryū, as Shūhei Hirayama in Ozu's <em>An Autumn Afternoon</em>, alone after marrying off his only daughter.</p>
+When it cuts back to her face, she now looks upset and sad. This is followed by another ten-second shot of the vase. Ozu leaves it to the audience to understand her feelings, heightening our contemplation by providing us with only short snapshots of her face. 
 
 Even the understated question, "Ain't it funny how the night moves?" feels perfectly at home in a Ozu movie.  Many of his films end with an older man alone in his house at night, reflecting on the past and considering the lonely years that lie ahead. The protagonist of one of his best works, _An Autumn Afternoon_, after having married off his only daughter in a situation similar to that in _Late Spring_, sits by himself in the middle of the night, humming a song from his younger days (notice any similarities?). The last words he speaks before the film ends are "Alone, eh?"  Loaded, simple, but heavy with meaning.  
 
+![Chishū Ryū, as Shūhei Hirayama in Ozu's <em>An Autumn Afternoon</em>, alone after marrying off his only daughter]({{ site.url }}/images/nightmoves/autumn_afternoon.png){:width="400px"}
+
+<p class = "figcaption">Chishū Ryū, as Shūhei Hirayama in Ozu's <em>An Autumn Afternoon</em>, alone after marrying off his only daughter.</p>
 
 And don't get me started on Jackson Browne's exploration of meaning in existential philosophy.
 
