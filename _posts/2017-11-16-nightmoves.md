@@ -73,9 +73,9 @@ On the surface, this is nothing new--electric passion without any cares. But, Se
 
 But before Seger sings even the first words of this next stanza, the music signals a change. The percussion and guitar riffs have fallen away, and his voice drops down from a throaty cry to almost a whisper. What comes next are some of the most poetically dense lines of rock ever recorded.
 
-![The album cover of Night Moves, which does not speak to Bob Seger's artistic ability.  (Taken from Wikipedia)](https://upload.wikimedia.org/wikipedia/en/0/00/Bob_Seger_-_Night_Moves.jpg)
+![The album cover of Night Moves, which fortunately does not speak to Bob Seger's artistic ability.  (Taken from Wikipedia)](https://upload.wikimedia.org/wikipedia/en/0/00/Bob_Seger_-_Night_Moves.jpg)
 
-<p class = "figcaption">The album cover of <em>Night Moves</em>, which does not speak to Bob Seger's artistic ability. (Taken from Wikipedia)</p>
+<p class = "figcaption">The album cover of <em>Night Moves</em>, which fortunately does not speak to Bob Seger's artistic ability. (Taken from Wikipedia)</p>
 
 
 ### The Second Part
