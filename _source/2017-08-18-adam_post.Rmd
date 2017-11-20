@@ -44,21 +44,21 @@ I love the look, but I sometimes feel that this aesthetic has a somewhat limited
 
 ### The Inspiration
 
-The name **ADAM** is doubly fitting: it is a reference to both the Biblical Adam, as the first of its kind, and the Adam brothers who created the style of architecture that inspired it ([known as "Adam style" or "Adamesque"](http://en.wikipedia.org/wiki/Adam_style)).
+The name **ADAM** is doubly fitting: it is a reference to both the Biblical Adam, as it's the first of its kind, and the Adam brothers who created the style of architecture that inspired it ([known as "Adam style" or "Adamesque"](http://en.wikipedia.org/wiki/Adam_style)).
 
 ![Gloss white with stand-in caps, viewed from the front.]({{ site.url }}/images/adam_ic/white_keys_front.png)
 
 <p class = "figcaption">I'm currently working on two colors of glazes: Celadon green and gloss white. Early prototypes will be in Celadon green, as it highlights the features better than gloss white, and is easier to work with in terms of consistency/pooling.  Ignore the cutoff text in the bottom left corner--these were rendered online, so all I have are screenshots.</p>
 
-The fact that Adam style incorporates simplified Rococo and Baroque elements works perfectly with the natural constraints of the manufacturing process.  Not only would the intricate detail and complex geometries of *true* Rococo/Baroque be lost in the glazing process, but they could have easily pushed the keyboard over the edge from "ornate" to "gaudy."
+The fact that Adam style incorporates simplified Rococo and Baroque elements works perfectly with the natural constraints of the manufacturing process.  Not only would the intricate detail and complex geometries of *true* Rococo/Baroque be lost in the glazing process, but they could have easily pushed the keyboard over the edge from "ornate" to "really, _really_ gaudy."
 
-The front of the keyboard features a cartouche surrounded by paneling. I actually drew the bolection profile to imitate a real profile used at the Palace of Versailles, but the detail is too fine to make out in the finished product.
+The front of the keyboard features a cartouche surrounded by paneling. I actually drew the bolection profile for the paneling to imitate one actually used at the Palace of Versailles, but sadly the detail is too fine to make out in the finished product.
 
 ![Celadon green without the stand-in caps, viewed from the front.]({{ site.url }}/images/adam_ic/green_nokeys_front.png)
 
 <p class = "figcaption">This is what will actually be printed for the Let's Split PCB version. (The hand-wired version will probably have a further ledge below for mounting the chip/batteries/etc.) The plate will be mounted on the ledges (one of which you can see from this angle), leaving the underside open for access and LEDs.</p>
 
-The sides of the keyboard are decorated with simplified [festoons](http://en.wikipedia.org/wiki/Festoon). Festoons are very characteristic of the Adam style, and keep the sides interesting while not distracting (also, festoons are sometimes called *swag*, which is pretty funny). I might test how adding more detail to festoons looks, but the smoothness is growing on me.
+The sides of the keyboard are decorated with simplified [festoons](http://en.wikipedia.org/wiki/Festoon). Festoons are characteristic of the Adam style, and keep the sides interesting while not distracting (also, festoons are sometimes called *swag*, which is pretty funny). I might test how adding more detail to festoons looks, but the smoothness is growing on me.
 
 ![Celadon green without the stand-in caps, viewed from the side]({{ site.url }}/images/adam_ic/green_nokeys_side2.png)
 
@@ -74,13 +74,13 @@ Somewhat frustratingly, the USB and TRRS connections are not symmetrically align
 
 ## Why Porcelain? 
 
-To me, it doesn't make sense to make **ADAM** in anything *other* than porcelain. Other than architecture, pottery has always been my favorite form of art.  Most hobbyist plastic keyboard prints I've seen turn out looking relatively ugly to me, requiring lots of sanding and painting to make them look professional. The 3D printing process for porcelain makes everything smooth and even, gives it a nice heft and feel, and the way some of the glaze pools and highlights the features of the keyboard looks stunning.[^1]
+To me, it doesn't make sense to make **ADAM** in anything *other* than porcelain. Other than architecture, pottery has always been my favorite form of art.  Most hobbyist plastic keyboard prints I've seen turn out looking relatively ugly to me (loads of layer lines), requiring lots of sanding and painting to make them look professional. The 3D printing process for porcelain makes everything smooth and even, gives it a nice heft and feel, and the way some of the glaze pools and highlights the features of the keyboard looks stunning.[^1]
 
-The obvious "drawback" of using ceramic is that if you drop it from a height onto a hard surface, it might crack. But I don't really consider this a drawback so much as something inherent to the sort of product I'm trying to make. 
+The obvious "drawback" of using ceramic is that if you drop it, it might crack. But I don't really consider this a drawback so much as something inherent to the sort of product I'm trying to make. 
 
 ### **ADAM** is *not* designed to be a travel keyboard. 
 
-It is meant to sit on your desk, similar to a piece of furniture.  Although it is relatively durable, if it breaks, you can do what people have been doing with broken pottery for thousands of years: **_repair it_**.
+It is meant to sit on your desk, similar to a piece of furniture.  Although it is relatively durable, if it breaks, you can do what people have been doing with broken pottery for thousands of years: you can **_repair it_**.
 
 To me, cracks in a piece of pottery make it look more interesting---give it more *history*---which is what I had in mind when designing **ADAM**. I love the idea of embracing this aesthetic, maybe even drawing *attention* to the history of the object, such as using [kintsugi](http://en.wikipedia.org/wiki/Kintsugi) to highlight the cracks.  I'm honestly debating whether I want to *intentionally* shatter my first production and glue it back together with kintsugi[^2]---a porcelain keyboard with golden spiderweb cracks would look *amazing*.
 

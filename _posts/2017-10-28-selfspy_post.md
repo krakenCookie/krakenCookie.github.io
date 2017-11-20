@@ -328,7 +328,7 @@ If this helps at all, or if you have any questions (_please don't be about insta
 
 ## Source Code:
 
-> [`keyboard_analysis.py`]({{ site.url }}/code/keyboard-analysis/keyboard_analysis.R)
+> [`keyboard_analysis.R`]({{ site.url }}/code/keyboard-analysis/keyboard_analysis.R)
 
 The code that I banged out for this project. Although it's using some outdated package versions, I added a lot of comments and usage examples. 
 
