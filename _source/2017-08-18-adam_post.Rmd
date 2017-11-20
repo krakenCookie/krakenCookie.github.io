@@ -5,7 +5,7 @@ comments:  true
 published:  true
 author: "Zach Burchill"
 date: 2017-08-18 10:00:00
-permalink: /adam_ic.html
+permalink: /adam_ic/
 categories: ['mechanical keyboards','3D printing','3D design','interest check',keyboard,porcelain]
 output:
   html_document:

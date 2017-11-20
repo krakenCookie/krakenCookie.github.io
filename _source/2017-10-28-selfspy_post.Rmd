@@ -5,7 +5,7 @@ comments:  true
 published:  true
 author: "Zach Burchill"
 date: 2017-10-28 10:00:00
-permalink: /selfspy.html
+permalink: /selfspy/
 categories: ['mechanical keyboards',selfspy,analysis,'keyboard layout',R]
 output:
   html_document:
