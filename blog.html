@@ -5,31 +5,37 @@ author: Zach
 permalink: /blog/
 ---
 <div class="blog_head_container">
+  <h2 style="text-align:center;"><a href="{{site.baseurl}}/archive.html">[Archive]</a></h2>
+</div>
+<hr />
+
 {% assign featured_posts = site.posts | where: "featured", true %}
 {% if featured_posts.size > 0 %}
-  <h2>Featured posts:</h2>
+  <h2>Featured Post:</h2>
   <ul>
-    {% for post in featured_posts limit:3 %}
-    <li>
-      <h3>
-        <a href="{{ post.url }}">
-          &bull; {{ post.title }}
-          <small> &ndash; {{ post.date | date_to_string }}</small>
-        </a>
-      </h3>
-    </li>
+    {% for post in featured_posts limit:1 %}
+    <div class="post">
+    <h1 class="post-title">
+      <a href="{{ post.url }}">
+        {{ post.title }}
+      </a>
+    </h1>
+    <span class="post-date">{{ post.date | date_to_string }}</span> 
+    {% if site.disqus %}
+      &mdash;  <a href="{{ post.url }}#disqus_thread"
+                              class = "commentcount" style="margin:0;display:inline"></a>
+    {% endif %}
+    {{ post.excerpt }}
+    <p style="margin-top:0; text-align: right;display: block;font-weight: bold"><a href="{{ post.url }}">&#8618; [Read more...]</a></p>
+  </div>
     {% endfor %}
-  </ul>
-
-  <h2><a href="{{site.baseurl}}/archive.html">[Archive]</a></h2>
-{% else %}
-  <h2 style="text-align:center;"><a href="{{site.baseurl}}/archive.html">[Archive]</a></h2>
+  <hr />
 {% endif %}  
   
   
-</div>
 
-<hr />
+
+
 
 <div class="posts">
   {% for post in site.posts limit:site.homepostlimit %}
