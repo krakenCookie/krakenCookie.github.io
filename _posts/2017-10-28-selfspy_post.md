@@ -266,7 +266,7 @@ Yeah, most of my typing is typing English words, separated by spaces, so you can
 
 There are differences, however. I threw together this quick-and-dirty little visualization that compares the highest key presses across applications.
 
-![plot of chunk unnamed-chunk-7](/figure/source/2017-10-28-selfspy_post/unnamed-chunk-7-1.png)
+![plot of chunk unnamed-chunk-7](/_posts/figures/generated/source/x2017-10-28-selfspy_post/unnamed-chunk-7-1.png)
 
 <p class = "figcaption">Visualizing the most-pressed keys across a few applications. Presses with modifier keys are highlighted--the rest are boring and left blank. The order of the keys is identical across applications. Note the dearth of returns in Word--it's probably because I'm writing in paragraphs as opposed to coding/browsing.</p>
 
