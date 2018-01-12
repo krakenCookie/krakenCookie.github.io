@@ -24,9 +24,6 @@ compass:
 # Exclude non-site files:
 exclude: ["CNAME", "Gemfile", "Gemfile.lock", "LICENSE", "README.md", "anne_pro_macros.xlsx", "notes.txt"]
 
-plugins:
-   - jemoji
-
 
 # Dependencies
 markdown: kramdown
