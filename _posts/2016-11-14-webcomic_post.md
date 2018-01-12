@@ -13,8 +13,6 @@ output:
     fig_caption:  true
 ---
 
-:+1:
-
 I like statistical models. I like webcomics. I like not having to suffer through deciding whether a webcomic is ever going to update regularly again. I began to ask myself, "Can I use statistical modelling to tell me when I should stop hoping a webcomic will keep updating?"
 
 Nothing is more haunting than that oft-repeated phrase: "updates when?" It's not even about the wait, it's about the _uncertainty_--either end or start updating, don't keep me in limbo!  I would love it if I could make a model that could just _tell_ me, "Hey, this comic is entering its death spiral, abandon ship!"  Also, I just like learning new statistical methods.
