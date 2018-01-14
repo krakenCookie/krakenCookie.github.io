@@ -5,7 +5,7 @@ _site
 knitr-hyde.Rproj
 .Rhistory
 .RData
-
+ 
 # Numerous always-ignore extensions
 *.diff
 *.err
