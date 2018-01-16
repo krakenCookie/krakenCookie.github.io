@@ -17,6 +17,18 @@ local({
     fig.path   = sprintf('_posts/figures/generated/%s/', d),
     cache.path = sprintf('cache/%s/', d)
   )
+  
+  knitr::knit_hooks$set(autocaption = function(before, options, envir) {
+  if (!before) {
+  	if (length(options$fig.cap)>0) {
+  	  paste0("\n\n<p class='figcaption'>", options$fig.cap, "</p>")
+  	}
+  	#paste0(" WAAAA  ", str(options[c("fig.cap")]), "  sss  ", length(str(options[c("fig.cap")])), "mmmmm", options$fig.cap)
+    #z = capture.output(str(options[c('eval', 'dev', 'results', 'bar1', 'bar2', 'bar3')]))
+    #z = paste('    ', z, sep = '', collapse = '\n')
+    #paste('Some chunk options in the above chunk are:\n\n', z, sep = '')
+  }
+  })
   # set where you want to host the figures (I store them in my Dropbox Public
   # folder, and you might prefer putting them in GIT)
   if (Sys.getenv('USER') == 'noway') {
