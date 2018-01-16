@@ -1,4 +1,9 @@
-<img src="{% if page.post_fig_path %}{{ page.post_fig_path}}{% endif %}{{ include.file }}"{% if include.alt and include.caption %} alt="{{ include.alt }}"{% endif %}>{% if include.caption %}
+<img src="{% if page.post_fig_path and include.external == null %}{{ site.static_blog_pics_dir }}/{{ page.post_fig_path}}{% endif %}{{ include.file }}"
+{% if include.alt and include.caption %}
+	alt="{{ include.alt }}"
+{% endif %}>
+{% if include.caption %}
 
-<p class="figcaption">{{ include.caption }}</p>{% endif %}
+<p class="figcaption">{{ include.caption }}</p>
+{% endif %}
     

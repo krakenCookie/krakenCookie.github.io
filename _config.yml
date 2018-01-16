@@ -54,7 +54,9 @@ links:
 
 # Other stuff
 facepic: /images/zburchill.jpg
-                                
+
+# Blog post static image directory
+static_blog_pics_dir: /_posts/figures/static_files/                                
 
 # set limit on number of post to appear on Home page
 homepostlimit: 4
