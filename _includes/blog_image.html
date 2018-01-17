@@ -1,6 +1,6 @@
 <img src="{% if page.post_fig_path and include.external == null %}{{ site.static_blog_pics_dir }}/{{ page.post_fig_path}}{% endif %}{{ include.file }}"
-{% if include.alt and include.caption %}
-	alt="{{ include.alt }}"
+{% if include.caption %}
+	alt="{{ include.caption | strip_html }}"
 {% endif %}
 {% if include.style %}
 	style="{{ include.style }}"
