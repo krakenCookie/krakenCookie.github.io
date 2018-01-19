@@ -1,0 +1,91 @@
+---
+---
+
+@import 'variables';
+
+
+.logo-container-nav {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-align-content: center;
+    align-content: center;
+}
+
+
+.wrap {
+   text-align: center;
+}
+.nav {
+    display: inline-block;
+    margin: 0 auto;
+   
+}
+ 
+ /** mobile/base view, float center **/
+.nav-container, .nav-container2 {
+  margin: 0 auto;
+  padding: 10 20px;
+}
+ 
+@media screen and (min-width: 700px) {
+  .nav-container2 {
+    margin: 0 auto;
+    float: right
+  }
+  .nav-container {
+    margin: 0 auto;
+    float: left;
+  }
+  .nav {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+  }
+  nav.main-nav ul, .logo-container-nav {
+    float: right;
+  }
+}
+
+nav.main-nav ul {
+    margin: 0;
+    padding: 1;
+    list-style: none;
+    display: block;
+        
+}
+
+nav.main-nav li, nav.main-nav a {
+    display: inline-block;
+}
+
+nav.main-nav li {
+    text-align: -webkit-match-parent;
+    font-weight: bold;
+}
+
+nav.main-nav li a {
+    padding: 0px 10px 10px;
+}
+
+.nav-container h1, .nav-container2 h1 {
+    padding: 0;
+    margin: 0;
+}
+.nav-container .logo-small, .nav-container2 .logo-small {
+    margin-right: 20;
+    
+}
+.nav-container h1, .nav-container div.logo-container-nav, .nav-container2 h1, .nav-container2 div.logo-container-nav {
+    display: inline-block;
+}
+.nav-container h1 a, .nav-container2 h1 a {
+    text-decoration: none;
+    color: $text-color
+    
+}
+
+
+
+
