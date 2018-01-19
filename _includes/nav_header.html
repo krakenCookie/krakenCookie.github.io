@@ -1,7 +1,11 @@
 
 {% assign data_file = site.pages | where: "type", "burchilldata" | first %}
 {% if data_file %}
-    {% assign first_author_name = data_file.cognomen[site.compass.author] %}
+	{% if site.sharing_option.post_author_left and page.layout == 'post' %}
+		{% assign first_author_name = data_file.cognomen[page.author] %}
+	{% else %}
+    	{% assign first_author_name = data_file.cognomen[site.compass.author] %}
+    {% endif %}
     {% assign first_author_url = data_file.authorlinks[first_author_name] %}
     {% assign first_author_css = data_file.authorstyles[first_author_name] %}
     {% assign first_author_logo = data_file.logo_files[first_author_name] %}
@@ -9,7 +13,7 @@
     {% assign first_author_blog = data_file.author_blogs[first_author_name] %}
     
     {% for burchill in data_file.burchills %}
-    	{% if data_file.burchills != first_author_name %}
+    	{% if burchill != first_author_name %}
     		{% assign second_author_name = burchill %}
     	{% endif %}
     {% endfor %}
@@ -18,6 +22,7 @@
     {% assign second_author_logo = data_file.logo_files[second_author_name] %}
     {% assign second_author_basesite = data_file.base_sites[second_author_name] %}
     {% assign second_author_blog = data_file.author_blogs[second_author_name] %}
+
 
 <div class="wrap">
 	<header class="nav">
