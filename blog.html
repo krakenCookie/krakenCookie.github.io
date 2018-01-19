@@ -33,11 +33,14 @@ permalink: /blog/
         {{ post.title }}
       </a>
     </h1>
-    <span class="post-date">{{ post.date | date_to_string }}</span> 
+    <span class="post-date">{{ post.date | date_to_string }}</span> &mdash; <a class="commentcount" style="margin:0;display:inline" href="{{ post.url }}">{{ post.author }}</a>
+    {% comment %}
+    <!--Eh, not really worth including if I don't have people commenting -->
     {% if site.disqus %}
       &mdash;  <a href="{{ post.url }}#disqus_thread"
                               class = "commentcount" style="margin:0;display:inline"></a>
     {% endif %}
+    {% endcomment %}
     {{ post.excerpt }}
     <p style="margin-top:0; text-align: right;display: block;font-weight: bold"><a href="{{ post.url }}">&#8618; [Read more...]</a></p>
   </div>
