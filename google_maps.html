@@ -25,12 +25,12 @@
       var map;
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          center: {39.828, 98.579},
+          center: {lat: -34.397, lng: 150.644},
           zoom: 5,
         });
        // Place a draggable marker on the map
       var marker = new google.maps.Marker({
-          position: usa,
+          position: {lat: -34.397, lng: 150.644},
           zoom: 5,
           map: map,
           draggable:true,
