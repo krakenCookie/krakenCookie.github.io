@@ -8,11 +8,11 @@
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 50%;
+        height: 100%;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
-        height: 50%;
+        height: 100%;
         margin: 0;
         padding: 0;
       }
@@ -28,6 +28,19 @@
           center: {lat: -34.397, lng: 150.644},
           zoom: 8
         });
+       / Place a draggable marker on the map
+      var marker = new google.maps.Marker({
+          position: myLatlng,
+          map: map,
+          draggable:true,
+          title:"Drag me!"
+      });
+
+      //get marker position and store in hidden input
+      //google.maps.event.addListener(marker, 'dragend', function (evt) {
+        //  document.getElementById("latInput").value = evt.latLng.lat().toFixed(3);
+          //document.getElementById("lngInput").value = evt.latLng.lng().toFixed(3);
+      //});
       }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWpSc7HqHCjw-KWkb_H5ae8vpZNjtYkZA&callback=initMap"
