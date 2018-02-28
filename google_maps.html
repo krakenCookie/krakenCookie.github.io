@@ -38,10 +38,13 @@
           zoom: 5,
           map: map,
           draggable:true,
-          title:"Drag me!",
-          icon:BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
+          title:"Drag me!"
       });
       //function addPointer
+      static final LatLng MELBOURNE = new LatLng(-37.813, 144.962);
+      Marker melbourne = mMap.addMarker(new MarkerOptions()
+                                .position(MELBOURNE)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
       //get marker position and store in hidden input
       //google.maps.event.addListener(marker, 'dragend', function (evt) {
