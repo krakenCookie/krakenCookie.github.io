@@ -51,6 +51,11 @@
           //document.getElementById("lngInput").value = evt.latLng.lng().toFixed(3);
       //});
       }
+      Marker marker = map.add(new MarkerOptions()
+         .position(new LatLng(37.7750, 122.4183))
+         .title("San Francisco")
+         .snippet("Population: 776733"))
+         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
       
       
       function addPointer() {
