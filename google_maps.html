@@ -28,16 +28,17 @@
     <div id="map2"></div>
     <script>
       var map;
+      var map2;
       function initMap() { 
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 43.1, lng: -77.5},
           zoom: 5,
         });
       function initMap() { 
-      map = new google.maps.Map(document.getElementById('ma2p'), {
-        center: {lat: 43.1, lng: 77.5},
-        zoom: 5,
-      });
+        map2 = new google.maps.Map(document.getElementById('ma2p'), {
+          center: {lat: 43.1, lng: 77.5},
+          zoom: 5,
+        });
       // Place a draggable marker on the map
       var marker = new google.maps.Marker({
           position: {lat: 43.1, lng: -77.5},
