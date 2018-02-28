@@ -52,6 +52,11 @@
       function addPointer() {
         var marker = new google.maps.Marker({
           position: {lat: 43.1, lng: -77.6},
+          icon: {
+              path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+              strokeColor: "blue",
+              scale: 3
+          },
           zoom: 5,
           map: map,
           draggable:true,
