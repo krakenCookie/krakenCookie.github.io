@@ -18,8 +18,12 @@
       }
     </style>
   </head>
+  
+  
   <body>
     <p>baaa</p>
+    <p><input onclick="clearMarkers();" type=button value="Hide Markers"></p>
+    
     <div id="map"></div>
     <script>
       var map;
@@ -34,8 +38,10 @@
           zoom: 5,
           map: map,
           draggable:true,
-          title:"Drag me!"
+          title:"Drag me!",
+          icon:BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
       });
+      //function addPointer
 
       //get marker position and store in hidden input
       //google.maps.event.addListener(marker, 'dragend', function (evt) {
