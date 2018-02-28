@@ -30,9 +30,9 @@
       function initMap() { 
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 43.1, lng: -77.5},
-          zoom: 5,
-        });
-       // Place a draggable marker on the map
+          zoom: 5
+      });
+      // Place a draggable marker on the map
       var marker = new google.maps.Marker({
           position: {lat: 43.1, lng: -77.5},
           zoom: 5,
@@ -42,7 +42,7 @@
       });
       //function addPointer
       static final LatLng MELBOURNE = new LatLng(-37.813, 144.962);
-      Marker melbourne = mMap.addMarker(new MarkerOptions()
+      Marker melbourne = maps.addMarker(new MarkerOptions()
                                 .position(MELBOURNE)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
