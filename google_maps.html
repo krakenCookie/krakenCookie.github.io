@@ -25,6 +25,7 @@
     <p><input onclick="addPointer();" type=button value="make Markers"></p>
     
     <div id="map"></div>
+    <div id="map2"></div>
     <script>
       var map;
       function initMap() { 
@@ -32,6 +33,11 @@
           center: {lat: 43.1, lng: -77.5},
           zoom: 5,
         });
+      function initMap() { 
+      map = new google.maps.Map(document.getElementById('ma2p'), {
+        center: {lat: 43.1, lng: 77.5},
+        zoom: 5,
+      });
       // Place a draggable marker on the map
       var marker = new google.maps.Marker({
           position: {lat: 43.1, lng: -77.5},
@@ -51,12 +57,6 @@
           //document.getElementById("lngInput").value = evt.latLng.lng().toFixed(3);
       //});
       }
-      Marker marker = map.add(new MarkerOptions()
-         .position(new LatLng(37.7750, 122.4183))
-         .title("San Francisco")
-         .snippet("Population: 776733"))
-         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-      
       
       function addPointer() {
         var marker = new google.maps.Marker({
@@ -69,10 +69,6 @@
          // icon: BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
       });
       }
-      //static final LatLng MELBOURNE = new LatLng(-37.813, 144.962);
-      //Marker melbourne = maps.addMarker(new MarkerOptions()
-                            //    .position(MELBOURNE)
-                            //    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWpSc7HqHCjw-KWkb_H5ae8vpZNjtYkZA&callback=initMap"
     async defer></script>
