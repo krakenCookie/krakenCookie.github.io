@@ -22,99 +22,105 @@
     <div class="post">
     
     
-<form class="form">
-  <h2>Myoozam survey</h2>
-  <p><label for="name">Name:</label><input placeholder="First name, full name, fake name, whatever" id="name"></input></p>
-  
-  <p><label for="myuzam">Do you pronounce "museum" as <span style="white-space: nowrap;">/myoo-zam/</span>? (Two syllables)</label>
-  <span style="width:100%;display:block;margin-top:7px;">
-  <input type="radio" name="myoozam" id="myoozam_yes" value="yes">  &nbsp;<label for="myoozam_yes"> Yes </label> &nbsp; &nbsp; &nbsp;
-  <input type="radio" name="myoozam" id="myoozam_no" value="no"> &nbsp;<label for="myoozam_no"> No </label> 
+<form class="form" name="submit-to-google-sheet">
+  <h2>Where Does "Myoozam" Come From?</h2>
+  <p><label for="name">Name:</label><input placeholder="First name, full name, fake name, whatever" id="name"></input>
+  </p>
+
+  <p><label for="myuzam">Do you pronounce "museum" as <span style="white-space: nowrap;">/myoo-zam/</span>? (two syllables)</label>
+    <span style="width:100%;display:block;margin-top:7px;">
+  <input type="radio" name="myoozam" id="myoozam_yes" value="yes" required>  &nbsp;<label for="myoozam_yes"> Yes </label> &nbsp; &nbsp; &nbsp;
+  <input type="radio" name="myoozam" id="myoozam_no" value="no" required> &nbsp;<label for="myoozam_no"> No </label> 
   </span>
   </p>
-  
+
   <p><label for="two_syll_hearsay">Do you hear/say "museum" as two syllables?</label>
-  <select id="two_syll_hearsay" name="two_syll_hearsay">
-  <option disabled selected value> -- select one -- </option>
-  <option value="hear">I HEAR it as two syllables</option>
-  <option value="say">I SAY it as two syllables</option>
-  <option value="both">I both hear and say it as two syllables</option>
-  <option value="neither">I neither hear nor say it as two syllables</option>
-  </select>
+    <select id="two_syll_hearsay" name="two_syll_hearsay" required>
+      <option disabled selected value> -- select one -- </option>
+      <option value="hear">I HEAR it as two syllables</option>
+      <option value="say">I SAY it as two syllables</option>
+      <option value="both">I both hear and say it as two syllables</option>
+      <option value="neither">I neither hear nor say it as two syllables</option>
+    </select>
   </p>
   <p><label>Where did you grow up?</label></p>
-  <p>Add a marker and drag it to any region you lived <b>for more than five years</b> growing up (until you were 14) on the map below. 
-     If you grew  grew up in multiple regions, add them in order of how long you lived there, <b>starting with the place you lived longest</b>.</p>
-  <p>You don't need to be super precise--unless you moved over 100 miles, don't count them as "different" locations!
+  <p><b>Add</b> a marker and <b>drag</b> it to any region you lived <b>for more than five years</b> growing up (until you were 14) on the map below. If you grew grew up in multiple regions, add them in order of how long you lived there, <b>starting with the place you lived longest</b>.</p>
+  <p>You don't need to be super precise&mdash;unless you moved over 100 miles, don't count them as "different" locations!
   </p>
-  
+
   <p>
-  <div style="justify-content:center;flex-wrap:wrap;display:flex;margin-bottom:12px;">
-  <input style="width:auto;margin:3px;0;0;3px;" onclick="addPointer(you_map_array_obj, you_map);" type=button value="Add location">
-  <input style="width:auto;margin:3px;0;0;3px;" onclick="removeLastPointer(you_map_array_obj, you_map);" type=button value="Remove last location">
-  <input style="width:auto;margin:3px;0;0;3px;" onclick="removeAllPointers(you_map_array_obj, you_map);" type=button value="Remove all locations">
-  </div>
-  <div class="map_holder_holder" style="width:100%;max-height:300px">
-  <div class="map_holder" id="you_map"></div>
-  </div>
-  
-  <p><label>Where did your parents grow up?</label></p>
-  <p style="text-align:justify;">The people who raise us exert a strong influence on the way we speak, so it's important to look at their language backgrounds too! 
-  Do the same thing as above, but mark where your parents or guardians grew up. <b>It doesn't have to be exact</b>--just complete it to the best of your knowledge. </p>
-  <p>If you were only raised by one parent, or don't know their backgrounds at all, feel free to leave these maps blank.
-  </p>
-  <p><label>Parent A:</label></p>
-  
-  <p>
-  <div style="justify-content:center;flex-wrap:wrap;display:flex;margin-bottom:12px;">
-  <input style="width:auto;margin:3px;0;0;3px;" onclick="addPointer(parent_a_map_array_obj, parent_a_map);" type=button value="Add location">
-  <input style="width:auto;margin:3px;0;0;3px;" onclick="removeLastPointer(parent_a_map_array_obj, parent_a_map);" type=button value="Remove last location">
-  <input style="width:auto;margin:3px;0;0;3px;" onclick="removeAllPointers(parent_a_map_array_obj, parent_a_map);" type=button value="Remove all locations">
-  </div>
-  <div class="map_holder_holder" style="width:100%;max-height:300px">
-  <div class="map_holder" id="parent_a_map"></div>
-  </div>
-  </p>
-  
-  <p><label>Parent B:</label></p>
-  
-  <p>
-  <div style="justify-content:center;flex-wrap:wrap;display:flex;margin-bottom:12px;">
-  <input style="width:auto;margin:3px;0;0;3px;" onclick="addPointer(parent_b_map_array_obj, parent_b_map);" type=button value="Add location">
-  <input style="width:auto;margin:3px;0;0;3px;" onclick="removeLastPointer(parent_b_map_array_obj, parent_b_map);" type=button value="Remove last location">
-  <input style="width:auto;margin:3px;0;0;3px;" onclick="removeAllPointers(parent_b_map_array_obj, parent_b_map);" type=button value="Remove all locations">
-  </div>
-  <div class="map_holder_holder" style="width:100%;max-height:300px">
-  <div class="map_holder" id="parent_b_map"></div>
-  </div>
-  </p>
-  
-  <p><label for="parents_say_darnedest">Have you ever heard your parents say <span style="white-space: nowrap;">/myoo-zam/</span>?</label>
-  <select id="parents_say_darnedest" name="parents_say_darnedest">
-  <option disabled selected value> -- select the best -- </option>
-  <option value="parent_a">I've heard Parent A say it.</option>
-  <option value="parent_b">I've heard Parent B say it.</option>
-  <option value="both">I've heard both say it.</option>
-  <option value="neither">I've never heard either say it.</option>
-  <option value="idk">I don't remember/can't recall.</option>
-  </select>
-  </p>
-  
-  <p><label for="comments">Additional comments/information</label>
-  <textarea style="resize:none;" id="comments" name="comments" placeholder="Anything else you think might be important to know?"></textarea>
-  </p>
-  
-  <p><label for="wtf">Do you want this information to be taken seriously?</label>
-  <span style="width:100%;display:block;margin-top:7px;">
-  <input type="radio" name="kidding" id="not_kidding" value="good"> <label for="not_kidding"> Yes </label> &nbsp; 
-  <input type="radio" name="kidding" id="kidding" value="no"> <label for="kidding"> No </label> &nbsp; 
-  <input type="radio" name="kidding" id="zachfriend" value="zachfriend"><label for="zachfriend"> No, I'm one of Zach's friends and I'm just messing with him </label> 
-  </span>
-  </p>
-  
-  <p>
-  <button>Send Message</button>
-  </p>
+    <div style="justify-content:center;flex-wrap:wrap;display:flex;margin-bottom:12px;">
+      <input style="width:auto;margin:3px;0;0;3px;" onclick="addPointer(you_map_array_obj, you_map);" type=button value="Add location">
+      <input style="width:auto;margin:3px;0;0;3px;" onclick="removeLastPointer(you_map_array_obj, you_map);" type=button value="Remove last location">
+      <input style="width:auto;margin:3px;0;0;3px;" onclick="removeAllPointers(you_map_array_obj, you_map);" type=button value="Remove all locations">
+    </div>
+    <div class="map_holder_holder" style="width:100%;max-height:300px">
+      <div class="map_holder" id="you_map"></div>
+    </div>
+
+    <p><label>Where did your parents grow up?</label></p>
+    <p style="text-align:justify;">The people who raise us exert a strong influence on the way we speak, so it's important to look at their language backgrounds too! Do the same thing as above, but mark where your parents or guardians grew up. <b>It doesn't have to be exact</b>&mdash;just
+      complete it to the best of your knowledge. </p>
+    <p>If you were only raised by one parent, or don't know their backgrounds at all, feel free to leave these maps blank.
+    </p>
+    <p><label>Parent A:</label></p>
+
+    <p>
+      <div style="justify-content:center;flex-wrap:wrap;display:flex;margin-bottom:12px;">
+        <input style="width:auto;margin:3px;0;0;3px;" onclick="addPointer(parent_a_map_array_obj, parent_a_map);" type=button value="Add location">
+        <input style="width:auto;margin:3px;0;0;3px;" onclick="removeLastPointer(parent_a_map_array_obj, parent_a_map);" type=button value="Remove last location">
+        <input style="width:auto;margin:3px;0;0;3px;" onclick="removeAllPointers(parent_a_map_array_obj, parent_a_map);" type=button value="Remove all locations">
+      </div>
+      <div class="map_holder_holder" style="width:100%;max-height:300px">
+        <div class="map_holder" id="parent_a_map"></div>
+      </div>
+    </p>
+
+    <p><label>Parent B:</label></p>
+
+    <p>
+      <div style="justify-content:center;flex-wrap:wrap;display:flex;margin-bottom:12px;">
+        <input style="width:auto;margin:3px;0;0;3px;" onclick="addPointer(parent_b_map_array_obj, parent_b_map);" type=button value="Add location">
+        <input style="width:auto;margin:3px;0;0;3px;" onclick="removeLastPointer(parent_b_map_array_obj, parent_b_map);" type=button value="Remove last location">
+        <input style="width:auto;margin:3px;0;0;3px;" onclick="removeAllPointers(parent_b_map_array_obj, parent_b_map);" type=button value="Remove all locations">
+      </div>
+      <div class="map_holder_holder" style="width:100%;max-height:300px">
+        <div class="map_holder" id="parent_b_map"></div>
+      </div>
+    </p>
+
+    <p><label for="parents_say_darnedest">Have you ever heard your parents say <span style="white-space: nowrap;">/myoo-zam/</span>?</label>
+      <select id="parents_say_darnedest" name="parents_say_darnedest" required>
+        <option disabled selected value> -- select the best -- </option>
+        <option value="parent_a">I've heard Parent A say it.</option>
+        <option value="parent_b">I've heard Parent B say it.</option>
+        <option value="both">I've heard both say it.</option>
+        <option value="neither">I've never heard either say it.</option>
+        <option value="idk">I don't remember/can't recall.</option>
+      </select>
+    </p>
+
+    <p><label for="comments">Additional comments/information</label>
+      <textarea style="resize:none;" id="comments" name="comments" placeholder="Anything else you think might be important to know?"></textarea>
+    </p>
+
+    <p><label for="wtf">Do you want this information to be taken seriously?</label>
+      <span style="width:100%;display:block;margin-top:7px;">
+        <input type="radio" name="kidding" id="not_kidding" value="good" required> <label for="not_kidding"> Yes </label> &nbsp; 
+        <input type="radio" name="kidding" id="kidding" value="no" required> <label for="kidding"> No </label> &nbsp; 
+        <input type="radio" name="kidding" id="zachfriend" value="zachfriend" required><label for="zachfriend"> No, I'm one of Zach's friends and I'm just messing with him </label> 
+      </span>
+    </p>
+
+    <input type="hidden" id="you_positions" name="you_positions" value="">
+    <input type="hidden" id="parent_a_positions" name="parent_a_positions" value="test">
+    <input type="hidden" id="parent_b_positions" name="parent_b_positions" value="test">
+
+    <p>
+      <input style="width:auto;margin:3px;0;0;3px;" onclick="closeUpShop();" type=button value="Add location">
+
+      <button type="submit">Send Message</button>
+    </p>
 </form>
     
     
@@ -124,48 +130,41 @@
     
     
     <script>
-      var map;
-      var you_map_array_obj = {l:[]};
-      var parent_a_map_array_obj = {l:[]};
-      var parent_b_map_array_obj = {l:[]};
-      function initMap() { 
-      
-        you_map = new google.maps.Map(document.getElementById('you_map'), {
-          center: {lat: 43.1, lng: -77.5},
-          zoom: 4,
-          mapTypeControl: false,
-          streetViewControl: false,
-          rotateControl: false,
-          fullscreenControl: false,
-        });
-        
-        parent_a_map = new google.maps.Map(document.getElementById('parent_a_map'), {
-          center: {lat: 43.1, lng: -77.5},
-          zoom: 4,
-          mapTypeControl: false,
-          streetViewControl: false,
-          rotateControl: false,
-          fullscreenControl: false,
-        });
-        
-        parent_b_map = new google.maps.Map(document.getElementById('parent_b_map'), {
-          center: {lat: 43.1, lng: -77.5},
-          zoom: 4,
-          mapTypeControl: false,
-          streetViewControl: false,
-          rotateControl: false,
-          fullscreenControl: false,
-        });
-      
-      
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwoM7O8LsMnGW5L9YdpZOXiBMM01Jy0flixRV-9tJ4CZQsFLNrm/exec'
+const form = document.forms['submit-to-google-sheet']
+var map;
+var you_map_array_obj = { l: [] };
+var parent_a_map_array_obj = { l: [] };
+var parent_b_map_array_obj = { l: [] };
+function initMap() {
+  you_map = new google.maps.Map(document.getElementById("you_map"), {
+    center: { lat: 43.1, lng: -77.5 },
+    zoom: 4,
+    mapTypeControl: false,
+    streetViewControl: false,
+    rotateControl: false,
+    fullscreenControl: false
+  });
 
-      //get marker position and store in hidden input
-      //google.maps.event.addListener(marker, 'dragend', function (evt) {
-        //  document.getElementById("latInput").value = evt.latLng.lat().toFixed(3);
-          //document.getElementById("lngInput").value = evt.latLng.lng().toFixed(3);
-      //});
-      }
- 
+  parent_a_map = new google.maps.Map(document.getElementById("parent_a_map"), {
+    center: { lat: 43.1, lng: -77.5 },
+    zoom: 4,
+    mapTypeControl: false,
+    streetViewControl: false,
+    rotateControl: false,
+    fullscreenControl: false
+  });
+
+  parent_b_map = new google.maps.Map(document.getElementById("parent_b_map"), {
+    center: { lat: 43.1, lng: -77.5 },
+    zoom: 4,
+    mapTypeControl: false,
+    streetViewControl: false,
+    rotateControl: false,
+    fullscreenControl: false
+  });
+}
+
 function addPointer(marker_array_obj, map_var) {
   var l = marker_array_obj.l.length + 1;
   marker_array_obj.l.push(makePointer(map_var, l.toString()));
@@ -189,11 +188,45 @@ function makePointer(map_var, label_var) {
     label: label_var,
     zoom: 5,
     map: map_var,
-    draggable:true,
-    title:"Drag me!",
+    draggable: true,
+    title: "Drag me!"
   });
   return marker;
 }
+
+function closeUpShop() {
+  if (you_map_array_obj.l.length === 0) {
+    alert("You must mark where you grew up to submit");
+    return false;
+  } else {
+    document.getElementById("you_positions").value = getPositions(you_map_array_obj);
+    document.getElementById("parent_a_positions").value = getPositions(parent_a_map_array_obj);
+    document.getElementById("parent_b_positions").value = getPositions(parent_b_map_array_obj);
+    return true;
+  }
+}
+
+function getPositions(marker_array_obj) {
+  var new_list = [];
+  for (var i = 0; i < marker_array_obj.l.length; i++) {
+    var pos = marker_array_obj.l[i].getPosition();
+    var lat = pos.lat().toFixed(3);
+    var lng = pos.lng().toFixed(3);
+    new_list.push([lat,lng].join(","));
+  }
+  if (new_list.length === 0) { return "undefined";} 
+  else {return new_list.join(",");}
+}
+
+form.addEventListener('submit', e => {
+	if (closeUpShop() == true) {
+      e.preventDefault()
+      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+        .then(response => console.log('Success!', response))
+        .catch(error => console.error('Error!', error.message))
+    }
+  })
+  
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDWpSc7HqHCjw-KWkb_H5ae8vpZNjtYkZA&callback=initMap"
     async defer></script>
