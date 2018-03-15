@@ -153,7 +153,7 @@ def wait_for(minutes_to_sleep, subdivide_time_by=10):
             (working_time + datetime.timedelta(seconds=fraction_of_total_sleep_time) -
             datetime.datetime.now()).seconds))
         working_time = datetime.datetime.now()
-    logging.info("Exiting sleep mode. Expected to sleep for {!s} minutes, but slept for {!s} minutes".format(minutes_to_sleep, (datetime.datetime.now() - check_time).minutes))
+    logging.info("Exiting sleep mode. Expected to sleep for {!s} minutes, but slept for {!s} minutes".format(minutes_to_sleep, (datetime.datetime.now() - check_time).seconds/60.0))
     
 
 # --------------------------------- Beautiful soup-based functions ----------------------------------------- #
@@ -546,16 +546,17 @@ def main():
     logging.info("Scraped for matches of: ({!s})".format(patterns))
     
     if minutes_to_sleep:
-        wait_for(minutes_to_sleep)
-        for re_obj in re_patterns:
-            new_threads = check_fourchan(archive_url, re_obj, top_level_dir)
-            scrape_new_threads(top_level_dir, new_threads, naming_scheme)
-        print("Scraping session complete")
-        logging.info(log_header.format("Scraping session complete"))
-        logging.info("Scraped for matches of: ({!s})".format(patterns))
-        while not q.empty():
-            print("Please wait while the {!s} remaining images are downloading.".format(threading.active_count()))
-            time.sleep(30)
+        while True:
+            wait_for(minutes_to_sleep)
+            for re_obj in re_patterns:
+                new_threads = check_fourchan(archive_url, re_obj, top_level_dir)
+                scrape_new_threads(top_level_dir, new_threads, naming_scheme)
+            print("Scraping session complete")
+            logging.info(log_header.format("Scraping session complete"))
+            logging.info("Scraped for matches of: ({!s})".format(patterns))
+            while not q.empty():
+                print("Please wait while the {!s} remaining images are downloading.".format(threading.active_count()))
+                time.sleep(30)
             
     q.join()       # block until all tasks are done
     print("Shutting down")
