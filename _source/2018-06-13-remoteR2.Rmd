@@ -250,20 +250,23 @@ print(x)
 ```
 
 ```{r, echo=FALSE}
-p2 <-   "task                top.host top.pid                mid.host mid.pid                    host   pid
-1    1 cycle1.cs.rochester.edu   29248 node33.cs.rochester.edu   29361 node33.cs.rochester.edu 29406
-2    1 cycle1.cs.rochester.edu   29248 node33.cs.rochester.edu   29361 node33.cs.rochester.edu 29407
-3    2 cycle1.cs.rochester.edu   29248 node34.cs.rochester.edu    9530 node34.cs.rochester.edu  9572
-4    2 cycle1.cs.rochester.edu   29248 node34.cs.rochester.edu    9530 node34.cs.rochester.edu  9576
-5    3 cycle1.cs.rochester.edu   29248 node33.cs.rochester.edu   29361 node33.cs.rochester.edu 29408
-6    3 cycle1.cs.rochester.edu   29248 node33.cs.rochester.edu   29361 node33.cs.rochester.edu 29409
-7    4 cycle1.cs.rochester.edu   29248 node33.cs.rochester.edu   29361 node33.cs.rochester.edu 29411
-8    4 cycle1.cs.rochester.edu   29248 node33.cs.rochester.edu   29361 node33.cs.rochester.edu 29412"
 
-pt <- read.table(text=p2, header = TRUE)
+# using `dput(x)`
 
-pt
+p2 <- structure(list(task = c(1L, 1L, 2L, 2L, 3L, 3L, 4L, 4L), top.host = structure(c(1L, 
+1L, 1L, 1L, 1L, 1L, 1L, 1L), .Label = "cycle1.cs.rochester.edu", class = "factor"), 
+    top.pid = c(9156L, 9156L, 9156L, 9156L, 9156L, 9156L, 9156L, 
+    9156L), mid.host = structure(c(1L, 1L, 2L, 2L, 1L, 1L, 1L, 
+    1L), .Label = c("node33.cs.rochester.edu", "node34.cs.rochester.edu"
+    ), class = "factor"), mid.pid = c(3422L, 3422L, 16543L, 16543L, 
+    3422L, 3422L, 3422L, 3422L), host = structure(c(1L, 1L, 2L, 
+    2L, 1L, 1L, 1L, 1L), .Label = c("node33.cs.rochester.edu", 
+    "node34.cs.rochester.edu"), class = "factor"), pid = c(3468L, 
+    3469L, 16586L, 16588L, 3470L, 3471L, 3472L, 3474L)), .Names = c("task", 
+"top.host", "top.pid", "mid.host", "mid.pid", "host", "pid"), row.names = c(NA, 
+-8L), class = "data.frame")
 
+print(p2)
 ```
 
 
