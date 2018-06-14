@@ -29,6 +29,38 @@ div.posts div.footnotes {
 
 
 
+/***  
+
+---- These are two versions of my attempt to add a small image at the end of each blog post ("like they do in REAL newspapers!")
+
+Sadly, these don't really work right, and WONT until CSS get's a positive lookahead. 
+
+Oh well!
+
+div.post > p:nth-last-of-type(2)::after {
+  display: inline-flex;
+  content: "";
+  width: 1em;
+  height: 1em;
+  position: relative;
+  left: 10px;
+  top: 4px;
+  background: transparent url("../images/pawpaw_25x25.png") no-repeat; 
+  background-size: contain;
+  }
+
+div.post > p:nth-last-of-type(2)::after {
+  display: inline-flex;
+  content: "";
+  width: 50px;
+  height: 25px;
+  position: relative;
+  left: 10px;
+  top: 7px;
+  background: transparent url("../images/pawpaw_25x25.png") 0px 0px no-repeat; }
+
+***/
+
 
 /*** I think blog posts look better justified ***/
 body {
