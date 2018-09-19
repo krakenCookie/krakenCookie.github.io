@@ -47,10 +47,11 @@ baseurlknitr:  "/" # This will always be your baseurl plus an extra '/'
                                 
 # Site-wide links
 links:
-  about_me:           /about/
+  about_me:        /about/
   blog:            /blog/
-  cv:            /cv.pdf
-  publications:           /about/#research
+  academic_cv:     /academic_cv.pdf
+  industry_cv:     /industry_resume.pdf
+  publications:    /about/#research
   home: "/"
 
 # Other stuff
