@@ -192,17 +192,17 @@ In order to not ruin any surprises let's just look at the first couple of rows a
 raw_df[1:5, 1:7]
 ```
 
-Notice that the first column is named "X", R's default for unnamed columns---this comes from the unnamed index column of the `pandas` data frame that generated it. "ID" is a uniquely generated ID for each measurement, "sleepwake"" is a factor we'll talk about later, and the rest of the columns are self-explanatory.
+Notice that the first column is named "X", R's default for unnamed columns---this comes from the unnamed index column of the `pandas` data frame that generated it. "ID" is a uniquely generated ID for each measurement, "sleepwake"" is a factor we'll talk about later, and the rest of the columns are self-explanatory. 
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # I was going to put this in the main text, but it seemed pretty obvious and just took up space
 
 # Look at the errors
-raw_df %>% 
-  group_by(error) %>%
-  summarise(n=n()) %>%
-  arrange(-n)
+# raw_df %>% 
+#   group_by(error) %>%
+#   summarise(n=n()) %>%
+#   arrange(-n)
 # Exclude them
 raw_df <- raw_df %>% filter(error=="")
 
