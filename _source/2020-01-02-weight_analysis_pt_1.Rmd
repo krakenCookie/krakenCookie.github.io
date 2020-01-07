@@ -1,0 +1,429 @@
+---
+layout:  post
+title: "Cleaning and Preparing Personal Weight Data"
+comments:  true
+published:  true
+author: "Zachary Burchill"
+date: 2020-01-02 10:00:00
+permalink: /weight_analysis_pt_1/
+categories: ["raspberry pi",R,scale,health,weight,"wii fit",wii,data,"data science","data analysis"]
+output:
+  html_document:
+    mathjax:  default
+    fig_caption:  true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(fig.width = 8, fig.height = 6, autocaption=TRUE)
+library(tidyverse)
+library(lubridate)
+theme_set(theme_bw(base_size = 16))
+
+stat_cols <- quos(sd, median, mean)
+neg_stat_cols <- quos(-sd, -median, -mean)
+
+med_y_scale <- scale_y_continuous("median weight (kg)",
+    sec.axis = dup_axis(trans=~2.20462 * .,
+                        name="median weight (lb)"))
+
+mean_y_scale <- scale_y_continuous("mean weight (kg)",
+    sec.axis = dup_axis(trans=~2.20462 * .,
+                        name="mean weight (lb)"))
+
+```
+
+```{r functions, echo=FALSE}
+time_between <- function(first,second,units="seconds") {
+  interval(first, second) %>%
+    as.duration() %>%
+    as.numeric(units=units)
+}
+
+are_close <- function(first, second, t) {
+  as.duration(interval(first, second)) < t
+}
+
+# Currently unused
+find_post_vals <- function(time_val, post_df, time_col, nt) {
+  tcol <- enquo(time_col)
+  
+  vals <- post_df %>% 
+    filter(!!tcol > time_val) %>%
+    filter(are_close(time_val, !!tcol, nt))
+  if (nrow(vals) > 2)
+    warning("Multiple values in range, taking closest")
+  if (nrow(vals) == 0) tibble()
+  else vals %>% arrange(!!tcol) %>% {.[1,]}
+}
+
+# Given a score calculator function that calculates a score 
+#   for two rows and an optional constraint function, it 
+#   calculates the scores for each combination of row pairs, 
+#   removing the ones that violate the constraint. 
+# It returns a list of data frames with the two ids of the 
+#   rows and their score.
+calculate_scores <- function(test_df, calculator,
+                             constraint=NA,
+                             temp_index_col = Index,
+                             ID_col = X) {
+  ID_col = enexpr(ID_col) %>% as.character()
+  # Adds a new index column
+  index_col_name = enexpr(temp_index_col)
+  test_df <- mutate(test_df, !!index_col_name := 1:nrow(test_df))
+  
+  # just making things shorter
+  constr <- as_mapper(constraint)
+  calc <- as_mapper(calculator)
+  
+  # First separate df into a list of its rows
+  slices <- map(1:nrow(test_df), ~slice(test_df,.x))
+  pairs <- combn(slices, 2, simplify = F)
+
+  # Applies the constraints
+  if (!rlang::is_na(constr))
+    pairs <- pairs %>% keep(~constr(.x[[1]], .x[[2]]))
+  
+  # Calculate scores
+  map(pairs, ~data.frame(FirstID  = .x[[1]][[ID_col]],
+                         SecondID = .x[[2]][[ID_col]],
+                         score = calc(.x[[1]], .x[[2]])))
+}
+
+# This function takes the output of `calculate_scores` and attempts
+#   to return the paired rows that maximize the total score such that
+#   each row is only ever present in one pair, removing those rows that
+#   are not present in any pair.
+# It then returns a data frame of IDs with pair ids.
+# Note that the output is not at ALL guaranteed to be globally optimal,
+#   nor is the speed optimal. I just wanted to get something quick
+get_best_scores <- function(pairs, hi_scores_bad=FALSE,
+                            ID_col = X) {
+  ID_col = enexpr(ID_col)
+  # Order the pairs by their score
+  pairs <- pairs[order(map_dbl(pairs, ~.$score),
+                       decreasing = hi_scores_bad)]
+  
+  good_pairs <- list()
+  # Go through the lists, picking the best pairs first
+  #   and removing the ones that were already used
+  while (length(pairs) > 0) {
+    best <- pairs[[1]]
+    newIDs <- c(best$FirstID, best$SecondID)
+    good_pairs <- append(good_pairs, list(best))
+    pairs <- pairs %>%
+      keep(~!(.$FirstID %in% newIDs | .$SecondID %in% newIDs))
+  }
+
+  good_pairs %>%
+    imap_dfr(~mutate(.x, PairID=.y)) %>%
+    tidyr::gather("IDthing", !!ID_col,
+                  FirstID:SecondID) %>%
+    select(!!ID_col, PairID)
+}
+
+# test_df %>%
+#   calculate_scores(~abs(time_between(.x$time, .y$time)),
+#               ~.x$poo!=.y$poo & .x$clothing==.y$clothing) %>%
+#   get_best_scores()
+
+```
+
+If you don't remember [my previous post about my custom Bluetooth scale]({{ site.baseurl }}{% post_url 2019-09-07-bluetooth_scale_intro %}) from a couple of months ago, I've been collecting a large amount of fine-grained information about my weight for the past couple of months.
+
+In this post, I'll walk through my initial look at it, some problems I had with cleaning the data, and what I did to fix them.
+
+<!--more-->
+
+_For the background on the project this post stems from, check out the [first post in the series]({{ site.baseurl }}{% post_url 2019-09-07-bluetooth_scale_intro %})._
+
+## Data cleaning and sanity checking
+
+Let's load up the data and put it into the right format, making the `time` column actual time data (in this case, [Unix epoch time](https://en.wikipedia.org/wiki/Unix_time), which the numbers in that column represent), and making sure each weight measurement was tagged and from me.
+
+```{r load data for show, eval=FALSE}
+raw_df <- read.csv("~/Desktop/for_r.csv") %>% 
+  as_tibble() %>%
+  # Turn the `time` column into actual time objects
+  mutate(time = as.POSIXct(time, origin="1970-01-01")) %>%
+  # Give it the right time zone
+  mutate(time = with_tz(time, tzone="America/New_York")) %>%
+  # Reorder the columns
+  select(-weight_values, everything(), weight_values) %>%
+  # Make sure each measurement was tagged and was from me
+  filter(matched=="True", grepl("zach", tolower(username)))
+```
+
+```{r load data, echo=FALSE}
+# This is ACTUALLY what is run--the only difference is the uglier backwards compatability code, which I don't want to confuse people with. I had just forgot to log
+raw_df <- read.csv("~/Desktop/for_r.csv") %>% 
+  as_tibble() %>%
+  mutate(time = as.POSIXct(time, origin="1970-01-01")) %>%
+  mutate(time = with_tz(time, tzone="America/New_York")) %>%
+  select(-weight_values, everything(), weight_values) %>%
+  filter(matched=="True") %>% 
+  # This is for backwards compatability:
+  { 
+    if ("username" %in% names(.))
+      filter(., grepl("zach", tolower(username)) |
+               username=="")
+    else
+      .
+    } %>%
+  mutate(clothing = factor(clothing, levels=c("full_clothes","some_clothes","naked")))
+```
+
+The first thing you'll notice is that there are a lot of columns in this data frame (`r length(names(raw_df))`)---the way my setup currently converts its JSON data into R-readable files just dumps all the values into their own columns. 
+
+Let's remove a lot of those right now to make things easier for you:
+
+```{r}
+raw_df <- raw_df %>%
+  select(-matched,-linkID,-type,-method,-stepped_off,
+         -unexpected, -client_js, is_past,
+         # Gets rid of all columns with these strings
+         -contains("label_"), -contains("expire_"), -contains("offset"))
+```
+
+In order to not ruin any surprises let's just look at the first couple of rows and columns:
+
+```{r}
+raw_df[1:5, 1:7]
+```
+
+Notice that the first column is named "X", R's default for unnamed columns---this comes from the unnamed index column of the `pandas` data frame that generated it. "ID" is a uniquely generated ID for each measurement, "sleepwake"" is a factor we'll talk about later, and the rest of the columns are self-explanatory.
+
+
+```{r, echo=FALSE}
+# I was going to put this in the main text, but it seemed pretty obvious and just took up space
+
+# Look at the errors
+raw_df %>% 
+  group_by(error) %>%
+  summarise(n=n()) %>%
+  arrange(-n)
+# Exclude them
+raw_df <- raw_df %>% filter(error=="")
+
+# Some of the older data needs to be cleaned up a bit.
+# My measurement code now avoids this necessity, so I'm keeping this out of the reader's way right now.
+mezzies_need_cleaning <- raw_df %>%
+  filter(git_hash=="") %>%
+  tidyr::separate_rows(weight_values) %>%
+  mutate(w=as.numeric(weight_values)) %>%
+  group_by(X, time) %>%
+  filter(any(w < 75)) %>%
+  summarise() %>% pluck("X")
+
+df.clean <- raw_df %>%
+  filter(X %in% mezzies_need_cleaning) %>%
+  tidyr::separate_rows(weight_values) %>%
+  mutate(w=as.numeric(weight_values)) %>%
+  filter(w > 60) %>%
+  group_by(X, time) %>%
+  filter(abs(scale(w)) < 3) %>%
+  group_by_at(vars(-w, -weight_values, -sd:-mean)) %>%
+  summarise(mean   =   mean(w),
+            sd     =     sd(w),
+            median = median(w),
+            weight_values = paste(w, collapse=", ")) %>%
+  bind_rows(filter(raw_df, !(X %in% mezzies_need_cleaning))) %>%
+  ungroup()
+
+```
+
+
+### Outliers: medians are more robust
+
+Each weight "measurement" (i.e., row) is the aggregate of a hundred or so weight samples from the Wii Fit board over the few seconds I was standing on it. These samples are a bit noisy, and probably include samples where I was getting on or off the board. The columns we saw above (`sd`, `median`, and `mean`) reflect the summary statistics of these samples.
+
+Here are the mean values: 
+
+```{r, fig.height=3.5, fig.cap="Means of samples have outliers..."}
+raw_df %>% ggplot(aes(x=time, y=mean)) + 
+  geom_point() + mean_y_scale + 
+  ggtitle("Means")
+```
+
+As you can see, there are some values that seem very suspect.  But what about the medians?
+
+```{r, fig.height=3.5, fig.cap="...while the medians do not."}
+raw_df %>% ggplot(aes(x=time, y=median)) + 
+  geom_point()+ med_y_scale + 
+  ggtitle("Medians")
+```
+
+Yes, what you are taught in intro stats classes is true: the median IS more robust to outliers than the mean! From the plot above, you might want to move on and just stick to using the median values, but something about those huge outliers of the means seems suspicious. 
+
+### A deeper cleaning
+
+Let's look at the individual samples, which are stored as comma-separated strings in `weight_values` for each measurement to see what's going on:
+
+```{r, fig.cap="Boxplots of the individual samples for each logged weight (before I fixed this problem). Notice that the interquartile range of one measurement almost hits 0 kg."}
+raw_df %>% 
+  # Extracting out the individual samples
+  tidyr::separate_rows(weight_values, convert=TRUE) %>%
+  # Filtering a particular subset of older weights
+  filter(X < 90, git_hash=="") %>%
+  ggplot(aes(y = weight_values, x = as.factor(time), color = mean)) +
+  geom_boxplot(outlier.alpha = 0.1) +
+  scale_y_continuous("sample weight (kg)",
+    sec.axis = dup_axis(trans = ~2.20462*., name="sample weight (lb)")) +
+  theme(axis.text.x = element_blank()) +
+  labs(x = "logged weights", title = "There are some crazy outliers") +
+  viridis::scale_color_viridis(guide=FALSE)
+```
+
+Clearly, many of these samples are just _wrong_ and one measurement's interquartile range extends down to almost 0 kg!
+
+A go-to move for cleaning outliers might be to exclude samples by z-score thresholds, but removing sample outliers by z-scores won't always correctly clean the data. For that particularly outlier-filled measurement, there _are_ no samples with z-scores > 3 SD:
+
+```{r, echo=FALSE, fig.cap="The individual samples of the measurement with the lowest mean weight. Notice how none of the z-scores of any of the samples exceed 3 SD from the mean. The mean and median of the samples are indicated with solid and dashed lines, respectively. Skew and kurtosis are also shown."}
+raw_df %>% 
+  tidyr::separate_rows(weight_values) %>%
+  mutate(w=as.numeric(weight_values)) %>%
+  filter(X==46) %>%
+  mutate(zscore = scale(w),
+         outlier = !(abs(zscore) < 3)) %>% 
+  select(outlier, w, zscore, median, mean) %>%
+  tidyr::gather("stat","val", c(median, mean)) %>%
+  ggplot(aes(x=w)) + geom_density(fill="blue", alpha=0.2, color=NA) +
+  geom_rug(aes(color=abs(zscore))) +
+  geom_vline(aes(xintercept=val, linetype=stat)) +
+  zplyr::stat_moments(aes(xpos=0.3, ypos=0.5), moment="both") +
+  viridis::scale_color_viridis("|z-score|", direction=-1) +
+  labs(title="Samples from outlier-filled measurement",
+       x="weight of sample")
+```
+
+However, I know roughly how much I weigh. I know for a fact that I will likely never weigh less than 60 kg (~132 lb). Therefore, any sample < 60 kg is an error, and I can exclude it _before_ calculating z-scores.
+
+```{r, echo=FALSE, fig.height=8, fig.cap="The two outlier steps (thresholding and z-score exclusions) together do a much better job of cleaning the most troublesome measurement, and bring the mean an median much closer together."}
+temp_df <- raw_df %>% 
+  tidyr::separate_rows(weight_values) %>%
+  mutate(w=as.numeric(weight_values)) %>%
+  filter(X==46) %>%
+  mutate(zscore = scale(w),
+         outlier = !(abs(zscore) < 3)) 
+
+temp_df %>%
+  filter(w > 60) %>%
+  mutate(zscore = scale(w),
+         outlier = !(abs(zscore) < 3)) %>% 
+         {
+  bind_rows("with" = temp_df,
+            "thresholded" = mutate(., mean  =  mean(w), median = median(w)),
+            "thresholded + SD excl." = filter(., outlier==FALSE) %>%
+              mutate(mean  =  mean(w), 
+                     median = median(w)),
+            
+            .id="outliers") 
+           } %>%
+  mutate(outliers=factor(outliers, levels=c(unique(outliers)))) %>%
+  select(outliers, w, zscore, median, mean) %>%
+  tidyr::gather("stat","val", c(median, mean)) %>%
+  ggplot(aes(x=w)) + geom_density(fill="blue", alpha=0.2, color=NA) +
+  geom_rug(aes(color=abs(zscore))) +
+  geom_vline(aes(xintercept=val, linetype=stat)) +
+  zplyr::stat_moments(aes(xpos=0.2,ypos=0.5), moment="both") +
+  facet_wrap(~outliers, nrow = 3, labeller = label_both,
+             scales="free") +
+  viridis::scale_color_viridis("|z-score|", direction=-1) +
+  labs(title="Three steps of outlier exclusions",
+       x="weight of sample")
+```
+
+When we apply these cleaning steps to _all_ the measurements, the individual samples look much better.
+
+```{r, fig.cap="After I exclude samples <= 60 kg, and <em>then</em> exclude outliers > +-3 SD, the outliers are much less extreme. We do see a few values < 75 kg, but these <em>could</em> be real weights. (Wishful thinking, perhaps.)", echo=FALSE, autocaption=TRUE}
+temp_df <- raw_df %>% 
+  tidyr::separate_rows(weight_values) %>%
+  mutate(w=as.numeric(weight_values)) %>%
+  filter(git_hash=="")
+
+temp_df %>%
+  filter(w > 60) %>%
+  group_by(time) %>%
+  filter(abs(scale(w)) < 3) %>%
+  ggplot(aes(y=w, x=as.factor(time),
+             color=mean)) +
+  geom_boxplot(outlier.alpha=0.1) +
+  scale_y_continuous("sample weight (kg)",
+    sec.axis = dup_axis(trans=~2.20462 * .,
+                        name="sample weight (lb)")) +
+  theme(axis.text.x = element_blank()) +
+  labs(x="logged weights",
+       title="After outlier exclusion",
+       subtitle="(only plotting older weights)") +
+  viridis::scale_color_viridis(guide=FALSE)
+```
+
+Importantly, after I noticed this problem, I made a few changes to my weight-capturing system, so I won't have to clean new measurements.
+
+```{r, fig.height=3, fig.cap="You can clearly see when I fixed the problem by how less skewed samples are in newer measurements (although skewness isn't a <em>great</em> indicator of outlier-ness here, tbh).", echo=FALSE}
+raw_df %>%
+  mutate(`Data fixed?` = git_hash!="") %>%
+  tidyr::separate_rows(weight_values, convert=TRUE) %>%
+  filter(X < 150) %>% 
+  group_by(X, time, `Data fixed?`) %>%
+  summarise(skew = moments::skewness(weight_values)) %>%
+  ggplot(aes(x = time, y = skew, color=`Data fixed?`)) + geom_point() + 
+  ggtitle("Post-fix data is much more normal")
+```
+
+## Analysis
+
+So let's get cracking, what kind of insights can we glean from this data?
+
+### Background: clothing matters for micro-measurements
+
+When you're weighed at the doctor's, the nurses don't care if you take your shoes off---it's just a few pounds---but in my case I'm making enough measurements that a few pounds of shoes, wallet, and phone is going to make a difference.
+
+In order to get around this, my weight-capturing system lets me "tag" weights, giving them additional metadata/context. Since I _know_ the amount of clothing I wear will influence my weight, I've broken my clothing status into three categories: 
+
+1. When I'm wearing "full" outfits (what I would wear outside, shoes, phone, jacket, etc.)
+
+2. When I'm wearing lighter outfits (loungewear, sweatpants, no shoes)
+
+3. When I'm wearing only my birthday suit 😳
+
+```{r, warning=FALSE, message=FALSE}
+df.clean %>%
+  ggplot(aes(x=time, y=median, color=clothing)) +
+  geom_point() + geom_smooth() +
+  theme(legend.position="bottom") +
+  med_y_scale +
+  ggtitle("Clothing affects weight (duh)") 
+```
+
+These are pretty loose categories, but right away, we can see that they explain a lot of the variance of the data. Since being naked is the closest I can get to measuring my "true" weight and varying clothing per day adds extra noise to the data, I'll generally stick with my "naked" measurements as being the gold standard.
+
+```{r, echo=FALSE, fig.cap="It looks like I wear about five pounds of clothes!"}
+df.clean %>% 
+  group_by(clothing) %>%
+  mutate(avg_kg=mean(median), avg_lb = avg_kg*2.20462, n=n()) %>%
+  ggplot(aes(x=clothing, y=median, color=clothing)) +
+  zplyr::stat_errorbar() +
+  scale_color_discrete(guide=FALSE) +
+  geom_label(aes(y=avg_kg, label=paste(round(avg_lb, 0), "lb"))) +
+  med_y_scale +
+  ggtitle("Average (median) weights of clothing categories") 
+```
+
+## The Actually Interesting Questions
+
+Now that we've gotten the boring bits out of the way, we're ready to get to the juicier questions. Sadly, this post is getting too long, so you're going to have to wait until I publish the next installment. Look forward to it soon! 
+
+<hr />
+<br />
+
+## Source Code:
+
+> [`2020-01-02-weight_analysis_pt_1.Rmd`](https://raw.githubusercontent.com/burchill/burchill.github.io/master/_source/2020-01-02-weight_analysis_pt_1.Rmd)
+
+If you want to see how I did what I did in this post, check out the source code of the R Markdown file!
+
+
+
+
