@@ -1,0 +1,1043 @@
+---
+layout:  post
+title: "Modeling long-term personal weights with GAMs"
+comments:  true
+published:  true
+author: "Zachary Burchill"
+date: 2020-01-04 10:00:00
+permalink: /weight_analysis_pt_2/
+categories: ["raspberry pi",R,scale,health,weight,"time series",gam,gamm,data,"data science","data analysis"]
+output:
+  html_document:
+    mathjax:  default
+    fig_caption:  true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(fig.width = 8, fig.height = 6, 
+                      echo=FALSE, autocaption=TRUE,
+                      warning = FALSE, message = FALSE)
+options(kableExtra.latex.load_packages = FALSE)
+
+library(tidyverse)
+library(lubridate)
+# library(testthat)
+library(mgcv)
+library(gratia)
+
+```
+
+```{r functions, echo=FALSE} 
+
+is_empty_val <- function(v, ev=EMPTY_VALS) {
+  map_lgl(v, ~.x %in% ev)
+}
+ 
+time_between <- function(first,second,units="seconds") {
+  interval(first, second) %>%
+    as.duration() %>%
+    as.numeric(units=units)
+}
+
+are_close <- function(first, second, t) {
+  as.duration(interval(first, second)) < t
+}
+
+# Currently unused
+find_post_vals <- function(time_val, post_df, time_col, nt) {
+  tcol <- enquo(time_col)
+  
+  vals <- post_df %>% 
+    filter(!!tcol > time_val) %>%
+    filter(are_close(time_val, !!tcol, nt))
+  if (nrow(vals) > 2)
+    warning("Multiple values in range, taking closest")
+  if (nrow(vals) == 0) tibble()
+  else vals %>% arrange(!!tcol) %>% {.[1,]}
+}
+
+# Right now, this doesn't take into account that calibrations can change over time
+make_calibration_fn <- function(gt, measured) {
+  ratio <- gt/measured
+  fn <- approxfun(measured, ratio, rule=2)
+  return(fn)
+}
+
+# Turn a cleaned df into a df for the GAMs
+add_time_vars <- function(df) {
+  df %>%
+    mutate(ToD = hms::as_hms(time) %>% 
+             as.numeric(),
+           ToD_c = ToD %>% scale() %>% as.vector(),
+           Hour = hour(time),
+           DoW = wday(time, week_start = 1),
+           DoW_fac = wday(time, label=T, week_start = 1) %>%
+             `class<-`("factor"),
+           ToW = DoW*3600*24+ToD,
+           Date = date(time) %>% as.numeric(),
+           Date_c = scale(Date) %>% as.vector(),
+           Date_fac = as.factor(date(time)),
+           Time_n = as.numeric(time),
+           Time_c = scale(Time_n) %>% as.vector(),
+           Time_n = Time_n - min(Time_n),
+           WoY = week(time),
+           FromStart = interval(min(time), time),
+           nWeeks = trunc(time_length(FromStart,"week")))
+} 
+
+# Return the important predictions of a gam model in a nice format
+get_gam_predictions <- function(model, df, time_term=Time_n) {
+  tt <- enquo(time_term)
+  # print(as_label(tt))
+  smooth_names <- smooths(model)
+  smooth_cols <- syms(smooth_names)
+  time_smooth <- model %>%
+    get_smooths_by_id(which_smooths(model, as_label(tt))) %>%
+    pluck(1) %>% pluck("label") %>% sym()
+  
+  pred_df <- model %>% 
+    predict(newdata = df, type = "terms") %>% 
+    {mutate(as.data.frame(.), Intercept=attr(., "constant")[[1]]) } %>%
+    as.data.frame() %>%
+    transmute(all_pred = rowSums(.),
+              smooth_pred = rowSums(select(., !!!smooth_cols, Intercept)),
+              time_smooth_pred = !!time_smooth + Intercept)
+  
+  no_char_df <- df %>% drop_touchy_columns()
+  
+  derivs <- derivatives(model, newdata=no_char_df,
+                        interval="simultaneous") %>%
+    filter(smooth == as_label(time_smooth)) %>%
+    transmute(sig_deriv = !map2_lgl(upper, lower, ~between(0,.y,.x)),
+              pos_deriv = derivative > 0)
+  
+  pred_df %>%
+    bind_cols(derivs)
+}
+
+# Get the regions of a smooth with a significant derivative
+get_contiguous_regions <- function(df, n = 3, val = TRUE,
+                                   time_col = Time_n,
+                                   return_sum_df=FALSE) {
+  tc <- enquo(time_col)
+  df_sum <- df %>% 
+    mutate(switch = ifelse(sig_deriv == lead(sig_deriv), 0, 1),
+           ba = cumsum(switch)) %>%
+    group_by(ba) %>%
+    summarise(max = max(!!tc),
+              min = min(!!tc) + 1e-7,
+              is_pos = pos_deriv[2]==TRUE,
+              numgood = sum(ifelse(sig_deriv==val, 1, 0))) %>%
+    filter(numgood >= n) %>%
+    mutate(group_id = seq_along(max))
+  
+  if (return_sum_df)
+    return(df_sum)
+  
+  df %>%
+    mutate(group_id = map(
+      !!tc, 
+      ~which(.x >= df_sum$min & .x <= df_sum$max)) %>%
+        modify_if(is_empty, ~NA_integer_) %>%
+        map_int(~.)) %>%
+    filter(!is.na(group_id))
+}
+
+# For dealing with bugs in `gratia`
+is_fac_or_can_inc <- function(x, by=1e-7) {
+  is.factor(x) || can_be_incremented(x)
+}
+can_be_incremented <- function(x, by=1e-7) {
+  tryCatch({x+by;TRUE}, error=function(e) FALSE)
+}
+drop_touchy_columns <- function(df) {
+  good_cols <- vapply(df, is_fac_or_can_inc, logical(1L))
+  df[,good_cols]
+}
+
+get_terms_data <- function(m, ...) {
+  predict(m, ..., type="terms") %>% 
+  {
+    mutate(as.data.frame(.),
+           Intercept=attr(., "constant")[[1]])
+  }
+}
+
+get_all_pred_data <- function(m, og_data, newdata, 
+                            time_term=Time_n,
+                            min_contig=3) {
+  tt <- enquo(time_term)
+  smooth_names <- smooths(m)
+  smooth_cols <- syms(smooth_names)
+  time_smooth <- m %>%
+    get_smooths_by_id(which_smooths(m, as_label(tt))) %>%
+    pluck(1) %>% pluck("label") %>% sym()
+  
+  m_preds <-  get_terms_data(m) %>%
+    select(tidyselect::matches("(s|ti|te|t2)\\(.+\\)"), `Intercept`) %>%
+    transmute(Pred = rowSums(.)) %>%
+    mutate(Resids = unlist(residuals(m))) %>%
+    bind_cols(select(og_data, time)) %>%
+    mutate(fuller_pred = Pred+Resids)
+  
+  m_even_time_se <- m %>%
+    predict(newdata=newdata, type="terms", se.fit = TRUE) %>%
+    pluck("se.fit") %>%
+    as.data.frame() %>% 
+    select(!!time_smooth) %>%
+    transmute(se2 = !!time_smooth*2)
+  
+  m_even_preds <- m %>%
+    get_gam_predictions(df=newdata, time_term=!!tt) %>%
+    bind_cols(newdata) %>%
+    bind_cols(m_even_time_se) %>%
+    mutate(upper=time_smooth_pred+se2,
+           lower=time_smooth_pred-se2)
+  
+  sig_regions_w_time <- get_contiguous_regions(m_even_preds,
+                                               n = min_contig) %>%
+    group_by(group_id) %>%
+    summarise(max=max(time),
+              min=min(time),
+              is_pos=pos_deriv[2] == TRUE)
+  
+  list(actual_preds = m_preds,
+       spline_data = m_even_preds,
+       sig_regions = sig_regions_w_time)
+}
+
+```
+
+```{r gathering functions}
+break_at_true <- function(bools, 
+                          break_before=FALSE,
+                          exclude_singletons=TRUE) {
+  comp <- `<=`
+  if (exclude_singletons)
+    comp <- `<`
+  
+  adder <- 1
+  if (break_before)
+    adder <- 0
+  
+  nvi = which(bools)
+  len = length(bools)
+  
+  if (length(nvi) == 0)
+    return(list(1:len))
+  
+  nums <- map2(c(1, nvi+adder), c(nvi-1, len), ~list(.x, .y))
+  
+  nums %>%
+    keep(~comp(.[[1]], .[[2]])) %>%
+    map(~.[[1]]:.[[2]])
+}
+
+break_df <- function(df, is_special_val=NA, 
+                     duration=NA, time_col_name=NA) {
+  
+  if (!rlang::is_na(is_special_val)) {
+    dfl <- break_at_true(!is_special_val,
+                         break_before = FALSE,
+                         exclude_singletons = TRUE) %>%
+      map(~df[.x,])
+  } else {
+    dfl <- list(df)
+  }
+  
+  if (!rlang::is_na(duration)) {
+    dfl <- dfl %>%
+      map(function(tiny_df) {
+        within_bools <- are_close(lag(tiny_df[[time_col_name]]),
+                                  tiny_df[[time_col_name]],
+                                  duration)
+        break_at_true(!within_bools,
+                      break_before = TRUE,
+                      exclude_singletons = TRUE) %>%
+          map(~tiny_df[.x,])
+      })
+  } else {
+    dfl <- dfl %>% map(list)
+  }
+  
+  dfl %>%
+    unlist(recursive=FALSE) %>%
+    keep(~!is_empty(.))
+}
+
+# Given a score calculator function that calculates a score 
+#   for two rows and an optional constraint function, it 
+#   calculates the scores for each combination of row pairs, 
+#   removing the ones that violate the constraint. 
+# It returns a list of data frames with the two ids of the 
+#   rows and their score.
+calculate_scores <- function(test_df, calculator,
+                             constraint=NA,
+                             temp_index_col = Index,
+                             ID_col = X) {
+  ID_col = enexpr(ID_col) %>% as.character()
+  # Adds a new index column
+  index_col_name = enexpr(temp_index_col)
+  test_df <- mutate(test_df, !!index_col_name := 1:nrow(test_df))
+  
+  # just making things shorter
+  constr <- as_mapper(constraint)
+  calc <- as_mapper(calculator)
+  
+  # First separate df into a list of its rows
+  slices <- map(1:nrow(test_df), ~slice(test_df,.x))
+  pairs <- combn(slices, 2, simplify = F)
+
+  # Applies the constraints
+  if (!rlang::is_na(constr))
+    pairs <- pairs %>% keep(~constr(.x[[1]], .x[[2]]))
+  
+  # Calculate scores
+  map(pairs, ~data.frame(FirstID  = .x[[1]][[ID_col]],
+                         SecondID = .x[[2]][[ID_col]],
+                         score = calc(.x[[1]], .x[[2]])))
+}
+
+# This function takes the output of `calculate_scores` and attempts
+#   to return the paired rows that maximize the total score such that
+#   each row is only ever present in one pair, removing those rows that
+#   are not present in any pair.
+# It then returns a data frame of IDs with pair ids.
+# Note that the output is not at ALL guaranteed to be globally optimal,
+#   nor is the speed optimal. I just wanted to get something quick
+get_best_scores <- function(pairs, hi_scores_bad=FALSE,
+                            ID_col = X) {
+  ID_col = enexpr(ID_col)
+  # Order the pairs by their score
+  pairs <- pairs[order(map_dbl(pairs, ~.$score),
+                       decreasing = !hi_scores_bad)]
+  
+  good_pairs <- list()
+  # Go through the lists, picking the best pairs first
+  #   and removing the ones that were already used
+  while (length(pairs) > 0) {
+    best <- pairs[[1]]
+    newIDs <- c(best$FirstID, best$SecondID)
+    good_pairs <- append(good_pairs, list(best))
+    pairs <- pairs %>%
+      keep(~!(.$FirstID %in% newIDs | .$SecondID %in% newIDs))
+  }
+
+  good_pairs %>%
+    imap_dfr(~mutate(.x, PairID=.y)) %>%
+    tidyr::gather("IDthing", !!ID_col,
+                  FirstID:SecondID) %>%
+    select(!!ID_col, PairID)
+}
+
+# test_df %>%
+#   calculate_scores(~abs(time_between(.x$time, .y$time)),
+#               ~.x$poo!=.y$poo & .x$clothing==.y$clothing) %>%
+#   get_best_scores()
+
+
+
+# sleepytime_ids <- df.clean %>%
+#   arrange(time) %>%
+#   break_df(df.clean$sleepwake != "", # there shouldn't be any intervening measurements
+#            duration = duration(24, "hours"), # they shouldn't be farther than 24 hr apart
+#            time_col_name = "time") %>%
+#   map(function(z) 
+#     calculate_scores(z, 
+#                      # Penalize for being longer than 8 hours or less than six
+#                      ~max(time_between(.x$time, .y$time, "minutes")-8*60, 0) +
+#                        max(6*60-time_between(.x$time, .y$time, "minutes"), 0),
+#                      # They have to be different sleep values, starting with bedtime
+#                      ~.x$sleepwake != .y$sleepwake & 
+#                        .x$sleepwake == "bedtime" &
+#                        # They have to have the same clothing
+#                        .x$clothing == .y$clothing &
+#                        # There can't be intervening sleep values
+#                        .x$Index == .y$Index - 1 &
+#                        # It can't be longer than 16 hours or shorter than 3
+#                        time_between(.x$time, .y$time, "hours") < 16 &
+#                        time_between(.x$time, .y$time, "hours") > 3
+#     )) %>%
+#   keep(~length(.x) > 0) %>%
+#   map(~get_best_scores(.x, hi_scores_bad = TRUE)) %>%
+#   imap_dfr(~mutate(.x, PID = paste0(.y,"-",PairID)) %>% select(-PairID))
+
+
+```
+
+```{r constants}
+# SIMPLE CONSTANTS
+DATA_PATH <- "~/burchill.github.io/code/weight-data/"
+DATA_FILE <- paste0(DATA_PATH, "for_r.csv")
+EMPTY_VALS <- c("", NA) 
+KG2LB <- 2.20462
+
+```
+
+```{r plotting constants and functions}
+kg_lb_scale <- function(s, in_kg=TRUE) {
+  if (in_kg) {
+    trans <- ~KG2LB * .
+    left  <- "(kg)"
+    right <- "(lb)"
+  } else {
+    trans <- ~./KG2LB 
+    right <- "(kg)"
+    left  <- "(lb)"
+  }
+  scale_y_continuous(
+    paste(s, left),
+    sec.axis = dup_axis(trans=trans, name=paste(s, right)))
+}
+
+theme_set(theme_bw(base_size = 16))
+
+stat_cols <- quos(sd, median, mean)
+neg_stat_cols <- quos(-sd, -median, -mean)
+
+med_y_scale  <- kg_lb_scale("median weight")
+mean_y_scale <- kg_lb_scale("mean weight")
+
+```
+
+If you don't remember [my previous post about my custom Bluetooth scale]({{ site.baseurl }}{% post_url 2019-09-07-bluetooth_scale_intro %}) from a couple of months ago, I've been collecting a large amount of fine-grained information about my weight for the past couple of months.
+
+In this post, I'll walk through my initial look at it, some problems I had with cleaning the data, and what I did to fix them.
+
+<!--more-->
+
+_For the background on the project this post stems from, check out [Part 1]({{ site.baseurl }}{% post_url 2019-09-07-bluetooth_scale_intro %}) and [Part 2]({{ site.baseurl }}{% post_url 2020-01-02-weight_analysis_pt_1 %}) of this series._
+
+```{r load data}
+raw_df <- read.csv(DATA_FILE) %>% 
+  as_tibble() %>%
+  mutate(time = as.POSIXct(time, origin="1970-01-01")) %>%
+  # HACK! should be changed soon (GG1)
+  mutate(time = with_tz(time, tzone="America/New_York")) %>%
+  select(-weight_values, everything(), weight_values) %>%
+  filter(matched=="True") %>% 
+  # This is for backwards compatability:
+  { 
+    if ("username" %in% names(.))
+      filter(., grepl("zach", tolower(username)) | username=="")
+    else
+      .
+  } %>%
+  { 
+    if (!("is_metric" %in% names(.)))
+      mutate(., is_metric="")
+    else
+      .
+  } %>% 
+  filter(error=="") %>%
+  mutate(clothing = factor(clothing,
+                           levels = c("naked", "some_clothes","full_clothes")))
+
+# Some of the older data needs to be cleaned up a bit.
+# My measurement code now avoids this necessity
+mezzies_need_cleaning <- raw_df %>%
+  filter(git_hash=="") %>%
+  tidyr::separate_rows(weight_values) %>%
+  mutate(w=as.numeric(weight_values)) %>%
+  group_by(X, time) %>%
+  filter(any(w < 75)) %>%
+  summarise() %>% pluck("X")
+
+df.clean <- raw_df %>%
+  filter(X %in% mezzies_need_cleaning) %>%
+  tidyr::separate_rows(weight_values) %>%
+  mutate(w=as.numeric(weight_values)) %>%
+  filter(w > 60) %>%
+  group_by(X, time) %>%
+  filter(abs(scale(w)) < 3) %>%
+  group_by_at(vars(-w, -weight_values, -sd:-mean)) %>%
+  summarise(mean   =   mean(w),
+            sd     =     sd(w),
+            median = median(w),
+            weight_values = paste(w, collapse=", ")) %>%
+  bind_rows(filter(raw_df, !(X %in% mezzies_need_cleaning))) %>%
+  ungroup()
+```
+
+### Background: calibration
+
+After having [hacked my Wii Fit board to serve as a Bluetooth scale]({{ site.baseurl }}{% post_url 2019-09-07-bluetooth_scale_intro %}), I was crestfallen to discover that it actually seemed to be slightly inaccurate---when I weighed myself on the scale in my bathroom, the readings were always slightly different. Luckily, the weight-tagging system I had made is easily adjustable to allow for adding calibration information.
+
+I made a few measurements on both scales with various weights, and whipped up a very simple calibration curve you can see below.[^1] 
+
+```{r calibrate, fig.cap="The labels indicate the ratio of the 'ground truth' (my bathroom scale) over the Wii Fit measurements."}
+calib_df <- df.clean %>%
+  filter(!is_empty_val(is_calib)) %>%
+  select(X,median,mean,sd,
+         calib_weight, is_metric,
+         ID, time, weight_values) %>%
+  mutate(calib_weight = ifelse(is_metric==TRUE,
+                               calib_weight, 
+                               calib_weight/KG2LB))
+
+calib_df %>% 
+  ggplot(aes(x=median, y=calib_weight,
+             label=round(calib_weight/median,3))) +
+  geom_point() +
+  geom_line() +
+  geom_label(nudge_y = 1) +
+  labs(title = "Calibration curve",x="measured weight (kg)",
+       y="ground truth (kg)")
+
+calibrate <- make_calibration_fn(calib_df$calib_weight,
+                                 calib_df$median)
+
+df.clean <- df.clean %>%
+  mutate(calib_ratio = calibrate(median)) %>%
+  mutate_at(vars(mean,median,sd), ~ . * calib_ratio) %>%
+  filter(is_empty_val(is_calib) | is_calib==FALSE) %>%
+  filter(!is_empty_val(clothing))
+
+```
+
+After calibration, the measurements looked much more accurate:
+
+```{r}
+df.clean %>%
+  ggplot(aes(x=time,y=median,color=clothing)) + 
+  geom_point() +
+  kg_lb_scale("median weight")
+
+```
+
+## Making sense of noisy time series data
+
+So how do I get a sense of what my _real_ weight is? It seems like I'm all over the place, and whether or not I'm wearing clothes makes it even more complicated!
+
+Well, that's to be expected: your body's weight changes over the course of the day, and fluctuates as you eat, breathe, and use the bathroom. Weight gain/loss is a noisy process---it's only when you average across longer periods of time can you get a sense of overall movement.
+
+And true to the name, a moving average of my weight data would probably be pretty helpful. If new to stats, I would recommend doing that before you attempt what I'm going to do here---like all data scientists, I just want to show off the new techniques I've been learning. 
+
+The type of technique I'll be demonstrating _isn't_ just for show though. By using a regression model to investigate my data, I can regress out many of the effects that aren't important to finding my "true" weight: I can take a clothed measurement and infer what my base weight would be from that, for example.
+
+## Generalized Additive Models (GAMs)
+
+I learned to use generalized additive models (GAMs, for short) doing research in psycholinguistics, but they're a very flexible class of models---for example, I've applied them in industry for machine learning, and now I'm using them for time series data here.
+
+I won't say I'm an expert in the theory behind them, however, so if you catch me doing anything that's not kosher, drop me a comment below or yell at me on Twitter. Also, shout-out to [Gavin Simpson](https://www.fromthebottomoftheheap.net/about/) at UCL for his exceedingly helpful [blog posts about applying GAMS to time series](https://www.fromthebottomoftheheap.net/tag/gam/), and for his awesome [`gratia`](https://github.com/gavinsimpson/gratia) R package, which I will be using here.
+
+If you want to learn what GAMs are, this probably isn't the place. But at a very naive level, they're simple to understand: they're just like linear regression, but instead of using straight lines, they use lines that are allowed to "wiggle" (called "splines" or "smooths").  This ability lets you fit non-linear relationships to your dependent variable.
+
+```{r big gam stuff}
+
+big_gam_df <- df.clean %>%
+  add_time_vars() %>%
+  mutate(Y = median) %>%
+  mutate_at(vars(clothing, poo, pee, sleepwake, shower),
+            ~as.character(.)) %>%
+  mutate(clothing = factor(clothing, 
+                           levels = 
+                             c("naked","some_clothes","full_clothes")),
+         poo = ifelse(poo=="", "normal", poo) %>%
+           factor(levels=c("normal", "pre_poop", "post_poop")),
+         pee = ifelse(pee=="", "normal", pee) %>%
+           factor(levels=c("normal","pre_pee","post_pee")),
+         sleepwake = ifelse(sleepwake=="","normal", sleepwake) %>%
+           factor(levels=c("normal","bedtime","wakeup")),
+         shower = ifelse(shower=="","normal", shower) %>%
+           factor(levels=c("normal","pre_shower","post_shower"))) %>%
+  arrange(time) %>%
+  filter(time < max(time)) # just removes a weird point
+
+dummy_df <- data.frame(
+  time = seq(from = min(big_gam_df$time), 
+             to = max(big_gam_df$time), 
+             length = nrow(big_gam_df))) %>%
+  add_time_vars() %>%
+  mutate(clothing = big_gam_df$clothing,
+         poo = big_gam_df$poo,
+         sleepwake = big_gam_df$sleepwake,
+         pee=big_gam_df$pee, shower=big_gam_df$shower,
+         median=big_gam_df$median)
+
+m_high_k <- gam(Y ~ 1 + s(Time_n, k=60) + s(DoW, k=4, bs="cc") + 
+                  clothing + sleepwake + poo + pee + shower,
+                data = big_gam_df)
+m_low_k <- gam(Y ~ 1 + s(Time_n, k=4) + s(DoW, k=4, bs="cc") + 
+                  clothing + sleepwake + poo + pee + shower,
+                data = big_gam_df)
+
+
+big_m <- gam(Y ~ 1 + s(Time_n, k=60) + 
+            s(DoW, k=4, bs="cc") + 
+            s(ToD, k=12, bs="cc") + 
+            clothing + sleepwake + poo + pee + shower,
+          data = big_gam_df)
+
+
+
+# stable_plotter <- function(df, n=130, bad_ids=all_ids) {
+#   hem <- df %>% sample_n(size=n, replace = T)
+#   rest <- filter(hem, X %in% bad_ids) %>% nrow()
+#   m <- gamm(Y ~ 1 +
+#            s(Time_n, k=50) +
+#            s(DoW, k=4, bs="cc") +
+#            clothing,
+#          metho="REML",
+#          data = hem)
+#   data.frame(rest=rest,
+#              n=n,
+#              edf = broom::tidy(m$gam) %>% pluck("edf") %>% pluck(1))
+# }
+# 
+# bla <- map_dfr(c(80, 130, 150, 200),
+#                ~map_dfr(1:30, function(x) stable_plotter(collapsed_gam_df, n=.x)))
+# bla %>% ggplot(aes(x=as.factor(n),y=edf,color=rest)) + 
+#   # geom_violin() +
+#   # geom_point(alpha=0.2) +
+#   zplyr::stat_dots_and_bar()
+# bla %>% ggplot(aes(x=rest,y=edf,color=as.factor(n))) + geom_point(alpha=0.7)
+# 
+# bind_rows("good"=bla,"bad"=bla2,.id = "eh") %>%
+#    ggplot(aes(x=as.factor(n),y=edf,color=eh)) + 
+#   # geom_violin() +
+#   # geom_point(alpha=0.2) +
+#   zplyr::stat_dots_and_bar()
+  
+
+```
+
+```{r group tags}
+
+poo_ids <- df.clean %>%
+  ungroup() %>%
+  break_df(df.clean$poo != "", 
+           duration = duration(120, "minutes"),
+           "time") %>%
+  map(function(z) 
+    calculate_scores(z, 
+                     ~abs(time_between(.x$time, .y$time)),
+                     ~.x$poo != .y$poo & .x$clothing == .y$clothing &
+                       .x$poo == "pre_poop")) %>%
+  keep(~length(.x) > 0) %>%
+  map(~get_best_scores(.x, hi_scores_bad = TRUE)) %>%
+  imap_dfr(~mutate(.x, PID = paste0(.y,"-",PairID,"-poo")) %>% select(-PairID))
+
+pee_ids <- df.clean %>%
+  ungroup() %>%
+  break_df(df.clean$pee != "", 
+           duration = duration(120, "minutes"),
+           "time") %>%
+  map(function(z) 
+    calculate_scores(z, 
+                     ~abs(time_between(.x$time, .y$time)),
+                     ~.x$pee != .y$pee & .x$clothing == .y$clothing &
+                       .x$pee == "pre_pee")) %>%
+  keep(~length(.x) > 0) %>%
+  map(~get_best_scores(.x, hi_scores_bad = TRUE)) %>%
+  imap_dfr(~mutate(.x, PID = paste0(.y,"-",PairID,"-pee")) %>% select(-PairID))
+
+
+sleepytime_ids <- df.clean %>%
+  arrange(time) %>%
+  break_df(df.clean$sleepwake != "", 
+           duration = duration(24, "hours"),
+           time_col_name = "time") %>%
+  map(function(z) 
+    calculate_scores(z, 
+                     # Penalize for being longer than 8 hours or less than six
+                     ~max(time_between(.x$time, .y$time, "minutes")-8*60, 0) +
+                       max(6*60-time_between(.x$time, .y$time, "minutes"), 0),
+                     # They have to be different sleep values, starting with bedtime
+                     ~.x$sleepwake != .y$sleepwake & 
+                       .x$sleepwake == "bedtime" &
+                       # They have to have the same clothing
+                       .x$clothing == .y$clothing &
+                       # There can't be intervening sleep values
+                       .x$Index == .y$Index - 1 &
+                       # It can't be longer than 16 hours or shorter than 3
+                       time_between(.x$time, .y$time, "hours") < 16 &
+                       time_between(.x$time, .y$time, "hours") > 3
+    )) %>%
+  keep(~length(.x) > 0) %>%
+  map(~get_best_scores(.x, hi_scores_bad = TRUE)) %>%
+  imap_dfr(~mutate(.x, PID = paste0(.y,"-",PairID,"-sleep")) %>% select(-PairID))
+
+shower_ids <- df.clean %>%
+  arrange(time) %>%
+  break_df(df.clean$shower != "", 
+           duration = duration(1, "hours"),
+           time_col_name = "time") %>%
+  map(function(z) 
+    calculate_scores(z, 
+                     # Penalize for being longer than 8 hours or less than six
+                     ~max(time_between(.x$time, .y$time, "minutes")-45, 0) +
+                       max(7-time_between(.x$time, .y$time, "minutes"), 0),
+                       # They have to be different sleep values, starting with pre-shower
+                       ~.x$shower != .y$shower & 
+                         .x$shower == "pre_shower" &
+                         # They have to have the same clothing
+                         .x$clothing == .y$clothing &
+                         # There can't be intervening sleep values
+                         .x$Index == .y$Index - 1
+      )) %>%
+    keep(~length(.x) > 0) %>%
+    map(~get_best_scores(.x, hi_scores_bad = TRUE)) %>%
+    imap_dfr(~mutate(.x, PID = paste0(.y,"-",PairID,"-shower")) %>% select(-PairID))
+
+all_ids <- map(list(poo_ids, pee_ids, sleepytime_ids, shower_ids), ~.$X) %>% unlist()
+
+collapsed_df <- map_dfr(list(poo_ids, pee_ids, sleepytime_ids, shower_ids),
+                  ~left_join(.x, df.clean)) %>%
+                  { bind_rows(., anti_join(df.clean, ., by="X"))} %>%
+  mutate(PID = ifelse(is.na(PID), paste(seq_along(PID), "ZA"), PID)) %>%
+  group_by(PID, clothing) %>% #filter(n() > 2)
+  summarise_at(vars(time, !!!stat_cols, X), mean) %>%
+  ungroup()
+
+```
+
+```{r grouped gam stuff}
+
+collapsed_gam_df <- collapsed_df %>% 
+  add_time_vars() %>%
+  mutate(Y = median) %>%
+  mutate(clothing = clothing %>% 
+           as.character() %>% 
+           factor(levels = 
+                    c("naked", "some_clothes", "full_clothes"))) %>%
+  arrange(time) %>%
+  filter(time < max(time)) # just removes a weird point
+
+collapsed_dummy_df <- data.frame(
+  time = seq(from = min(collapsed_gam_df$time), 
+             to = max(collapsed_gam_df$time), 
+             length = nrow(collapsed_gam_df))) %>%
+  add_time_vars() %>%
+  mutate(clothing = collapsed_gam_df$clothing[[1]])
+
+m <- gamm(Y ~ 1 + s(Time_n, k=15) + 
+            s(DoW, k=4, bs="cc") + 
+            s(ToD, k=12, bs="cc") + 
+            clothing,
+          data = collapsed_gam_df)
+# print(plot(mgcViz::getViz(m$gam), allTerms = T), pages = 1)
+
+pred_d <- m$gam %>%
+  get_all_pred_data(collapsed_gam_df, collapsed_dummy_df, Time_n)
+
+# gam_df <- gam_df %>%
+#   mutate(new_val = Y - get_terms_data(m$gam, newdata=gam_df)$`s(Time_n)`)
+# 
+# 
+# m <- gamm(Y ~ 1 +
+#             s(DoW, k=4, bs="cc") +
+#             s(ToD, k=12, bs="cc") + 
+#             clothing + sleepwake + poo + pee + shower,
+#           data = gam_df)
+# print(plot(mgcViz::getViz(m$gam), allTerms = T), pages = 1)
+# 
+# m <- gamm(new_val ~ 1 +
+#             s(DoW, k=4, bs="cc") +
+#             s(ToD, k=12, bs="cc") + 
+#           clothing + sleepwake + poo + pee + shower,
+#           data = gam_df)
+# print(plot(mgcViz::getViz(m$gam), select=1:7), pages = 1)
+# 
+# 
+# m <- gamm(Y ~ 1 + s(Time_n, k=12) + 
+#             s(ToD, k=12, bs="cc") + 
+#             s(DoW, k=4, bs="cc") +
+#           clothing + sleepwake + poo + pee + shower,
+#           data = gam_df)
+# print(plot(mgcViz::getViz(m$gam), select=2:7), pages = 1)
+# 
+# 
+# yarp <- df.clean %>%
+#   select(X, time, median, clothing, sleepwake,poo,pee,shower) %>%
+#   mutate_at(vars(sleepwake:shower),
+#             ~ifelse(.=="normal",NA,as.character(.))) %>%
+#   mutate(reg = pmap_lgl(list(sleepwake, poo, pee, shower),
+#                     ~is.na(..1) & is.na(..2) & is.na(..3) & is.na(..4))) %>%
+#   mutate(reg=ifelse(reg,"reg",NA)) %>%
+#   tidyr::gather(key,value,sleepwake:reg) %>%
+#   filter(!is.na(value)) %>%
+#   arrange(X) %>%
+#   mutate(value = ifelse(grepl("pre_|bedtime", value), "pre",
+#                  ifelse(grepl("post_|wakeup", value), "post", "reg"))) %>%
+#   filter(value != "reg") %>%
+#   mutate(value=factor(value, levels=c("pre","post")),
+#          key=factor(key)) %>%
+#   group_by(X) %>%
+#   filter(n() < 2) %>% ungroup() %>%
+#   add_time_vars() %>%
+#    mutate(clothing = factor(clothing,
+#                            levels =
+#                              c("naked","some_clothes","full_clothes")))
+# 
+# 
+# m <- gam(median ~ 1 +
+#             s(Time_n, k=20) +
+#             # s(ToD, k=12, bs="cc") +
+#             s(DoW, k=4, bs="cc") + clothing + value +
+#            s(key, bs="re") + s(key, value, bs="re"),
+#           data = yarp)
+
+# m <- gamm(median ~ 1 + 
+#             s(Time_n, k=12) + 
+#             s(ToD, k=12, bs="cc") + 
+#             s(DoW, k=4, bs="cc") + clothing + value,
+#           random=list(key = ~1+value),
+#           data = yarp)
+# print(plot(mgcViz::getViz(m$gam), allTerms = T), pages = 1)
+# 
+
+
+# derivatives(m$gam, term="Time_n",
+#             newdata = big_dummy_df %>% drop_touchy_columns()) %>%
+#   mutate(sig_deriv = !map2_lgl(upper, lower, ~between(0,.y,.x)),
+#          pos_deriv = derivative > 0) %>% 
+#   ggplot(aes(x=data,y=derivative,color=sig_deriv,group=1)) +
+#   geom_line()# +
+#   geom_ribbon(aes(ymax=upper,ymin=lower),color=NA, fill="grey",alpha=0.6)
+
+m_for_plots <- gam(Y ~ 1 + 
+           s(Time_n, k=13,fx=T) + 
+           s(DoW, k=4, bs="cc") + clothing,
+          data = collapsed_gam_df)
+# print(plot(mgcViz::getViz(m_for_plots), allTerms = T), pages = 1)
+
+m_plot_pred_d <- m_for_plots %>%
+  get_all_pred_data(collapsed_gam_df, collapsed_dummy_df)
+
+# pred_d$actual_preds %>% 
+#   ggplot(aes(x=time)) +
+#   geom_line(aes(y=time_smooth_pred),
+#             data=pred_d$spline_data,
+#             color="blue") +
+#   geom_ribbon(aes(ymax=upper,ymin=lower),
+#             data=pred_d$spline_data, color="grey80",
+#             alpha=0.2) +
+#   { 
+#     if (nrow(pred_d$sig_regions) > 0)
+#       geom_rect(inherit.aes=FALSE,
+#             aes(ymax=Inf, ymin=-Inf,
+#                 xmin=min, xmax=max, fill=is_pos),
+#             alpha=0.2, data=pred_d$sig_regions)
+#   } +
+#   geom_point(aes(y=fuller_pred)) +
+#   scale_fill_manual(guide=FALSE,
+#                     values=c("green","red")) +
+#   kg_lb_scale("estimated weight") +
+#   labs(title="Estimated weight and trends over time",
+#        subtitle = "Significant changes highlighted", x="Date")
+
+```
+
+For example, after putting the data into a more GAM/regression-friendly formatting, I can fit a very basic model to some data and compare it with a similar linear regression model:
+
+```{r, fig.cap="Simple linear regression vs. a GAM fit to the same data. Notice the wiggles in the GAM predictions.", echo=TRUE}
+library(mgcv)
+
+lm_test <- lm(median ~ Time_n, data = dummy_df)
+
+# `k` is used to set the number of 'knots' in the wiggly line
+# Convention wisdom is to use higher values and let the model
+#   reduce that number as it sees fit.
+gam_test <- gam(median ~ s(Time_n, k=60), data = dummy_df)
+
+bind_rows("lm"  = mutate(dummy_df, pred = predict( lm_test)),
+          "GAM" = mutate(dummy_df, pred = predict(gam_test)),
+          .id = "model") %>%
+  ggplot(aes(x = time, y = pred, color = model)) +
+  geom_line() 
+```
+
+So the GAM model is wiggly all right, but doesn't it seem _too_ wiggly?
+
+Sadly, the "right" approach in statistics is very rarely the simplest. The GAM in the plot above is potentially _over_-estimating how important the individual data points are.  Why? Well it doesn't take into account a little something called _autocorrelation_.
+
+## Autocorrelation: ugh, am I right?
+
+Imagine I ask you to guess my weight. I'll give you all the information you need, other than anything about my current weight.  What might be the best thing to ask for?
+
+Probably my weight from one minute ago.
+
+See, anybody's weight is mostly a function of what it was most recently---these weight measurements of mine aren't independent of each other, an important part of [the assumptions underlying many types of regression](https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables).  Since the GAM has no way of _knowing_ this without me telling it, it's as if it were stumbling on two weights measured a minute apart, and thinking, _Wow, this one is 185 pounds too! That must be really important!_
+
+We need to be able to tell the GAM functions that these points are correlated with other points near to them in time for it to be as accurate as possible. Fortunately, we can do so in a variety of ways.
+
+### Telling the GAM about the autocorrelation
+
+If we try to stick closely to the `mgcv` R package (the best one for making GAMs), there are two ways we can address this type of autocorrelation.  The first is to use the `bam()` function instead of the `gam()` function. The `bam()` function is basically the same thing, but is useful for fitting models to _huge_ data sets.  It also has a `rho` parameter, which lets us take care of our problem with [an AR1 model](https://en.wikipedia.org/wiki/Autoregressive_model).  I'm going to go into the specifics of what an autoregressive model is right now, but AR1 models are what we'll be using to tell the GAM about these autocorrelations.
+
+The only issue with this approach is that, sadly, this way won't work for my data. As far as I can tell, the AR1 model in `bam()` uses the order of the rows in the dataframe as a proxy for the temporal separation between data points, which in my case are _not_ equally spaced out.
+
+Fortunately, there's another way to do it: we can use the `gamm()` function, which, like `bam()`, is similar to `gam()`, but also insidiously different. Through my struggles with this data set, I've learned the difference, but suffice it to say, all _you_ need to know is that `gamm()` is less user-friendly, easier to mess up, and is built on top of the `lme()` function of the `nlme` package.
+
+`lme()` has a `correlation` parameter that lets you specify the correlation structure of the data, which you can use via `gamm()`. To give it the autocorrelation structure we'll need, I've used the `corCAR1()` function (since we're using unevenly-sampled time series data).
+
+```{r, eval=FALSE, echo=TRUE}
+m_ar1_test <- gamm(median ~ 1 + s(Time_n, k=60) + clothing,
+                   correlation = corCAR1(form = ~Time_n),
+                   data = gam_df)
+```
+
+Notice the `form` parameter: by default `corCAR1()` does the same thing as the `bam()` AR1 model, but by supplying it with a time variable explicitly the GAM will know how the data points are temporally distributed.
+
+### When _not_ to use autoregression
+
+So I have to admit, I played around with these models a _lot_.  Since they're not my forté, I was doing some learning on the fly.  I ended up finding out that the _scale_ of my time covariate (i.e., what I was using as the `form` parameter) radically changed my results.  In desperation, I turned yet again to stackexchange, and [Gavin himself came to the rescue](https://stats.stackexchange.com/questions/444995/scale-of-time-covariate-in-corcar1-matters): evidently the smooth of the time covariate (which I had in my model) and the AR1 process couldn't be uniquely identified---they were so similar, the fitting process had difficulty deciding which it should attribute variance to, making it unstable.
+
+You can see for yourself with the `intervals()` function. I.e.:
+
+```{r, eval=FALSE}
+intervals(m_ar1_test$lme)
+```
+
+Scroll down to where you see something like:
+
+```
+ Correlation structure:
+           lower         est.        upper
+Phi 2.808139e-29 8.388738e-18 2.505957e-06
+```
+
+That `Phi` is the estimated correlation value for your AR1 process, and if it's really close to zero (like it is here), it probably means you don't need it in your model. Likewise, if you get an error saying something like `cannot get confidence intervals on var-cov components: Non-positive definite approximate variance-covariance`, you probably shouldn't be putting it in your model either.
+
+Unfortunately, that leaves us with a model that is a bit too wiggly for my taste, if we follow conventional wisdom and bump up the number of basis dimensions (via `k`):
+
+```{r, fig.cap="The time trend when the `k` parameter for the time smooth is set to 60. Much too wiggly."}
+plot(mgcViz::getViz(m_high_k), select=1)
+```
+
+I could bump `k` down to `4`, and I'd get something much nicer:
+
+```{r, fig.cap="The time trend when the `k` for the time smooth is set to 4. A bit better, but depressingly arbitrary."}
+plot(mgcViz::getViz(m_low_k), select=1)
+```
+
+But that's so *manual*.  I've literally spent hours trying to find some way to make the model less wiggly, but *automatically* less wiggly. I couldn't find an easy way of increasing the spline penalization, and although using the week number as the time variable worked, it felt wrong and would hinder extendability.
+
+## Solution?
+
+However, I lucked out when I went back to the analyses that I was _supposed_ to write for this blog post: after collapsing the before-and-after measurements, the time smooth had much fewer basis functions, and was basically at the level of smoothness that I was aiming for.
+
+This makes sense---even if the model knew about the time-based autocorrelation, the weight "jumping" between the before and after measurements might coerce the spline to be more wiggly to account for the more "disjointed" data.[^2]
+
+```{r, fig.cap="My inferred 'naked' weights, along with the time smooth from the GAM. Regions where this smooth was changing significantly (i.e., where the simultaneous 95% confidence interval of the derivative did not include zero) are highlighted, with green meaning a significant downward trend and red indicating upward."}
+
+pred_d$actual_preds %>%
+  ggplot(aes(x=time)) +
+  geom_line(aes(y=time_smooth_pred),
+            data=pred_d$spline_data,
+            color="blue") +
+  geom_ribbon(aes(ymax=upper,ymin=lower),
+            data=pred_d$spline_data, color="grey80",
+            alpha=0.2) +
+  {
+    if (nrow(pred_d$sig_regions) > 0)
+      geom_rect(inherit.aes=FALSE,
+            aes(ymax=Inf, ymin=-Inf,
+                xmin=min, xmax=max, fill=is_pos),
+            alpha=0.2, data=pred_d$sig_regions)
+  } +
+  geom_point(aes(y=fuller_pred)) +
+  scale_fill_manual(guide=FALSE,
+                    values=c("green","red")) +
+  kg_lb_scale("estimated weight") +
+  labs(title="Estimated weight and trends over time",
+       subtitle = "Significant changes highlighted", x="Date")
+
+```
+
+So that's cool. 
+
+## Lessons learned:
+
+When it comes down to it, the choice to use GAMs in my analyses is thornier than I originally thought. I already knew that GAMs aren't magic wands we can wave to perfectly fit our data, but issue of reducing the number of basis functions in a principled way has made me think about my models more.
+
+### What are you using the GAM for?
+
+If GAMs only 'work' when I take out my experimental before-and-after regressors, I might want to use a different model. Then again, irregularly-spaced time series can be pretty annoying to work with when using other models---the classic ARIMA models are usually applied to time series take at regular intervals, for example.  Kalman filtering seems pretty cool, but I'm not going to get into a whole new thing when I'm already procrastinating with these blog posts.
+
+However, if my original intent is to let the GAM model soak up as much of the random time-related variance as possible (so I can get estimates for the effects of the experimental predictors) then maybe it still makes some sense.  Letting the time-related smooth get greedy while still having ways of preventing _too_ much overfitting (which `mgcv` has tools for) means I have to worry about dealing with the problems of autocorrelation just a little less.
+
+Fitting a full model with a very wiggly time smooth gives me estimates for my experimental predictors that are pretty close to their real effects (which I'll talk about in my next post). For a "kitchen sink" approach to the problem, this one works pretty well.
+
+### Getting significant changes
+
+GAMs are also nice in that you can calculate the slope (i.e., derivative) of a smooth at any point and determine whether it's significant.  This might be helpful if you want to see whether certain periods of dieting are having any effect on your weight change, or to set up a script that messages you whenever you start to gain weight. You can see them highlighted in the previous plot.
+
+Unfortunately, this significance is 100% tied to the exact shape of the smooth (of course).  If the wiggles in your smooth are picking up on variance that isn't important, it can tell you that changes that aren't important are significant.
+
+```{r, fig.cap="The time spans that are 'significant' change wildly depending on the arbitrary wiggles of the smooth. Here, the GAM has the number of basis functions for the time smooth set to 12."}
+
+m_plot_pred_d$actual_preds %>%
+  ggplot(aes(x=time)) +
+  geom_line(aes(y=time_smooth_pred),
+            data=m_plot_pred_d$spline_data,
+            color="blue") +
+  geom_ribbon(aes(ymax=upper,ymin=lower),
+            data=m_plot_pred_d$spline_data, color="grey80",
+            alpha=0.2) +
+  {
+    if (nrow(m_plot_pred_d$sig_regions) > 0)
+      geom_rect(inherit.aes=FALSE,
+            aes(ymax=Inf, ymin=-Inf,
+                xmin=min, xmax=max, fill=is_pos),
+            alpha=0.2, data=m_plot_pred_d$sig_regions)
+  } +
+  geom_point(aes(y=fuller_pred)) +
+  scale_fill_manual(guide=FALSE,
+                    values=c("green","red")) +
+  kg_lb_scale("estimated weight") +
+  labs(title="Estimated weight and trends over time",
+       subtitle = "Significant changes highlighted", x="Date")
+
+```
+
+If I want to be able to automatically get notified when I'm _actually_ starting to gain weight, I think I'm going to use a simpler [exponential smoothing](https://en.wikipedia.org/wiki/Exponential_smoothing) model, maybe one that also uses a GAM to remove some of the periodic effects beforehand.
+
+See you next time for my (hopefully) final post on this topic, where I'll be taking a look at the experiments I did!
+
+
+```{r}
+# left_join(poo_ids, df.clean) %>% 
+#   group_by(PID) %>% 
+#   summarise(diff=median[poo=="pre_poop"]-median[poo=="post_poop"]) %>%
+#   summarise(m=mean(diff)) %>% pluck("m")
+# 
+# left_join(pee_ids, df.clean) %>% 
+#   group_by(PID) %>% 
+#   summarise(diff=median[pee=="pre_pee"]-median[pee=="post_pee"]) %>%
+#   summarise(m=mean(diff)) %>% pluck("m")
+# 
+# left_join(shower_ids, df.clean) %>% 
+#   group_by(PID) %>% 
+#   summarise(diff=median[shower=="pre_shower"]-median[shower=="post_shower"]) %>%
+#   summarise(m=mean(diff)) %>% pluck("m")
+# 
+# left_join(sleepytime_ids, df.clean) %>% 
+#   group_by(PID) %>% 
+#   summarise(diff=median[sleepwake=="bedtime"]-median[sleepwake=="wakeup"]) %>%
+#   summarise(m=mean(diff)) %>% pluck("m")
+
+
+```
+
+
+<hr />
+<br />
+
+## Source Code:
+
+> [`2020-01-04-weight_analysis_pt_2.Rmd`](https://raw.githubusercontent.com/burchill/burchill.github.io/master/_source/2020-01-04-weight_analysis_pt_2.Rmd)
+
+If you want to see how I did what I did in this post, check out the source code of the R Markdown file!
+
+### Footnotes:
+
+[^1]: R makes this sort of calibration very easy: check out `approxfun()` for making linearly interpolating calibration functions.
+
+[^2]: But, well, it also doesn't _totally_ make sense. <br /> For example, the wiggliness also disappears when I merely subsample the original data, although that _could_ amount to doing an inefficient version of what I just did. But, when I model the same data with the `gam()` rather than `gamm()`, the wiggliness is still there. <br /> I suspect the good behavior that I'm seeing might be more of a quirk of the smoothing parameter estimations in `mgcv` than anything else---my hunch is that it's mostly a product of the relatively "small" amount of data (`r nrow(collapsed_gam_df)` data points) in the collapsed data set. I've run a few tests, but they're inconclusive. I should find out as time goes by though.
+
+
+
