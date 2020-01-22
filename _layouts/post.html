@@ -9,6 +9,14 @@
         <span class="post-date">{{ page.date | date_to_string }}</span> {% if page.author %}&mdash; 
         <span class="post-author"><a href="{{ post_author_url }}">{{ page.author }}</a></span> {% endif %}
         {{ content }}
+        <br />
+        <span style="display:block;">
+          <h4 style="display:contents;">Tags: </h4>
+      	<small style="padding-left:5px;"><b>
+      		{% for cat in page.categories %}
+				<a href="{{ site.baseurl }}/categories/#{{ cat }}">{{ cat }}</a>, 
+			{% endfor %}
+		</b></small></span>
       </div>
 	
       <div class="related">
