@@ -143,7 +143,7 @@ _For the background on the project this post stems from, check out the [first po
 Let's load up the data and put it into the right format, making the `time` column actual time data (in this case, [Unix epoch time](https://en.wikipedia.org/wiki/Unix_time), which the numbers in that column represent), and making sure each weight measurement was tagged and from me.
 
 ```{r load data for show, eval=FALSE}
-raw_df <- read.csv("~/Desktop/for_r.csv") %>% 
+raw_df <- read.csv("~/burchill.github.io/code/weight-data/for_r.csv") %>% 
   as_tibble() %>%
   # Turn the `time` column into actual time objects
   mutate(time = as.POSIXct(time, origin="1970-01-01")) %>%
@@ -192,7 +192,7 @@ In order to not ruin any surprises let's just look at the first couple of rows a
 raw_df[1:5, 1:7]
 ```
 
-Notice that the first column is named "X", R's default for unnamed columns---this comes from the unnamed index column of the `pandas` data frame that generated it. "ID" is a uniquely generated ID for each measurement, "sleepwake"" is a factor we'll talk about later, and the rest of the columns are self-explanatory. 
+Notice that the first column is named "X", R's default for unnamed columns---this comes from the unnamed index column of the `pandas` data frame that generated it. "ID" is a uniquely generated ID for each measurement, "sleepwake" is a factor we'll talk about later, and the rest of the columns are self-explanatory.  
 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -399,7 +399,7 @@ df.clean %>%
 
 These are pretty loose categories, but right away, we can see that they explain a lot of the variance of the data. Since being naked is the closest I can get to measuring my "true" weight and varying clothing per day adds extra noise to the data, I'll generally stick with my "naked" measurements as being the gold standard.
 
-```{r, echo=FALSE, fig.cap="It looks like I wear about five pounds of clothes!"}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="It looks like I wear about five pounds of clothes!"}
 df.clean %>% 
   group_by(clothing) %>%
   mutate(avg_kg=mean(median), avg_lb = avg_kg*2.20462, n=n()) %>%
