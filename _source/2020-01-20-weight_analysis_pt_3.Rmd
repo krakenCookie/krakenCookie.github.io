@@ -370,7 +370,7 @@ get_best_scores <- function(pairs, hi_scores_bad=FALSE,
 
 ```
 
-   ```{r constants}
+```{r constants}
 # SIMPLE CONSTANTS
 DATA_PATH <- "~/Desktop/"
 DATA_FILE <- paste0(DATA_PATH, "for_r.csv")
