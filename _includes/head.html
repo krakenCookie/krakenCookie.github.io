@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/default_style.css">
   {% endif %} 
   
+  
   {% comment %} If the page has an author, that author should get credit {% endcomment %}
   {% if page.author %}
     {% assign reg_author = page.author %}
@@ -43,19 +44,14 @@
   	<link rel="stylesheet" href="{{ site.baseurl }}/assets/main.css">
   {% endif %}
   
-  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href='https://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
-  
-  <!-- RSS -->
-  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
-  
-  <!-- Mathjax -->
-  <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-  </script>
-
-  <link rel="canonical" href="{{ site.url }}{{ page.url }}">
   <meta name="author" content="{{ reg_author }}">
+  
+  {% comment %} If the post has a different author URL, that URL should be canonical {% endcomment %}
+  {% if post_author_url %}
+    <link rel="canonical" href="{{ post_author_url }}{{ page.url }}">
+  {% else %}
+    <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+  {% endif %}
   
   {% if page.url == "/" %}
     <meta name="description" content="{{ site.compass.tagline }}"/>
@@ -71,11 +67,22 @@
   <meta property="og:image" content="{{ site.url }}{{ site.baseurl }}{{ site.compass.og_logo }}"/>
   <meta property="og:site_name" content="{{ site.compass.tagline }}">
 
+  <!-- Constants --->
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='https://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+  
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+  
+  <!-- Mathjax -->
+  <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
   {% if site.disqus %}
     <!--Disqus comment counts-->
     <script id="dsq-count-scr" src="//{{ site.shortname }}.disqus.com/count.js" async></script>
   {% endif %}
-  
   
   {% if site.compass.include_analytics %}
   {% include analytics.html %}
