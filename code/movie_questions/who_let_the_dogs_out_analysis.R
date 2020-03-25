@@ -221,7 +221,6 @@ remove_foreign_films <- function(df, uncap_word_list,
 
 # Load data ==============================================
 
-
 dir_path <- "/Users/zburchill/burchill.github.io/non_git_building_material/movie_questions/"
 # This should refer to the output of the pos_tagging.R script
 raw_df <- readRDS(paste0(dir_path, "pos_tagged_possible_questions.RDS")) %>%
@@ -231,6 +230,21 @@ raw_df <- readRDS(paste0(dir_path, "pos_tagged_possible_questions.RDS")) %>%
 ratings_df <- read_delim(paste0(dir_path, "title.ratings.tsv"),
                       "\t", escape_double = FALSE, trim_ws = TRUE,
                       na = "\\N",  quote = '')
+
+
+
+# This refers to the title.basics.tsv file downloaded from https://www.imdb.com/interfaces/
+# But with the following applied to it:
+# read_delim(paste0(dir_path, "title.basics.tsv"),
+#            "\t", escape_double = FALSE, trim_ws = TRUE,
+#            na = "\\N",  quote = '') %>%
+#   filter(titleType=="movie") %>%
+#   filter(grepl("\\?", originalTitle)) %>%
+#   add_ratings() %>%
+#   mutate(we_used = tconst %in% zach_df$tconst) %>%
+#   distinct(tconst, .keep_all = T) %>%
+#   saveRDS(paste0(dir_path, "validation.RDS"))
+validation <- readRDS(paste0(dir_path, "validation.RDS"))
 
 # This should refer to a version of the CMUPD, but I altered this particular
 #   file to make it better suited for R about 4 years ago, and don't remember what exactly
