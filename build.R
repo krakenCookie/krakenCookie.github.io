@@ -1,4 +1,6 @@
 local({
+  # This build.R file needs to be in the main directory for the plotly stuff to work!!!!!!!!!!!!
+
   # fall back on '/' if baseurl is not specified
   baseurl = servr:::jekyll_config('.', 'baseurlknitr', '/')
   knitr::opts_knit$set(base.url = baseurl)
@@ -15,9 +17,12 @@ local({
   d = gsub("source/","source/x",d)
   knitr::opts_chunk$set(
     fig.path   = sprintf('_posts/figures/generated/%s/', d),
+    proj.basedir = getwd(),
+    plotly.loadpath = sprintf('/_posts/figures/generated/%s/', d),
+    plotly.savepath  = sprintf('%s/_posts/figures/generated/%s/', getwd(), d),
     cache.path = sprintf('cache/%s/', d)
   )
-  
+
   knitr::knit_hooks$set(autocaption = function(before, options, envir) {
   if (!before) {
   	if (length(options$fig.cap)>0) {
