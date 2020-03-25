@@ -1,3 +1,4 @@
 # best to build with the version of Jekyll currently used by GitHub (see https://pages.github.com/versions/).
 
-servr::jekyll(command = "jekyll _2.4.0_ build")
+# Bash has the most updated ruby path preloaded in ~/bashrc
+servr::jekyll(command='bash -lic "cd ~/burchill.github.io/; bundle exec jekyll build"')

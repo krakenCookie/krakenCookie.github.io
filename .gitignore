@@ -1,6 +1,9 @@
 # Ignore docs files
 _gh_pages
 _site
+vendor
+.bundle/
+non_git_building_material
 .ruby-version
 knitr-hyde.Rproj
 .Rhistory

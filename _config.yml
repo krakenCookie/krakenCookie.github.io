@@ -24,7 +24,7 @@ compass:
 
 # Exclude non-site files:
 include: ["_posts"]
-exclude: ["CNAME", "Gemfile", "Gemfile.lock", "LICENSE", "README.md", "anne_pro_macros.xlsx", "notes.txt"]
+exclude: ["CNAME", "Gemfile", "Gemfile.lock", "LICENSE", "README.md", "anne_pro_macros.xlsx", "notes.txt", "vendor"]
   
 
 # Dependencies
