@@ -870,7 +870,7 @@ diff_dfs %>%
 
 If Derek and NPR are right, we lose most of the weight lost in sleep through respiration. If this hypothesis is correct, we would expect that longer sleep = more respiration = more weight lost. Is this borne out in the data?
 
-```{r, fig.height = base_fig_height * 0.8, fig.width = base_fig_width/2 }
+```{r, out.width="40%", fig.height = base_fig_height * 0.8, fig.width = base_fig_width/2 }
 
 diff_dfs %>%
   filter(df_type %in% c("sleep")) %>%
