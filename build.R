@@ -16,6 +16,7 @@ local({
   d = gsub('^_|[.][a-zA-Z]+$', '', a[1])
   d = gsub("source/","source/x",d)
   knitr::opts_chunk$set(
+    dpi = 200, # Want the default dpi to be high
     fig.path   = sprintf('_posts/figures/generated/%s/', d),
     proj.basedir = getwd(),
     plotly.loadpath = sprintf('/_posts/figures/generated/%s/', d),
