@@ -17,7 +17,9 @@ output:
 knitr::opts_chunk$set(
   echo=FALSE, autocaption=TRUE,
   warning = FALSE, message = FALSE,  
-  comment = "")
+  comment = "",
+  dpi = 200
+  )
 
 library(tidyverse)
 library(lubridate)
@@ -192,7 +194,7 @@ Ahem. Anyway, we figured that because most grammatical questions follow certain 
 
 Okay! With refined, polished dataset in tow, Zach suggested we start by testing an incredibly stringent, very literal interpretation of the first prediction just for fun. Do movies without question marks rate better? There were six pairs[^3] of movies with identical titles, differing by only the inclusion or exclusion of a question mark (e.g. [*Who's That Girl?*](https://www.imdb.com/title/tt1841942/) and [*Who's That Girl*](https://www.imdb.com/title/tt0094321/), [*What Is Love?*](https://www.imdb.com/title/tt9163346/) and [*What Is Love*](https://www.imdb.com/title/tt2235811/), etc.) When we look at the data, there is clearly a pattern: other than the unfortunate [*What's Love Got to Do with It?*](https://www.imdb.com/title/tt2993648/), each question-marked version has a higher rating than its counterpart. 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="When we compare paired movie titles, the counterparts with question marks get better ratings! (Except for the one pair marked by a dashed line.)"}
 paired_df_plot <- paired_df %>%
   group_by(title, has_mark) %>%
   # Combine identical titles, with averageRating becoming the weighted avg
@@ -234,7 +236,7 @@ Even with using only a handful of films, we find this difference statistically s
 
 However, there is a *much* bigger pool of movies waiting to be analyzed; *very* few of our films have a paired counterpart. To deal with this large and ungainly dataset,[^4] we can whip out my favorite statistical sledgehammer, ye olde [Kruskal-Wallis rank sum test]( https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_one-way_analysis_of_variance),[^5] and *BAM!* the answer seems to be a clear and resounding "no." (The large *p*-value below indicates a non-significant difference.)
 
-```{r, echo=FALSE, results="asis"}
+```{r, echo=FALSE, results="asis", fig.cap="However, when we compare ALL the movies with interrogative titles, we find no difference between those with a question mark and those without. The plot is interactive, so try hovering your mouse over the points to see if you recognize any of the titles."}
 library(plotly)
 p <- zach_df %>%
     ggplot(aes(label=originalTitle, y = averageRating, x = has_mark)) + 
@@ -280,7 +282,7 @@ Although this result goes against the findings of the previous test,[^6] the vas
 
 But maybe we should get more granular---maybe there's still something going on beneath the surface. After all, Chris and Liz seem to think different genres might make different use of punctuation. Looking at the data, this claim definitely holds.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="Comedies do use question marks at a higher proportion than dramas. Error bars represent 95% confidence intervals."}
 zach_df %>%
   tidyr::separate_rows(genres, sep=",") %>%
   binom_confs(genres) %>%
@@ -325,7 +327,7 @@ Perhaps, as our podcasting pair posit, "[a question mark] makes you feel kind of
 
 We can restrict our dataset to only comedies and dramas and use a linear model to test whether the specific genre and "question-markedness" interact to affect ratings. That is, does including a question mark affect the movie's rating *differently* depending which genre the movie is? 
 
-```{r, echo=FALSE, results="asis"}
+```{r, echo=FALSE, results="asis", fig.cap="Focus on the left half of this graph: we see that comedies do BETTER with question marks and dramas do sliiiightly worse. I didn't have any hypotheses about movies that were neither (or both) of the two genres, but I included them on the right for completeness. Remember, this graph is interactive too!"}
 p <- zach_df %>%
   mutate(genre= genre %>% str_to_title(),
          genre= factor(genre, levels=c("Comedy","Drama","Both","Neither"))) %>% 
@@ -382,7 +384,7 @@ Listen, this methodology isn't perfect. If you look through our dataset, you mig
 
 But here's an idea: if a movie has a question mark in its title, we can be almost 100% confident that the title is a question, even if it's an ungrammatical, weird question. (I'm looking at you, *What Price Innocence?*) We can easily gather up these titles and have the grand list---the whole population, the closest thing to ground truth---for one of the two treatments in our dataset. If our methods have a low bias, when we look at our sample of question-marked titles, they should be representative of this grand, complete list of question-marked titles. It's a sanity check: does our refined subset of data reflect the whole?
 
-```{r, results="asis"}
+```{r, results="asis", fig.cap="Our results seem valid. At least we couldn't detect a bias between the subset of titles we used and the totality of titles that include question marks. Mmm! Those thicc curves though."}
 kept_val <- validation %>%
   mutate(we_used = tconst %in% zach_df$tconst) %>%
   distinct(tconst, .keep_all = T) %>%
@@ -436,7 +438,7 @@ for(i in 3:5){
 zach_plot_plotly(p)
 ```
 
-Check it. Although my eye wants to find slight differences between the two distributions, ma boi Krusky W tells me they aren't significant (*p*-value = `r kruskal.test(averageRating ~ we_used, data = kept_val)$p.value %>% signif(., digits=3)`. Perrrrfect.
+Check it. Although my eye wants to find slight differences between the two distributions, ma boi Krusky W tells me they aren't significant (*p*-value = `r kruskal.test(averageRating ~ we_used, data = kept_val)$p.value %>% signif(., digits=3)`). Perrrrfect.
 
 ## [Who's Afraid of Happy Endings?](https://www.imdb.com/title/tt1559021/)
 

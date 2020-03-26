@@ -16,10 +16,11 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(fig.width = 8, fig.height = 6, autocaption=TRUE)
+knitr::opts_chunk$set(fig.width = 8, fig.height = 6, autocaption=TRUE,
+                      dpi = 200)
 library(tidyverse)
 library(lubridate)
-theme_set(theme_bw(base_size = 16))
+theme_set(theme_bw(base_size = 16)) 
 
 stat_cols <- quos(sd, median, mean)
 neg_stat_cols <- quos(-sd, -median, -mean)

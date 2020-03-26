@@ -2,3 +2,8 @@
 
 # Bash has the most updated ruby path preloaded in ~/bashrc
 servr::jekyll(command='bash -lic "cd ~/burchill.github.io/; bundle exec jekyll build"')
+
+# Also, if you ever get an error like:
+#   Could not find post "2020-03-27-questionable_movies" in tag 'post_url'. Make sure the post exists and the name is correct. in _posts/2020-03-27-qmovies_postmortem.md
+ #               ERROR: YOUR SITE COULD NOT BE BUILT:
+# It's probably because you're trying to make a post be in the future
