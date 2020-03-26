@@ -1,0 +1,481 @@
+---
+layout:  post
+title: "Hollywood Superstitions vs. Data Science: Investigating for 99PI"
+comments:  true
+published:  true
+author: "Andrew and Zachary Burchill"
+date: 2020-03-26 01:00:00
+permalink: /questionable_movies/
+categories: [R,IMDB,movies,"99 Percent Invisible","99PI","both brothers",data,"hypothesis testing","question marks"]
+output:
+  html_document:
+    mathjax:  default
+    fig_caption:  true
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(
+  echo=FALSE, autocaption=TRUE,
+  warning = FALSE, message = FALSE,  
+  comment = "")
+
+library(tidyverse)
+library(lubridate)
+library(ggrepel)
+
+ylabel <- "average rating"
+xlabel <- "includes a question mark?"
+```
+
+```{r load data,cache=TRUE,echo=FALSE,warning=FALSE,message=FALSE}
+# You can find this code at:
+#   https://github.com/burchill/burchill.github.io/tree/master/code/movie_questions/
+muffled<-capture.output(source("/Users/zburchill/burchill.github.io/code/movie_questions/who_let_the_dogs_out_analysis.R"))
+```
+
+```{r plotting constants}
+base_fig_height = 6
+base_fig_width = 8
+
+knitr::opts_chunk$set(fig.width = base_fig_width, 
+                      fig.height = base_fig_height)
+
+base_text_size = 20
+shrinking_factor = 0.8
+geom_text_size = base_text_size * 5/15 * shrinking_factor
+reg_plot_theme <- theme_classic(base_size = base_text_size)
+# For some reason, the plotly plots have MUCH larger text than the ggplot ones do
+theme_set(theme_classic())
+
+```
+
+```{r functions}
+get_asterisks <- function(p.value, 
+                          mapping = c("0.05"="*", "0.01"="**", "0.001"="***", " n.s.")) {
+  stopifnot(length(p.value)==1)
+  
+  named <- rlang::have_name(mapping)
+  named_vals <- mapping[named]
+  unnamed_val <- mapping[!named]
+  threshs <- as.numeric(names(named_vals))
+  named_vals <- named_vals[order(threshs)]
+  
+  if (length(threshs) != length(mapping) - 1 || 
+      length(threshs) == 0 || any(threshs >= 1) || 
+      any(is.na(threshs)))
+    stop("mapping variable not properly specified")
+  
+  purrr::reduce2(
+    sort(threshs), named_vals,
+    function(x, v, nom) if (p.value < v) rlang::done(nom) else unnamed_val,
+    .init = -Inf) %>% paste0()
+}
+
+make_pretty_table <- function(x) {
+  x %>%
+    broom::tidy() %>%
+    mutate(` ` = format(map_chr(p.value, get_asterisks),
+                        justify = "left")) %>%
+    mutate(term=case_when(
+      term == "(Intercept)" ~ "intercept",
+      term == "has_markTRUE" ~ "q-mark effect",
+      term == "genredrama" ~ "genre effect",
+      TRUE ~ "interaction"
+    )) %>%
+    mutate(p.value = format.pval(p.value, justify="right", digits=1)) %>%
+    rename(estimate = estimate, `p-value`=p.value) %>%
+    mutate_at(vars(estimate, std.error),
+              ~format(., digits=3, justify="right")) %>%
+    select(-statistic) %>%
+  # knitr::kable("html",
+  #              caption="The regression summary. Note how the interaction term is significant, implying that the effect of having a question mark differs by genre.") %>%
+  #   kableExtra::kable_styling(bootstrap_options="s")
+    as.data.frame() %>%
+    print(row.names = FALSE)
+  invisible(NULL)
+}
+
+zach_plot_plotly <- function(p) {
+  cur_chunk_res <- knitr::opts_current$get("results")
+  if (is.null(cur_chunk_res) | cur_chunk_res != "asis")
+    stop("Current chunk needs to have `results='asis'`")
+  
+  deps <- p %>%
+    zach_make_dependencies(
+      postdir = knitr::opts_chunk$get("plotly.savepath"),
+      basedir = knitr::opts_chunk$get("proj.basedir"))
+  cat(deps)
+  
+  plotly::as_widget(p) %>% list() %>% htmltools::tagList()
+}
+
+zach_make_dependencies <- function(widget, postdir, basedir,
+                                   libdirname = "js_files/") {
+  libdir <- paste0(postdir, libdirname)
+  dir.create(libdir, showWarnings = FALSE, recursive = TRUE)
+  
+  htmltools::renderTags(widget)$dependencies %>%
+    lapply(function(dep) {
+    htmltools::copyDependencyToDir(dep, libdir, FALSE) %>%
+      htmltools::makeDependencyRelative(basedir, FALSE)
+    }) %>%
+    htmltools::renderDependencies(hrefFilter=function(x) paste0("/",x)) %>%
+    htmltools::htmlPreserve()
+}
+
+```
+
+
+## [Where do we start the tale from?](https://www.imdb.com/title/tt8545404/)
+
+Science is all about asking the right questions, yada yada, something like that. But normally the sorts of questions I ask require ages of preparation, multiple failed experiments, and oodles of tedious computer analysis. However, *this* time it was going to be different. We had a simple question, easy data, and a straight-forward approach. A simple job, in and out, right?
+
+Our question was about questions—questions, question marks, the film industry, and making money. 
+
+<!--more-->
+
+## [Is Anyone Listening---A Podcast Story](https://www.imdb.com/title/tt5886174/)
+
+My twin brother and I have a deep and abiding love for educational podcasts.[^1] One of my favorites---one that highlights my secret passion for urban planning and design---is [99 Percent Invisible](https://99percentinvisible.org). 99 Percent Invisible (often referred to as 99PI) is hosted by Roman Mars, and other than being a thinly veiled advertisement for the city of "[beautiful downtown Oakland, California](https://store.dftba.com/collections/99-invisible/products/beautiful-downtown-oakland-california-shirt)," it is a podcast about the ninety-nine percent of design, architecture, and life that goes by unseen and unnoticed.
+
+<aside class="right"><p>Sneak peek sans context:</p><p>Interestingly, there are two movies with the title, "Have You Seen My Movie?", but only the version *without* a question mark has received any ratings on IMDB. <a href="https://www.imdb.com/title/tt9617782/"><em>Who Let the Dogs Out</em></a> is a relatively well reviewed 2019 documentary about the popular song, whereas <a href="https://www.imdb.com/title/tt4671868/"><em>Who Let the Dogs Out?</em></a> is a 2013 comedy, seemingly filmed and edited by high school students.</p></aside>
+
+For example, on February 11th, 99PI released an [episode about the song "Who Let the Dogs Out"](https://99percentinvisible.org/episode/whomst-among-us-let-the-dogs-out/) by the Baha Men. If you thought a catchy hook and repetitive lyrics were all this song had to offer, you're in for an exceptionally riveting episode. I'm not joking, it is absolutely surprising how deep the rabbit-hole goes on that one. But in pursuing the "white whale"---the inscrutable question of *WHO* actually let the dogs out---song expert [Ben Sisto](https://twitter.com/bensisto) casually notes that the song's title, although a question, lacks a question mark.
+
+
+## [Have You Seen My Movie?](https://www.imdb.com/title/tt6112836/)
+
+In the 99PI episode, this observation kick-starts a conversation between 99PI producer [Chris Berube](https://twitter.com/chrisberube) and movie producer Liz Watson. They realize that plenty of movies whose titles are *phrased* as questions actually lack the correct punctuation. Take for instance the movie, *Who Frame Roger Rabbit*. Apparently, the director of the movie ditched the question mark because, as Liz explains, "there is a superstition in Hollywood that if you put a question mark at the end of your title, the movie will bomb at the box office." While mulling this over, Chris and Liz point out that movies like *Who's Afraid Of Virginia Woolf?* and *They Shoot Horses, Don't They?* were successes, even in the face of the dreaded question-marked title.
+
+In the end, such worries are chalked up as the trivial preoccupations of an irrational movie industry. As Liz says:
+
+> "You can't fully predict how people are going to act. [...] I mean, these kinds of superstitions are just trying to put lightning in a bottle and trying to find any kind of rhyme or reason to what is ultimately such a multi-variant and shifting public mood that will put or not put money in your pocket, that you'll latch on to stuff like question marks in the titles, which is the equivalent of wearing the same pair of shorts for every NCAA finals game you play in." 
+
+Their take-home message for this human-interest story is that industry behavior is guided by the untestable, and that, "ultimately, there's kind of no answer to the mystery except to say that all creativity and art is a mystery."
+
+\[Cue an electric guitar riff that pierces the silence and hangs in the air. Jump cut to a close shot of me, revving a chainsaw and then shredding a sign that reads ‘Humanities' or ‘Mystery' or ‘Art' on it, *MythBusters* style. Maybe I look up into the camera and say something badass/pithy like, "Let's DO this!" or "I didn't get a science degree just to deal with *this* bullshit!"\]
+
+## [Can We Do It Ourselves?](https://www.imdb.com/title/tt4842618/)
+
+I don't have the tools to solve many problems, but I felt that THIS was one of few mysteries I could address. However, we need to be clear on what exactly our questions are. 
+
+Chris Berube and Liz Watson bring up several predictions in this episode: 
+
+1. Question marks at the end of movie titles will cause them to "bomb."
+2. Question marks are more commonly used in certain movie genres.
+3. Question marks work *better* for comedies than for dramas.
+
+<aside class="left"><p>Methods</p><p>"Easy"? Yeah, <em>sure</em>. Check out more on the methods <a href="{{ site.baseurl }}{% post_url 2020-03-27-qmovies_postmortem %}">here</a>.</p></aside>
+
+Zach and I thought about it, and we concluded that these predictions would be a piece of cake to test. I mean, isn't that what something like the Internet Movie Database is for? We just grab the movie database with titles, genres, and degrees of success from IMDB and then compare the titles with and without question marks. A simple job, in and out, easy peasy. 
+
+And if we make the assumption that online IMDB user ratings (on a 1-10 scale) are a trustworthy indicator of movie success,[^2] then [this data really *is* just sitting around](https://www.imdb.com/interfaces/), free to access.
+
+Yet there's one component still missing: not all movie titles are interrogatives. It doesn't make sense to compare [*All Babes Want to Kill Me*](https://www.imdb.com/title/tt0300922/) with [*Who Killed Cock Robin?*](https://www.imdb.com/title/tt5576318/); we are only interested in titles where including a question mark would be appropriate. We need to find the subset of titles that are phrased as questions.
+
+## [What is Acceptable Language/Heroes](https://www.imdb.com/title/tt2909164/)
+
+Well. It turns out that it is *not* easy to make a computer automatically determine whether a phrase is a question or not. Even for us humans, it's not always clear. I hate to throw Chris under the bus here, but in the 99PI episode, he claimed that *Guess Who's Coming To Dinner* constitutes a question… and it's not. Although the sentence clearly begs for an answer, it's technically phrased as a command instead. And consider titles like *How far the stars*. What even IS that? A noun phrase? A half-formed query? Let's not forget my absolute favorite title, *What What (In the Butt): The Movie*. Additionally, titles like *What Goes Up* are probably not *intended* as interrogatives, but they remain grammatically indistinguishable from questions. And what about foreign language titles like *Did Livogo Kraynogo* and *May lalaki sa ilalim ng kama ko*? Clearly, some amount of [syntactic](https://en.wikipedia.org/wiki/Syntax) analysis is required.
+
+<aside class="right"><p>A note from Zach:</p><p>Well, screw you too, man.</p></aside>
+
+You might erroneously think that having a twin brother with a (soon-to-be-acquired) doctorate in linguistics would be very helpful here. Boy, I know I certainly started out with that hope.
+
+
+Ahem. Anyway, we figured that because most grammatical questions follow certain syntactic structures, we could find our movies by breaking the titles up into individual words and investigating their order and parts of speech (i.e., verbs, nouns, adjectives, etc.). [To make a *very* long story short]({{ site.baseurl }}{% post_url 2020-03-27-qmovies_postmortem %}), I learned how to use the natural language processing R package [openNLP](https://cran.r-project.org/web/packages/openNLP/index.html) to tag parts of speech, and my brother filtered our massive database with his access to a large computing cluster. (Check his [description of the nitty-gritty details for more info]({{ site.baseurl }}{% post_url 2020-03-27-qmovies_postmortem %}).)
+
+<aside class="left"><p>Examples of the syntactic structures we used:</p><p>"<em>How</em> can we find questions?"<br />"<em>Why</em> is this so hard?"<br />"<em>Can</em> it even be done?"<br />"<em>Am</em> I going insane?"</p></aside>
+
+
+
+## [Is That the Question?](https://www.imdb.com/title/tt3912852/)
+
+Okay! With refined, polished dataset in tow, Zach suggested we start by testing an incredibly stringent, very literal interpretation of the first prediction just for fun. Do movies without question marks rate better? There were six pairs[^3] of movies with identical titles, differing by only the inclusion or exclusion of a question mark (e.g. [*Who's That Girl?*](https://www.imdb.com/title/tt1841942/) and [*Who's That Girl*](https://www.imdb.com/title/tt0094321/), [*What Is Love?*](https://www.imdb.com/title/tt9163346/) and [*What Is Love*](https://www.imdb.com/title/tt2235811/), etc.) When we look at the data, there is clearly a pattern: other than the unfortunate [*What's Love Got to Do with It?*](https://www.imdb.com/title/tt2993648/), each question-marked version has a higher rating than its counterpart. 
+
+```{r, echo=FALSE}
+paired_df_plot <- paired_df %>%
+  group_by(title, has_mark) %>%
+  # Combine identical titles, with averageRating becoming the weighted avg
+  summarise(total_votes = sum(numVotes),
+            averageRating = sum(averageRating*numVotes)/total_votes,
+            originalTitle = first(originalTitle)) %>% 
+  group_by(title) %>% 
+  mutate(diffs = averageRating[has_mark] - averageRating[!has_mark]) %>%
+  ungroup() %>%
+  mutate(diffs = if_else(diffs > 0, 1, 2) %>% as.factor())
+
+paired_df_plot %>%
+  ggplot(aes(x=has_mark, y= averageRating, group=title, label=originalTitle)) +
+  geom_line(color="gray", size=1, aes(linetype=diffs)) + 
+  geom_point(size=3, aes(color = has_mark)) +
+  ggrepel::geom_label_repel(data = subset(paired_df_plot, has_mark),
+                            aes(color = has_mark),
+                            nudge_x = 0.2,
+                            size = geom_text_size) +
+  ggrepel::geom_label_repel(data = subset(paired_df_plot, !has_mark),
+                            aes(color = has_mark),
+                            nudge_x = -0.2,
+                            size = geom_text_size) +
+  ylab(ylabel) +
+  xlab(xlabel) +
+  ggtitle("Given identical titles, are question marks better?")+ #ylim(c(3,8.5))+
+  reg_plot_theme +
+  theme(legend.position = "none") 
+```
+
+Because this data is fairly normal (i.e., has the bell-shaped curve that is helpful for many analyses), we can run a paired t-test to see if there is a true, meaningful difference between them:
+
+```{r, echo=TRUE}
+# Are titles with question marks differently rated than those without?  Yes
+t.test(averageRating ~ has_mark, paired=T, data=paired_df_plot)
+```
+
+Even with using only a handful of films, we find this difference statistically significant. Perhaps question marks actually help movies do *better*!
+
+However, there is a *much* bigger pool of movies waiting to be analyzed; *very* few of our films have a paired counterpart. To deal with this large and ungainly dataset,[^4] we can whip out my favorite statistical sledgehammer, ye olde [Kruskal-Wallis rank sum test]( https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_one-way_analysis_of_variance),[^5] and *BAM!* the answer seems to be a clear and resounding "no." (The large *p*-value below indicates a non-significant difference.)
+
+```{r, echo=FALSE, results="asis"}
+library(plotly)
+p <- zach_df %>%
+    ggplot(aes(label=originalTitle, y = averageRating, x = has_mark)) + 
+    ggforce::geom_sina(size=2, aes(col=has_mark)) +
+    stat_summary(geom="errorbar", fun.data=mean_cl_boot, 
+                 width=.15, position = position_dodge(0.75)) +
+    stat_summary(geom="point", aes(fill=has_mark), fun.y=mean, 
+                 position = position_dodge(0.75), size=3)+
+    ylab(ylabel) +
+    xlab(xlabel)+
+    ggtitle("Do question marks make a difference?")+
+    ylim(c(1,10))+
+    theme(legend.position = "none")
+  
+p <- plotly::ggplotly(p)
+
+#FML this tooltip sh** is a f***ing sh**show
+change_tooltip <- function(x) {
+  x %>% 
+    str_remove_all("^has_mark\\:\\s+(TRUE|FALSE)<br \\/>") %>%
+    gsub("(has_mark\\:\\s+)(TRUE|FALSE)","q\\-mark\\: \\2",.)  %>% 
+    str_replace_all("originalTitle", "title") %>%
+    str_replace_all("averageRating", "avg. rating") %>%
+    str_split("<br \\/>") %>%
+    map(.,~c(.[3],.[2],.[1]) %>% paste0(collapse="<br />"))
+}
+
+for(i in 1:2){
+  p$x$data[[i]]$text = change_tooltip(p$x$data[[i]]$text)
+}
+
+zach_plot_plotly(p)
+```
+
+```{r, echo=TRUE}
+# Are titles with question marks differently rated than those without?  No
+kruskal.test(averageRating ~ has_mark, data = zach_df)
+```
+
+Although this result goes against the findings of the previous test,[^6] the vastly increased sample size lends it much more credence.  As Chris and Liz espouse in the podcast, the data suggests that you really can take or leave this form of punctuation with very little effect. 
+
+## [What Lies Beneath](https://www.imdb.com/title/tt0161081/)
+
+But maybe we should get more granular---maybe there's still something going on beneath the surface. After all, Chris and Liz seem to think different genres might make different use of punctuation. Looking at the data, this claim definitely holds.
+
+```{r, echo=FALSE}
+zach_df %>%
+  tidyr::separate_rows(genres, sep=",") %>%
+  binom_confs(genres) %>%
+  arrange(-n) %>% head(7) %>% # take the top seven genres
+  arrange(-PointEst) %>%
+  mutate(genres = factor(genres, levels=unique(genres))) %>%
+  mutate(outline = genres %in% c("Comedy","Drama")) %>%
+  ggplot(aes(x = genres)) +
+  geom_bar(aes(y = PointEst, fill = genres, alpha=outline),
+           stat = "identity") +
+  geom_bar(aes(y = PointEst, color=outline),
+           stat = "identity", fill=NA, size=1) +
+  scale_fill_discrete(guide=FALSE) +
+  geom_pointrange(aes(y = PointEst, ymax=Upper, ymin=Lower)) +
+  scale_y_continuous("% question mark", labels = scales::percent) +
+  geom_text(aes(y=0.25,label=paste0("n=", n)),
+            size=geom_text_size) +
+  scale_color_manual(guide=FALSE,
+                     values=c(NA,"black")) +
+  scale_alpha_manual(guide=FALSE,
+                     values=c(0.5,1)) +
+  reg_plot_theme + 
+  theme(axis.text.x = element_text(angle=15, hjust=1)) +
+  xlab("genre") +
+  ggtitle("Question mark use by genre")
+```
+
+```{r, echo=FALSE}
+# Do comedies and dramas have different rates of question mark usage?  Yes
+chis_p <- zach_df %>%
+  filter(genre %in% c("comedy","drama")) %>%
+  {table(.$genre, .$has_mark)} %>% chisq.test() %>% 
+  .$p.value %>% signif(digits=3)
+```
+
+Comedies use question marks significantly more often than dramas do (*p*-value = `r chis_p` in a [chi-squared test](https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test)). Additionally, it's not surprising that mystery, documentary, and crime films are the genres that most frequently employ question marks. After all, the whole premise of these movies is to reveal the answer to some sort of investigation.
+
+
+## [What's So Damn Funny!](https://www.imdb.com/title/tt5501680/)
+
+Perhaps, as our podcasting pair posit, "[a question mark] makes you feel kind of cheerful and goofy. You're waiting for the punchline, you're waiting for the shoe to drop. It's like being told the first half of a joke." If this is the case, we would probably expect that question marks hurt ratings for dramas but give comedies a boost.
+
+We can restrict our dataset to only comedies and dramas and use a linear model to test whether the specific genre and "question-markedness" interact to affect ratings. That is, does including a question mark affect the movie's rating *differently* depending which genre the movie is? 
+
+```{r, echo=FALSE, results="asis"}
+p <- zach_df %>%
+  mutate(genre= genre %>% str_to_title(),
+         genre= factor(genre, levels=c("Comedy","Drama","Both","Neither"))) %>% 
+  ggplot(aes(label = originalTitle, y = averageRating, 
+             x = genre,  fill=interaction(has_mark, genre))) + 
+  ggforce::geom_sina( aes(color=NA), size=2, 
+                      position = position_dodge(.75)) +
+  stat_summary(geom="point", fun.y=mean, 
+               position = position_dodge(0.75), size=3)+
+  stat_summary(geom="errorbar", fun.data=mean_cl_boot, 
+               width=.3, position = position_dodge(0.75)) +
+  ylab(ylabel) + 
+  ggtitle("Question mark usage in comedies and dramas")+
+  ylim(c(1,10)) +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust=-1)) +
+  scale_color_brewer(palette = "Paired")+
+  scale_fill_brewer(palette = "Paired")
+
+p <- plotly::ggplotly(p)
+
+#FML this tooltip sh** is a f***ing sh**show
+change_tooltip <- function(x) {
+  x %>% 
+    str_remove_all("^colour\\: NA<br \\/>") %>%
+    gsub("(interaction\\(has_mark\\, genre\\)\\:)( TRUE| FALSE)(\\..+)","q\\-mark\\:\\2",.)  %>% 
+    str_replace_all("originalTitle", "title") %>%
+    str_replace_all("averageRating", "avg. rating") %>%
+    str_split("<br \\/>") %>%
+    map(.,~c(.[3],.[2],.[1],.[4]) %>% paste0(collapse="<br />"))
+}
+
+for(i in 1:8){
+  p$x$data[[i]]$text = change_tooltip(p$x$data[[i]]$text)
+}
+
+zach_plot_plotly(p)
+```
+
+Below, we included a little summary of our little linear model. The important part is that little asterisk to the far right of our “interaction” line.
+
+````{r, echo=TRUE, comment=""}
+# Is the effect of a question mark modulated by comedy vs. drama?  Yes
+zach_df %>% filter(genre %in% c("comedy","drama")) %>%
+  lm(averageRating ~ has_mark * genre, data = .) %>%
+  make_pretty_table()
+```
+
+And according to our model,[^7] there *IS* a significant interaction! When the title of a movie is a question, comedies tend to do better when they include a question mark, and dramas fare slightly worse when they include it. (It should be noted that this interaction term has a *p*-value of 0.0436, which is just barely under the common α = 0.05 significance threshold. But if you're more of an AIC model comparison sort of person, this full interaction model also has a ∆AIC of 2.0124 compared to the next best model.[^8])
+
+## [Do You Trust This Computer?](https://www.imdb.com/title/tt6152554/)
+
+Listen, this methodology isn't perfect. If you look through our dataset, you might find one or two movie titles that our algorithm misidentified as questions. There are certainly movies that it failed to spot: *They Shoot Horses, Don't They?* and *O Brother, Where Art Thou?* are two that our algorithm missed, even though Liz and Chris mentioned them in the episode, and a few that probably should have been screened out, like *Do or Die*. Perhaps the method our algorithm used to determine "question-ness" led to a biased subsample of movies; maybe those hard-to-detect titles happen to be quantitatively *different* from the ones we selected.
+
+But here's an idea: if a movie has a question mark in its title, we can be almost 100% confident that the title is a question, even if it's an ungrammatical, weird question. (I'm looking at you, *What Price Innocence?*) We can easily gather up these titles and have the grand list---the whole population, the closest thing to ground truth---for one of the two treatments in our dataset. If our methods have a low bias, when we look at our sample of question-marked titles, they should be representative of this grand, complete list of question-marked titles. It's a sanity check: does our refined subset of data reflect the whole?
+
+```{r, results="asis"}
+kept_val <- validation %>%
+  mutate(we_used = tconst %in% zach_df$tconst) %>%
+  distinct(tconst, .keep_all = T) %>%
+  mutate(words = stringr::str_split(tolower(originalTitle), " "),
+         num_words = map_dbl(words, length)) %>%
+  filter(num_words > 1) %>%
+  mutate(first_word  = map_chr(words, ~.[[1]])) %>%
+  mutate(contraction = str_detect(first_word,"\'")) %>%
+  remove_foreign_films(top_15_uncapped_words)
+
+px <- kept_val %>%
+  ggplot(.,aes(label=originalTitle, y = averageRating, x = we_used)) +
+  #ggforce::geom_sina(size=2, aes(col=we_used)) +
+  geom_violin(size=2, aes(col = we_used),
+              alpha=0.25,
+              draw_quantiles = c(0.25, 0.5, 0.75)) +
+  stat_summary(geom="errorbar", fun.data=mean_cl_boot, 
+               width=.15, position = position_dodge(0.75)) +
+  stat_summary(geom="point", aes(fill=we_used), 
+               fun.y=mean, position = position_dodge(0.75), 
+               size=3)+
+  ylab(ylabel) +
+  xlab("included in our analysis?")+
+  ggtitle("How representative was our sample?")+
+  ylim(c(1,10))+
+  theme(legend.position = "none")
+
+
+p <- plotly::ggplotly(px)
+
+#FML this tooltip sh** is a f***ing sh**show
+change_tooltip <- function(x) {
+  x %>%
+    str_remove_all("^we_used\\:\\s+(TRUE|FALSE)<br \\/>") %>%
+    gsub("(we_used\\:\\s+)(TRUE|FALSE)","used\\: \\2",.)  %>%
+    str_replace_all("originalTitle", "title") %>%
+    gsub("FALSE","No", .) %>%
+    gsub("TRUE","Yes",.) %>%
+    str_replace_all("averageRating", "avg. rating") %>%
+    str_split("<br \\/>") %>%
+    map(.,~c(.[2],.[1],.[3]) %>% paste0(collapse="<br />"))
+}
+
+for(i in 1:5){
+  p$x$data[[i]]$text = change_tooltip(p$x$data[[i]]$text)
+}
+for(i in 3:5){
+  p$x$data[[i]]$text <- str_replace(p$x$data[[i]]$text, "NA","")
+}
+
+zach_plot_plotly(p)
+```
+
+Check it. Although my eye wants to find slight differences between the two distributions, ma boi Krusky W tells me they aren't significant (*p*-value = `r kruskal.test(averageRating ~ we_used, data = kept_val)$p.value %>% signif(., digits=3)`. Perrrrfect.
+
+## [Who's Afraid of Happy Endings?](https://www.imdb.com/title/tt1559021/)
+
+Well there it is. Overall, Chris and Liz's intuition seemed to be quite accurate. Across all genres, the superstition that question marks affect success is just that: a baseless superstition. The pair were also justified in their claim that comedies seem to use question marks in their titles more frequently than dramas. When a title is formed as a question and listed as a comedy, ~68% of the time it'll include the proper punctuation, while only ~52% of dramas do so. Lastly---and this is their most impressive pull as far as I'm concerned---Liz speculates that question marks can set up a mood of cheerful goofiness in comedies that doesn't work for dramas. In our model, this bears out: comedies score better ratings when they have a question mark and dramas do slightly worse.
+
+As grad students, Zach and I are quite used to wasting long periods of time to only partially solve mysteries that no one is particularly interested in. This is probably why I'm drawn to projects like 99PI that double down to investigate the overlooked facets of life, like [the bizarre history of an (ostensibly) early 2000s pop song](https://99percentinvisible.org/episode/whomst-among-us-let-the-dogs-out/) or an examination of [vestigial architecture that endures against the odds](https://99percentinvisible.org/episode/thomassons/). And if you're reading this, chances are that you feel the same way. Maybe you have questions about [the weight you lose in your sleep](https://www.zachburchill.ml/weight_analysis_pt_3/) or [how scientists paint tiny nametags on living ants](https://asunow.asu.edu/20190822-creativity-how-do-i-love-ants-let-me-count-ways). Most likely, you didn't, but if you do ***now***, maybe you should stick around and check out some of our other stuff.
+
+
+<hr />
+<br />
+
+## Source Code:
+
+> [`pos_tagging.R`](https://github.com/burchill/burchill.github.io/blob/master/code/movie_questions/who_let_the_dogs_out_analysis.R)
+
+This is the code Zach ran on his compute cluster to do part-of-speech tagging on the movie titles. The output of this code is needed for the next script.
+
+> [`who_let_the_dogs_out_analysis.R`](https://github.com/burchill/burchill.github.io/blob/master/code/movie_questions/who_let_the_dogs_out_analysis.R)
+
+This is the code we used to separate the movie titles that we defined as questions from the others. Zach wrote a little more about the process [here]({{ site.baseurl }}{% post_url 2020-03-27-qmovies_postmortem %}).
+
+> [`2020-03-27-questionable_movies.Rmd`](https://github.com/burchill/burchill.github.io/blob/master/_source/2020-03-27-questionable_movies.Rmd)
+
+If you want to see the source code for any of the cool, interactive plotly graphs or anything else from this post, you can check out the source code above.
+
+### Footnotes:
+
+[^1]: As with *all* progressive, pseudo-intellectual millennials
+
+[^2]: We would have liked to measure success with box office revenue, but good financial data is hard to come by and IMDB is stingy with the info they dole out for free. Womp womp.
+
+[^3]: Well, more like 6.5 pairs: there were two movies entitled *What About Me?* and two movies entitled *What About Me*. So this was a weird quad-pairing? The quest for self-knowledge must be a popular movie plot.
+
+[^4]: Using a [Shapiro-Wilk normality test]( https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test), we find that the data is definitely non-normal (*p*-value = `r signif(shapiro.test(zach_df$averageRating)$p.value, digits=3)`).
+
+[^5]: The Kruskal-Wallis test is an extension of the [Mann–Whitney U test](https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test), in that it can handle more than two different groups. We're only testing the difference between two groups here, but it still works. The test should be in every behavioral ecologist's toolkit because it requires very, very few assumptions.
+
+[^6]: Note that none of our results ever support the hypothesis that question marks will *harm* a movie's rating though, the presumed Hollywood superstition.
+
+[^7]: You might be wondering why having a question mark seems to be a significant main effect here, while in the previous test we found that not to be true. Don't worry, this is just because we subsetted the data for this model into only comedies and dramas. When we include all the other genres, this effect goes away. The full model suggests that the main effect we see in the reduced model is mostly driven by comedies, which *do* really seem to be affected by question marks. 
+
+[^8]: But to be fair, this is *also* just above the common rule-of-thumb that says "a ∆AIC > 2 implies a clear choice."
