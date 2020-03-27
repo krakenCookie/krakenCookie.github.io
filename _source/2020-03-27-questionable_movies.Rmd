@@ -4,7 +4,7 @@ title: "Hollywood Superstitions vs. Data Science: Investigating for 99PI"
 comments:  true
 published:  true
 author: "Andrew and Zachary Burchill"
-date: 2020-03-26 01:00:00
+date: 2020-03-27 01:00:00
 permalink: /questionable_movies/
 categories: [R,IMDB,movies,"99 Percent Invisible","99PI","both brothers",data,"hypothesis testing","question marks"]
 output:
