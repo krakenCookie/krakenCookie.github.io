@@ -179,9 +179,9 @@ Unfortunately, you'll just end up with an empty place where the plot _should_ be
 
 ## The Javascript
 
-Normally, the Javascript used to power HTML widgets and plotly plots is already saved in these packages on your computer. When you view the plots from, say, RStudio, it just adds HTML elements that load the scripts in from where they are on your computer, something like `<script scr="path-to-script"></script>`.
+Normally, the Javascript used to power HTML widgets and plotly plots is already saved in these packages on your computer. When you view the plots from, say, RStudio, it just adds HTML elements that load the scripts in from where they are on your computer, something like `<script scr="path-to-script"></script>`. 
 
-If you want to save a widget and share it with a friend (who not have the same Javascript files as you) `htmlwidgets::saveWidget()` will let you essentially smush all the disparate Javascript files so that they're hardcoded _into_ the HTML file, along with the data, and saves that.
+If you want to save a widget and share it with a friend (who doesn't have the same Javascript files as you) `htmlwidgets::saveWidget()` will let you essentially smush all the disparate Javascript files so that they're hardcoded _into_ the HTML file, along with the data, and saves that.
 
 ### A (bad) first step
 
@@ -357,7 +357,7 @@ plotly_obj <- plotly_obj_maker()
 
 # You can set the hook...
 knitr::knit_hooks$set(._plotly_checker = plotly_obj$hook)
-# ...and plot with a single function
+# ...and plot with a single function 
 plotly_obj$plot(p)
 ```
 
