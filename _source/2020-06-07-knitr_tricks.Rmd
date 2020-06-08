@@ -193,13 +193,9 @@ plotly_plot
 
 ## Source Code:
 
-> [`plotly_plot_maker.R`](https://gist.github.com/burchill/9df0f6245ea7768e5b6bbd0a1c22db08)
-
-This is the final version of the code I made for _this_ post.
-
 > [`knit_hook_setter.R`](https://gist.github.com/burchill/8392b2a753652e24a35a8a1dd707c1b1)
 
-This is the better, _improved_ version of the final code.
+This is the better, _improved_ version of the HTML widget enabler. 
 
 ### Footnotes:
 
