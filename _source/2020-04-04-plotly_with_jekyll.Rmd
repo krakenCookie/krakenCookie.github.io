@@ -26,7 +26,6 @@ library(plotly)
 ```
 
 ```{r plotting constants, echo=FALSE}
-
 # This is a principled-ish way to get DPI high and not make the images to big
 base_fig_height = 6
 max_fig_height  = 6
@@ -66,17 +65,16 @@ theme_set(theme_classic())
 
 ```
 
-
 ```{r, echo=FALSE}
 plotly_manager <- function(
   postdir = knitr::opts_chunk$get("plotly.savepath"), 
   basedir = knitr::opts_chunk$get("proj.basedir"),
-  libdirname = "js_files/",
+  libdirname = "",
   hrefFilter = function(x) paste0("/", x)) {
   
   last_label <- tail(knitr::all_labels(), n=1)[[1]]
   deps <- list()
-  libdir <- paste0(postdir, libdirname)
+  libdir <- paste0(postdir, libdirname) 
   
   # Functions
   render_deps <- function(l) {
@@ -125,6 +123,8 @@ The only problem is that you're basically screwed if you want to use Plotly (or 
 
 ## Everbody else is wrong
 
+**_\~\~UPDATE: <u>Including</u> me, evidently! [See the very end of this post!](#update)\~\~_**
+
 Yeah, you heard it.  There are numerous blog posts and tidbits out there about using Plotly and HTML widgets with Jekyll, and you should resent every single one of them for being hacky as hell.  Let's go through a few:
 
  * [There's this post by Saul Cruz](https://saulcruzr.github.io/Plotly_Example/) wants you to do a two-step process where you first knit a file from R Markdown to HTML (individually) and then have another Markdown file load _that_ file.
@@ -142,7 +142,9 @@ library(ggplot2)
 library(plotly)
 
 # Make a super simple plot
-p <- qplot(x=1, y=1)
+p <- iris %>%
+  ggplot(aes(Petal.Length, Petal.Width, color=Species)) + 
+  geom_point()
 p
 ```
 
@@ -224,7 +226,7 @@ render_deps <- function(deps) {
 
 Let me explain that "postdir" and "basedir" stuff, the "postdir" is the directory that corresponds to the posts' `_posts/` subdirectory, or wherever you want to keep its automatically generated content, like plot images.  The "basedir" variable needs to be supplied because you need to know where the actual post itself is going to be in order to make the links right.  What these variables are will totally depend on your setup and how you organize your files, but should be easy to tweak.
 
-I was able to add them as default knitr variables by adding them into my `build.R` file as `plotly.savepath` and `proj.basedir` via `knitr::opts_chunk$set()`.
+I was able to add them as default knitr variables [by adding them into my `build.R` file as `plotly.savepath` and `proj.basedir` via `knitr::opts_chunk$set()`.](https://github.com/burchill/burchill.github.io/commit/ce18ff7ee833d4fc745cdd529f9e5035fb3a442d#diff-7d179ec4956ea309f110b6105874d871)
 
 Notice, however, the `hrefFilter` function in `renderDependencies`.  I noticed that the output of my dependencies, after I made them relative, started like, `<script src="_posts/...`, which didn't actually work. I needed to add an extra slash in front of the relative path for it to work (i.e., `<script src="/_posts/...`). The `hrefFilter` argument is a function that puts that finishing touch on.
 
@@ -361,7 +363,7 @@ knitr::knit_hooks$set(._plotly_checker = plotly_obj$hook)
 plotly_obj$plot(p)
 ```
 
-## Putting it all together
+## Putting it all together {#finalversion}
 
 I eventually decided that the only function I *really* needed to surface was the plotting function---everything else could be taken care of behind the scenes, without really reducing important use cases.  I boiled it down to the following:
 
@@ -442,6 +444,10 @@ p
 
 `knitr` defaults to its bad `webshot` behavior, evidently bypassing the `print()` function somehow.  If you know how to get around this, please contact me on Twitter or drop me a comment below!
 
+## UPDATE! (2020-06-07) {#update}
+
+To get straight to the point, I finally learned how to do what I described in the addendum above, and also realized all my code is reinventing the wheel. For a cleaner, better, and more correct version of this code, [check out my new post here]({{ site.baseurl }}{% post_url 2020-06-07-knitr_tricks %}#rightplotly)!
+
 
 <hr />
 <br />
@@ -450,7 +456,11 @@ p
 
 > [`plotly_plot_maker.R`](https://gist.github.com/burchill/9df0f6245ea7768e5b6bbd0a1c22db08)
 
-This is the final version of the code I made.
+This is the final version of the code I made for _this_ post.
+
+> [`knit_hook_setter.R`](https://gist.github.com/burchill/8392b2a753652e24a35a8a1dd707c1b1)
+
+This is the better, _improved_ version of the final code I discuss in [my new post]({{ site.baseurl }}{% post_url 2020-06-07-knitr_tricks %}#rightplotly).
 
 ### Footnotes:
 
