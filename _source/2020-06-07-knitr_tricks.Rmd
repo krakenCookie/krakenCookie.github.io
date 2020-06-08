@@ -14,7 +14,6 @@ output:
 ---
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE, echo=FALSE}
-
 library(ggplot2)
 library(plotly)
 
@@ -24,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = FALSE)
 ```
 
 ```{r plotting constants, echo=FALSE}
-base_text_size = 20
+base_text_size = 20 
 shrinking_factor = 0.8
 geom_text_size = base_text_size * 5/15 * shrinking_factor
 reg_plot_theme <- theme_classic(base_size = base_text_size)
