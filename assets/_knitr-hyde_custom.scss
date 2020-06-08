@@ -12,11 +12,17 @@
   margin-bottom:  20px;
 }
 
-.figcaption {
+/* Knitr's default caption class name is 'caption'  */
+.caption, .figcaption {
   font-weight:  bolder;
   text-align:  center;
   margin-bottom:  30px;
 }
+
+.figure {
+  max-width: 100%;
+}
+
 
 p img {
   display: block;
