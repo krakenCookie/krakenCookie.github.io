@@ -11,7 +11,7 @@ compass:
   logo: "/images/pawpaw.png"
   og_logo: "/images/open_graph_pawpaw.png"
   # author will appear under the avatar (optional)
-  author: "Check forked from"
+  author: "Kraken cookie"
   # tagline will appear under the title (optional)
   tagline: "Data dabbler, cognitive scientist, and Hadley Wickham aficionado"
   # if include_content is true, the contents of the content.html include will be
