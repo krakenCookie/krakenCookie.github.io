@@ -2,6 +2,26 @@
 looking for Summer '24 internships!)</p>
 
 <h2>My Jam:</h2>
+
+<style>
+label[for=extras-toggle] {
+  cursor: pointer;
+  }
+#extras-toggle {
+  display: none;
+  }
+#extras {
+  transition-duration: .7s;
+  transition-property: font-size, opacity;
+  font-size: 0pt;
+  opacity: 0;
+  }
+#extras-toggle:not(:checked) ~ #extras {
+  font-size: 100%;
+  opacity: 1;
+  }
+</style>
+
 <p>I love solving problems and simplifying them through abstractions.</p>
 <label for="extras-toggle">
 <p>My work so far has been focused on Software engineering challenges such as microservice designs, cache management, and multithreading to name a few.
