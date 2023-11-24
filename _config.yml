@@ -9,7 +9,7 @@ sass:
 compass:
   # an avatar or logo (optional)
   logo: "/images/pawpaw.png"
-  og_logo: "/images/open_graph_pawpaw.png"
+  og_logo: "/images/pawpaw.png"
   # author will appear under the avatar (optional)
   author: "Kraken cookie"
   # tagline will appear under the title (optional)
